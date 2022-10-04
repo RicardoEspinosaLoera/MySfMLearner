@@ -158,7 +158,7 @@ class MonodepthOptions:
         self.parser.add_argument("--num_workers",
                                  type=int,
                                  help="number of dataloader workers",
-                                 default=10)
+                                 default=8)
 
         # LOADING options
         self.parser.add_argument("--load_weights_folder",
