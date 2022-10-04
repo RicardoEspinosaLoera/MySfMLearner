@@ -307,7 +307,7 @@ class Trainer:
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
                     #writer.add_image("registration_{}_{}/{}".format(frame_id, s, j),outputs[("registration", s, frame_id)][j].data, self.step)
-                    wandb.log({mode+"_registration_{}_{}".format(frame_id): wandb.Image(outputs[("registration", s, frame_id)][j].data)},self.step)
+                    wandb.log({mode+"_registration_{}_{}".format(frame_id): wandb.Image(outputs[("registration", s, frame_id)][j].data)})
 
     def save_opts(self):
         """Save options to disk so we know what we ran this experiment with
