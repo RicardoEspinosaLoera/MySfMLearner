@@ -11,7 +11,9 @@ from utils import *
 from layers import *
 from torch.utils.data import DataLoader
 from tensorboardX import SummaryWriter
+import wandb
 
+wandb.init(project="AF-SfMLearner", entity="respinosa")
 
 class Trainer:
     def __init__(self, options):
@@ -298,14 +300,14 @@ class Trainer:
         """
         writer = self.writers[mode]
         for l, v in losses.items():
-            writer.add_scalar("{}".format(l), v, self.step)
+            wandb.log({mode+"_{}".format(l):v},step =self.step)
+            #writer.add_scalar("{}".format(l), v, self.step)
 
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
-                    writer.add_image(
-                        "registration_{}_{}/{}".format(frame_id, s, j),
-                        outputs[("registration", s, frame_id)][j].data, self.step)
+                    #writer.add_image("registration_{}_{}/{}".format(frame_id, s, j),outputs[("registration", s, frame_id)][j].data, self.step)
+                    wandb.log({mode+"_registration_{}_{}".format(frame_id,self.step): wandb.Image(im)})
 
     def save_opts(self):
         """Save options to disk so we know what we ran this experiment with
