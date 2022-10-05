@@ -124,7 +124,7 @@ class Trainer:
         self.dataset = datasets_dict[self.opt.dataset]
 
         fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
-        train_filenames = readlines(fpath.format("train"))
+        train_filenames = readlines(fpath.format("train_real"))
         val_filenames = readlines(fpath.format("val"))
         img_ext = '.jpg'  
 
@@ -564,21 +564,21 @@ class Trainer:
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
-                    wandb.log({mode+"brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("transform", "high", s, frame_id)][j].data)},step=self.step)
+                    wandb.log({mode+"_brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("transform", "high", s, frame_id)][j].data)},step=self.step)
 
-                    wandb.log({mode+"registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("registration", s, frame_id)][j].data)},step=self.step)
+                    wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("registration", s, frame_id)][j].data)},step=self.step)
                    
-                    wandb.log({mode+"refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("refined", s, frame_id)][j].data)},step=self.step)
+                    wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("refined", s, frame_id)][j].data)},step=self.step)
                     if s == 0:
                         #writer.add_image(
                         #    "occu_mask_backward_{}_{}/{}".format(frame_id, s, j),
                         #    outputs[("occu_mask_backward", s, frame_id)][j].data, self.step)
-                        wandb.log({mode+"occu_mask_backward_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("occu_mask_backward", s, frame_id)][j].data)},step=self.step)
+                        wandb.log({mode+"_occu_mask_backward_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("occu_mask_backward", s, frame_id)][j].data)},step=self.step)
 
                 #writer.add_image(
                 #    "disp_{}/{}".format(s, j),
                 #   normalize_image(outputs[("disp", s)][j]), self.step)
-                wandb.log({mode+"disp_{}/{}".format(s, j): wandb.Image(normalize_image(outputs[("disp", s)][j]))},step=self.step)
+                wandb.log({mode+"_disp_{}/{}".format(s, j): wandb.Image(normalize_image(outputs[("disp", s)][j]))},step=self.step)
 
     def save_opts(self):
         """Save options to disk so we know what we ran this experiment with
