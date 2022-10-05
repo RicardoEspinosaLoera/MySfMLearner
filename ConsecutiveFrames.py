@@ -4,7 +4,7 @@ from PIL import Image
 
 i = 0
 folder = 1
-path = "D:/Phd_Research/Datasets/Real_dominique/Sequence_12-18-52-88"
+path = "D:/Phd_Research/Datasets/Real_dominique/Sequence_11-8-53-796"
 listd = os.listdir(path)
 for folder in listd:
     p = os.path.join(path,folder)
