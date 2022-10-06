@@ -41,13 +41,10 @@ class SCAREDRAWDataset(SCAREDDataset):
     def get_image_path(self, folder, frame_index, side):
         #f_str = "{:010d}{}".format(frame_index, self.img_ext)
         #image_path = os.path.join(self.data_path, folder, "image_0{}/data".format(self.side_map[side]), f_str)
-        
-        if("Sequence" in folder):
-            f_str = (str(frame_index) + ".png")
+        f_str = (str(frame_index) + self.img_ext)
+        if("Sequence" in folder):            
             image_path = os.path.join(self.data_path, folder, f_str)
-            
         else:
-            f_str = (str(frame_index) + self.img_ext)
             image_path = os.path.join(self.data_path, folder, "data", f_str)
             
         return image_path
