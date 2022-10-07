@@ -19948,7 +19948,6 @@ Sequence_11-8-53-796/3 399 l
 Sequence_11-8-53-796/3 400 l
 Sequence_11-8-53-796/3 401 l
 Sequence_11-8-53-796/3 402 l
-Sequence_11-8-53-796/30 2930 l
 Sequence_11-8-53-796/30 2931 l
 Sequence_11-8-53-796/30 2932 l
 Sequence_11-8-53-796/30 2933 l
