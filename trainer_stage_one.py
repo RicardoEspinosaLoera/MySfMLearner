@@ -173,7 +173,7 @@ class Trainer:
 
             for scale in self.opt.scales:
 
-                outputs[("position", scale, f_i)] = outputs_0[("position", scale)]
+                outputs[("position", scale, f_i)] = outputs_0[("position_"+str(scale)]
                 outputs[("position", "high", scale, f_i)] = F.interpolate(
                     outputs[("position", scale, f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 outputs[("registration", scale, f_i)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs[("position", "high", scale, f_i)])
