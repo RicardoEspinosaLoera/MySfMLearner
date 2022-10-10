@@ -637,14 +637,16 @@ class Trainer:
                 to_save['use_stereo'] = self.opt.use_stereo
             
             torch.save(to_save, save_path)
-            if model_name in ["encoder","depth","position_encoder","position"]: 
+            if model_name in ["encoder","depth","pose","pose_encoder"]: 
                 print(model_name)
                 sm = torch.jit.script(model)
                 sm.save(save_path2)
 
         save_path = os.path.join(save_folder, "{}.pth".format("adam"))
+        save_path2 = os.path.join(save_folder, "{}.pt".format("adam"))
         torch.save(self.model_optimizer.state_dict(), save_path)
-        #sm = torch.jit.script(self.model_optimizer.state_dict())
+        sm = torch.jit.script(self.model_optimizer.state_dict())
+        sm.save(save_path2)
 
     def load_model(self):
         """Load model(s) from disk
