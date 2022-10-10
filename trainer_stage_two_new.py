@@ -248,7 +248,6 @@ class Trainer:
                 self.val()
 
             self.step += 1
-            break
             
         self.model_lr_scheduler.step()
 
