@@ -26,7 +26,7 @@ def export_gt_depths_SCARED():
     split_folder = os.path.join(os.path.dirname(__file__), "splits", opt.split)
     lines = readlines(os.path.join(split_folder, "test_files.txt"))
     print("Exporting ground truth depths for {}".format(opt.split))
-
+    print(opt.data_path)
     gt_Ts = []
     for line in lines:
         folder, frame_id, _ = line.split()
@@ -38,13 +38,17 @@ def export_gt_depths_SCARED():
         path_0 = os.path.join(
                 opt.data_path,
                 folder,
-                "image_02/data/frame_data",
+                "data",
+                "frame_data",
                 f_str_0)
+        path_0 = path_0.replace("/","\\")
         path_1 = os.path.join(
                 opt.data_path,
                 folder,
-                "image_02/data/frame_data",
+                "data",
+                "frame_data",
                 f_str_1)
+        path1 = path_1.replace("/","\\")
         with open(path_0, 'r') as path0:
             data_0 = json.load(path0)
         with open(path_1,'r') as path1:

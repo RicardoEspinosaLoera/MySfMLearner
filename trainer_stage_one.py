@@ -57,7 +57,7 @@ class Trainer:
 
         fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
         #train_filenames = readlines(fpath.format("train"))
-        train_filenames = readlines(fpath.format("train_real"))
+        train_filenames = readlines(fpath.format("train"))
         val_filenames = readlines(fpath.format("val"))
         img_ext = '.jpg'  # if self.opt.png else '.jpg'
 

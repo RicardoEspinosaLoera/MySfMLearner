@@ -8,7 +8,7 @@ import PIL.Image as pil
 import cv2
 
 from utils import readlines
-from kitti_utils import generate_depth_map
+#from kitti_utils import generate_depth_map
 
 
 def export_gt_depths_kitti():
@@ -42,7 +42,7 @@ def export_gt_depths_kitti():
             calib_dir = os.path.join(opt.data_path, folder.split("/")[0])
             velo_filename = os.path.join(opt.data_path, folder,
                                          "velodyne_points/data", "{:010d}.bin".format(frame_id))
-            gt_depth = generate_depth_map(calib_dir, velo_filename, 2, True)
+            #gt_depth = generate_depth_map(calib_dir, velo_filename, 2, True)
         elif opt.split == "eigen_benchmark":
             gt_depth_path = os.path.join(opt.data_path, folder, "proj_depth",
                                          "groundtruth", "image_02", "{:010d}.png".format(frame_id))
@@ -52,8 +52,11 @@ def export_gt_depths_kitti():
             gt_depth_path = os.path.join(
                 opt.data_path,
                 folder,
-                "image_02/data/groundtruth",
+                "data",
+                "scene_points",
                 f_str)
+            gt_depth_path = gt_depth_path.replace("/","\\")
+            #print(gt_depth_path)
             depth_gt = cv2.imread(gt_depth_path, 3)
             depth_gt = depth_gt[:, :, 0]
             gt_depth = depth_gt[0:1024, :]
