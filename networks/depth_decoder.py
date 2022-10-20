@@ -151,7 +151,7 @@ class DepthDecoder(nn.Module):
         #self.decoder = nn.ModuleList(list(self.convs.values()))
         self.sigmoid = nn.Sigmoid()
 
-    def forward(self,list(input_features)):
+    def forward(self,input_features: List[torch.Tensor]):
         #self.output = []
         # decoder
         x = input_features[-1]
