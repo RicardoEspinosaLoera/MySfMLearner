@@ -72,7 +72,7 @@ import torch.nn.functional as F
 
 #from collections import OrderedDict
 from layers import *
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 
 class DepthDecoder(nn.Module):
     #convs:Dict[str,int,int]
