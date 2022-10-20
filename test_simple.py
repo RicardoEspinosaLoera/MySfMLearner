@@ -98,7 +98,7 @@ def test_simple(args):
             original_width, original_height = input_image.size
             input_image = input_image.resize((feed_width, feed_height), pil.LANCZOS)
             input_image = transforms.ToTensor()(input_image).unsqueeze(0)
-
+            print(input_image.shape)
             # PREDICTION
             input_image = input_image.to(device)
             features = encoder(input_image)
