@@ -10,7 +10,7 @@ import torch.optim as optim
 from utils import *
 from layers import *
 from torch.utils.data import DataLoader
-from tensorboardX import SummaryWriter
+#from tensorboardX import SummaryWriter
 import wandb
 
 wandb.init(project="AF-SfMLearner", entity="respinosa")
@@ -78,9 +78,9 @@ class Trainer:
             num_workers=1, pin_memory=True, drop_last=True)
         self.val_iter = iter(self.val_loader)
 
-        self.writers = {}
-        for mode in ["train", "val"]:
-            self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
+        #self.writers = {}
+        #for mode in ["train", "val"]:
+        #    self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
 
         if not self.opt.no_ssim:
             self.ssim = SSIM()
