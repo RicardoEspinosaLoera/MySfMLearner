@@ -12,7 +12,7 @@ for i in arr:
     for x in listd:
         print(x)
         lista = os.listdir(path+i+"/"+x)
-        for idx,y in enumerate(lista):
+        #for idx,y in enumerate(lista):
             #name = y.split(".")[0]
             #if "png" in y: 
                 # Load .png image
