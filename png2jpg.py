@@ -17,7 +17,7 @@ for i in arr:
                 # Load .png image
                 image = cv2.imread(path+i+"/"+x+"/"+y)
                 # Save .jpg image
-                cv2.imwrite(path+i+"/"+x+"/"+(id+1)+'.jpg', image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                cv2.imwrite(path+i+"/"+x+"/"+str(id+1)+'.jpg', image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
                 os.remove(path+i+"/"+x+"/"+y)
                 id = id+1
                 #print((idx+1))
