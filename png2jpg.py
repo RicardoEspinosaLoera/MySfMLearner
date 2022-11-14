@@ -8,7 +8,7 @@ arr= ["Sequence_11-8-53-796","Sequence_12-18-52-88","Sequence_12-59-29-990"]
 id = 0
 for i in arr:    
     listd = os.listdir(path+i)
-    listd.sort()
+    #listd.sort()
     for x in listd:
         print(x)
         lista = os.listdir(path+i+"/"+x)
