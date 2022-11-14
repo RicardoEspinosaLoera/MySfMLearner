@@ -10,8 +10,8 @@ for i in arr:
     listd = os.listdir(path+i)
     listd.sort()
     for x in listd:
+        print(x)
         lista = os.listdir(path+i+"/"+x)
-        lista.sort()
         for idx,y in enumerate(lista):
             name = y.split(".")[0]
             if "png" in y: 
