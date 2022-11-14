@@ -18,4 +18,5 @@ for i in arr:
             #cv2.imwrite(path+i+"/"+x+"/"+(idx+1)+'.jpg', image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
             #os.remove(path+i+"/"+x+"/"+y)
             print((idx+1))
+            os.rename(path+i+"/"+x+"/"+y,path+i+"/"+x+"/"+(idx+1)+'.jpg')
             
