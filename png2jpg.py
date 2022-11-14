@@ -23,4 +23,3 @@ for i in arr:
                 #id = id+1
                 #print((idx+1))
                 #os.rename(path+i+"/"+x+"/"+y,path+i+"/"+x+"/"+str(idx+1)+'.jpg')
-            
