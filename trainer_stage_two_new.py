@@ -26,7 +26,7 @@ class Trainer:
         self.models = {}  # 字典
         self.parameters_to_train = []  # 列表
 
-        self.device = torch.device("cpu")
+        self.device = torch.device("gpu")
 
         self.num_scales = len(self.opt.scales)  # 4
         self.num_input_frames = len(self.opt.frame_ids)  # 3
