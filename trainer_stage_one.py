@@ -299,7 +299,7 @@ class Trainer:
     def log(self, mode, inputs, outputs, losses):
         """Write an event to the tensorboard events file
         """
-        writer = self.writers[mode]
+        #writer = self.writers[mode]
         for l, v in losses.items():
             wandb.log({mode+"_{}".format(l):v},step =self.step)
             #writer.add_scalar("{}".format(l), v, self.step)
