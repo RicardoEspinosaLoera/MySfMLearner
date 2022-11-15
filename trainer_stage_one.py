@@ -10,7 +10,7 @@ import torch.optim as optim
 from utils import *
 from layers import *
 from torch.utils.data import DataLoader
-#from tensorboardX import SummaryWriter
+from tensorboardX import SummaryWriter
 import wandb
 
 wandb.init(project="AF-SfMLearner", entity="respinosa")
@@ -73,14 +73,16 @@ class Trainer:
         val_dataset = self.dataset(
             self.opt.data_path, val_filenames, self.opt.height, self.opt.width,
             self.opt.frame_ids, 4, is_train=False, img_ext=img_ext)
-        self.val_loader = DataLoader(
+
+         self.val_loader = DataLoader(
             val_dataset, self.opt.batch_size, False,
             num_workers=1, pin_memory=True, drop_last=True)
         self.val_iter = iter(self.val_loader)
 
-        #self.writers = {}
-        #for mode in ["train", "val"]:
-        #    self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
+
+        self.writers = {}
+        for mode in ["train", "val"]:
+            self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
 
         if not self.opt.no_ssim:
             self.ssim = SSIM()
@@ -299,15 +301,15 @@ class Trainer:
     def log(self, mode, inputs, outputs, losses):
         """Write an event to the tensorboard events file
         """
-        #writer = self.writers[mode]
+        writer = self.writers[mode]
         for l, v in losses.items():
             wandb.log({mode+"_{}".format(l):v},step =self.step)
-            #writer.add_scalar("{}".format(l), v, self.step)
+            writer.add_scalar("{}".format(l), v, self.step)
 
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
-                    #writer.add_image("registration_{}_{}/{}".format(frame_id, s, j),outputs[("registration", s, frame_id)][j].data, self.step)
+                    writer.add_image("registration_{}_{}/{}".format(frame_id, s, j),outputs[("registration", s, frame_id)][j].data, self.step)
                     im = outputs[("registration", s, frame_id)][j].data
                     wandb.log({mode+"_registration_{}_{}".format(frame_id,self.step): wandb.Image(im)})
 
