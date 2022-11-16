@@ -266,8 +266,6 @@ class Trainer:
         losses = {}
         total_loss = 0
 
-        inputs.to("cpu")
-        outputs.to("cpu")
 
         for scale in self.opt.scales:
 
@@ -278,7 +276,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs[("registration", scale, frame_id)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs[("registration", scale, frame_id)].mean(1, True).to("cpu"), target.mean(1, True).to("cpu")))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
