@@ -345,6 +345,9 @@ def ncc_loss(I, J, win=None):
 
 def compute_local_sums(I, J, filt, stride, padding, win):
 
+    I.to("cpu")
+    filt.to("cpu")
+
     I2 = I * I
     J2 = J * J
     IJ = I * J
