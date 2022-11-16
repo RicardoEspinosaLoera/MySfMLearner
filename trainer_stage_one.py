@@ -266,6 +266,9 @@ class Trainer:
         losses = {}
         total_loss = 0
 
+        inputs.to("cpu")
+        outputs.to("cpu")
+
         for scale in self.opt.scales:
 
             loss = 0
