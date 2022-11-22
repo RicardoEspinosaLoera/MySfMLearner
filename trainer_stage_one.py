@@ -330,7 +330,7 @@ class Trainer:
                     #writer.add_image("registration_{}_{}/{}".format(frame_id, s, j),outputs[("registration", s, frame_id)][j].data, self.step)
                     im = outputs[("registration", s, frame_id)][j].data
                     f = outputs[("position", s, frame_id)][j].data
-                    flow = self.flow2rgb_raw(f,64)
+                    flow = self.flow2rgb_raw(f,32)
                     flow = torch.from_numpy(flow)
                     #print(im.shape)
                     #print(flow.shape)
