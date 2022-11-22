@@ -302,7 +302,7 @@ class Trainer:
         print(print_string.format(self.epoch, batch_idx, samples_per_sec, loss,
                                   sec_to_hm_str(time_sofar), sec_to_hm_str(training_time_left)))
     
-    def flow2rgb_raw(flow_map, max_value):
+    def flow2rgb_raw(selg,flow_map, max_value):
         flow_map_np = flow_map.detach().cpu().numpy()
         _, h, w = flow_map_np.shape
         flow_map_np[:,(flow_map_np[0] == 0) & (flow_map_np[1] == 0)] = float('nan')
