@@ -10,7 +10,7 @@ import torch.optim as optim
 from utils import *
 from layers import *
 from torch.utils.data import DataLoader
-from tensorboardX import SummaryWriter
+#from tensorboardX import SummaryWriter
 import wandb
 
 wandb.init(project="AF-SfMLearner", entity="respinosa")
@@ -81,9 +81,9 @@ class Trainer:
         self.val_iter = iter(self.val_loader)
 
 
-        self.writers = {}
-        for mode in ["train", "val"]:
-            self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
+        #self.writers = {}
+        #for mode in ["train", "val"]:
+        #    self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
 
         if not self.opt.no_ssim:
             self.ssim = SSIM()
@@ -305,17 +305,18 @@ class Trainer:
     def log(self, mode, inputs, outputs, losses):
         """Write an event to the tensorboard events file
         """
-        writer = self.writers[mode]
+        #writer = self.writers[mode]
         for l, v in losses.items():
             wandb.log({mode+"_{}".format(l):v},step =self.step)
-            writer.add_scalar("{}".format(l), v, self.step)
+            #writer.add_scalar("{}".format(l), v, self.step)
 
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
-                    writer.add_image("registration_{}_{}/{}".format(frame_id, s, j),outputs[("registration", s, frame_id)][j].data, self.step)
+                    #writer.add_image("registration_{}_{}/{}".format(frame_id, s, j),outputs[("registration", s, frame_id)][j].data, self.step)
                     im = outputs[("registration", s, frame_id)][j].data
-                    wandb.log({mode+"_registration_{}_{}".format(frame_id,self.step): wandb.Image(im)})
+                    flow = flow2rgb_raw(im,max_value=128)
+                    wandb.log({mode+"_registration_{}_{}".format(frame_id,self.step): wandb.Image(flow)})
 
     def save_opts(self):
         """Save options to disk so we know what we ran this experiment with
@@ -375,3 +376,16 @@ class Trainer:
         else:
             print("Cannot find Adam weights so Adam is randomly initialized")
 
+    def flow2rgb_raw(flow_map, max_value):
+        flow_map_np = flow_map.detach().cpu().numpy()
+        _, h, w = flow_map_np.shape
+        flow_map_np[:,(flow_map_np[0] == 0) & (flow_map_np[1] == 0)] = float('nan')
+        rgb_map = np.ones((3,h,w)).astype(np.float32)
+        if max_value is not None:
+            normalized_flow_map = flow_map_np / max_value
+        else:
+            normalized_flow_map = flow_map_np / (np.abs(flow_map_np).max())
+        rgb_map[0] += normalized_flow_map[0]
+        rgb_map[1] -= 0.5*(normalized_flow_map[0] + normalized_flow_map[1])
+        rgb_map[2] += normalized_flow_map[1]
+        return rgb_map.clip(0,1)
