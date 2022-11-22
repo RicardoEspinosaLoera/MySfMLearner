@@ -331,8 +331,8 @@ class Trainer:
                     im = outputs[("registration", s, frame_id)][j].data
                     flow = self.flow2rgb_raw(im,128)
                     flow = torch.from_numpy(flow)
-                    print(im.shape)
-                    print(flow.shape)
+                    #print(im.shape)
+                    #print(flow.shape)
                     wandb.log({mode+"_registration_{}_{}".format(frame_id,self.step): wandb.Image(flow)})
 
     def save_opts(self):
