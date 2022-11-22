@@ -330,7 +330,7 @@ class Trainer:
                     #writer.add_image("registration_{}_{}/{}".format(frame_id, s, j),outputs[("registration", s, frame_id)][j].data, self.step)
                     im = outputs[("registration", s, frame_id)][j].data
                     flow = self.flow2rgb_raw(im,128)
-                    print(im)
+                    print(im.shape)
                     print(flow.shape)
                     wandb.log({mode+"_registration_{}_{}".format(frame_id,self.step): wandb.Image(flow)})
 
