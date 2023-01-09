@@ -38,7 +38,7 @@ class MonodepthOptions:
         self.parser.add_argument("--dataset",
                                  type=str,
                                  help="dataset to train on",
-                                 default="endovis",
+                                 default="colon10k",
                                  choices=["endovis", "kitti", "kitti_odom", "kitti_depth", "kitti_test","colon10k"])
         self.parser.add_argument("--png",
                                  help="if set, trains from raw KITTI png files (instead of jpgs)",
