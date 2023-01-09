@@ -45,7 +45,7 @@ class SCAREDRAWDataset(SCAREDDataset):
         if("Sequence" in folder):            
             image_path = os.path.join(self.data_path, folder, f_str)
         else:
-            image_path = os.path.join(self.data_path, folder, "data", f_str)
+            image_path = os.path.join(self.data_path, folder, f_str)
             
         return image_path
 
