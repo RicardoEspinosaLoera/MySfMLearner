@@ -15,7 +15,7 @@ import wandb
 
 wandb.init(project="AF-SfMLearner", entity="respinosa")
 
-from tensorboardX import SummaryWriter
+#from tensorboardX import SummaryWriter
 
 
 class Trainer:
@@ -124,11 +124,11 @@ class Trainer:
         print("Training is using:\n  ", self.device)
 
         # data
-        datasets_dict = {"endovis": datasets.SCAREDRAWDataset}
+        datasets_dict = {"colon10k": datasets.SCAREDRAWDataset}
         self.dataset = datasets_dict[self.opt.dataset]
 
         fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
-        train_filenames = readlines(fpath.format("train_real"))
+        train_filenames = readlines(fpath.format("train"))
         val_filenames = readlines(fpath.format("val"))
         img_ext = '.jpg'  
 
@@ -150,8 +150,8 @@ class Trainer:
         self.val_iter = iter(self.val_loader)
 
         self.writers = {}
-        for mode in ["train", "val"]:
-            self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
+        #for mode in ["train", "val"]:
+        #    self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
 
         if not self.opt.no_ssim:
             self.ssim = SSIM()
