@@ -149,7 +149,7 @@ class Trainer:
             num_workers=1, pin_memory=True, drop_last=True)
         self.val_iter = iter(self.val_loader)
 
-        self.writers = {}
+        #self.writers = {}
         #for mode in ["train", "val"]:
         #    self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
 
@@ -587,30 +587,29 @@ class Trainer:
     def log(self, mode, inputs, outputs, losses):
         """Write an event to the tensorboard events file
         """
-        writer = self.writers[mode]
-        
+        #writer = self.writers[mode]
         for l, v in losses.items():
-            writer.add_scalar("{}".format(l), v, self.step)
+            wandb.log({mode+"{}".format(l):v},step =self.step)
 
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
+                    wandb.log({mode+"_brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("transform", "high", s, frame_id)][j].data)},step=self.step)
 
-                    writer.add_image(
-                        "brightness_{}_{}/{}".format(frame_id, s, j),
-                        outputs["th_"+str(s)+"_"+str(frame_id)][j].data, self.step)
-                    writer.add_image(
-                        "registration_{}_{}/{}".format(frame_id, s, j),
-                        outputs["r_"+str(s)+"_"+str(frame_id)][j].data, self.step)
-                    writer.add_image(
-                        "refined_{}_{}/{}".format(frame_id, s, j),
-                        outputs["ref_"+str(s)+"_"+str(frame_id)][j].data, self.step)
+                    wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("registration", s, frame_id)][j].data)},step=self.step)
+                   
+                    wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("refined", s, frame_id)][j].data)},step=self.step)
                     if s == 0:
-                        writer.add_image(
-                            "occu_mask_backward_{}_{}/{}".format(frame_id, s, j),
-                            outputs["omaskb_"+str(s)+"_"+str(frame_id)][j].data, self.step)
+                        #writer.add_image(
+                        #    "occu_mask_backward_{}_{}/{}".format(frame_id, s, j),
+                        #    outputs[("occu_mask_backward", s, frame_id)][j].data, self.step)
+                        wandb.log({mode+"_occu_mask_backward_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("occu_mask_backward", s, frame_id)][j].data)},step=self.step)
 
-                writer.add_image("disp_{}/{}".format(s, j),normalize_image(outputs["disp_"+ str(s)][j]), self.step)
+                #writer.add_image(
+                #    "disp_{}/{}".format(s, j),
+                #   normalize_image(outputs[("disp", s)][j]), self.step)
+                wandb.log({mode+"_disp_{}/{}".format(s, j): wandb.Image(normalize_image(outputs[("disp", s)][j]))},step=self.step)
+
                     
 
     def save_opts(self):
