@@ -609,7 +609,7 @@ class Trainer:
                 #writer.add_image(
                 #    "disp_{}/{}".format(s, j),
                 #   normalize_image(outputs[("disp", s)][j]), self.step)
-                wandb.log({mode+"_disp_{}/{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(scale)][j]))},step=self.step)
+                wandb.log({mode+"_disp_{}/{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
 
                     
 
