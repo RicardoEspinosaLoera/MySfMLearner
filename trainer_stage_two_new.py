@@ -599,7 +599,7 @@ class Trainer:
                     
                     wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                    
-                    wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(scale)+"_"+str(f_i)][j].data)},step=self.step)
+                    wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     if s == 0:
                         #writer.add_image(
                         #    "occu_mask_backward_{}_{}/{}".format(frame_id, s, j),
