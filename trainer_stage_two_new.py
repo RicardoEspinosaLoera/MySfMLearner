@@ -464,6 +464,7 @@ class Trainer:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
+                
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["r_"+str(scale)+"_"+str(frame_id)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 loss_transform += (
@@ -593,22 +594,22 @@ class Trainer:
 
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
-                for frame_id in self.opt.frame_ids[1:]:
-                    wandb.log({mode+"_brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("transform", "high", s, frame_id)][j].data)},step=self.step)
-
-                    wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("registration", s, frame_id)][j].data)},step=self.step)
+                for frame_id in self.opt.frame_ids[1:]:"th_"+str(scale)+"_"+str(f_i)
+                    wandb.log({mode+"_brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["th_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    
+                    wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                    
-                    wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("refined", s, frame_id)][j].data)},step=self.step)
+                    wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(scale)+"_"+str(f_i)][j].data)},step=self.step)
                     if s == 0:
                         #writer.add_image(
                         #    "occu_mask_backward_{}_{}/{}".format(frame_id, s, j),
                         #    outputs[("occu_mask_backward", s, frame_id)][j].data, self.step)
-                        wandb.log({mode+"_occu_mask_backward_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs[("occu_mask_backward", s, frame_id)][j].data)},step=self.step)
+                        wandb.log({mode+"_occu_mask_backward_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["omaskb_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
                 #writer.add_image(
                 #    "disp_{}/{}".format(s, j),
                 #   normalize_image(outputs[("disp", s)][j]), self.step)
-                wandb.log({mode+"_disp_{}/{}".format(s, j): wandb.Image(normalize_image(outputs[("disp", s)][j]))},step=self.step)
+                wandb.log({mode+"_disp_{}/{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(scale)][j]))},step=self.step)
 
                     
 
