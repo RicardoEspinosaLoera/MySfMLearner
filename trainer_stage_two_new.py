@@ -594,7 +594,7 @@ class Trainer:
 
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
-                for frame_id in self.opt.frame_ids[1:]:"th_"+str(scale)+"_"+str(f_i)
+                for frame_id in self.opt.frame_ids[1:]:
                     wandb.log({mode+"_brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["th_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
                     wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
