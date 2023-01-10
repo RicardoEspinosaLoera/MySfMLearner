@@ -18,7 +18,7 @@ class SCAREDDataset(MonoDataset):
                            [0, 0, 1, 0],
                            [0, 0, 0, 1]], dtype=np.float32)"""
          
-         self.K = np.array([[0.50, 0, 0.47, 0],
+        self.K = np.array([[0.50, 0, 0.47, 0],
                            [0, 0.64, 0.48, 0],
                            [0, 0, 1, 0],
                            [0, 0, 0, 1]], dtype=np.float32)
