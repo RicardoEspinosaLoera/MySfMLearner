@@ -21,8 +21,8 @@ class Trainer:
         self.log_path = os.path.join(self.opt.log_dir, self.opt.model_name)
 
         # checking height and width are multiples of 32
-        #assert self.opt.height % 32 == 0, "'height' must be a multiple of 32"
-        #assert self.opt.width % 32 == 0, "'width' must be a multiple of 32"
+        assert self.opt.height % 32 == 0, "'height' must be a multiple of 32"
+        assert self.opt.width % 32 == 0, "'width' must be a multiple of 32"
         assert self.opt.frame_ids[0] == 0, "frame_ids must start with 0"
 
         self.models = {}  # 字典
