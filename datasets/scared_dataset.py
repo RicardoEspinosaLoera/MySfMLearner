@@ -58,7 +58,7 @@ class SCAREDRAWDataset(SCAREDDataset):
         elif(len(str(frame_index))==4):
             f_str = ("0"+str(frame_index) + self.img_ext)
         """
-        f_str=frame_index
+        f_str=str(frame_index) + self.img_ext
         image_path = os.path.join(self.data_path, folder, f_str)
             
         return image_path
