@@ -28,8 +28,8 @@ class MonodepthOptions:
         self.parser.add_argument("--split",
                                  type=str,
                                  help="which training split to use",
-                                 choices=["colon10k","endovis", "eigen_zhou", "eigen_full", "odom", "benchmark"],
-                                 default="colon10k")
+                                 choices=["colon10k","endovis", "eigen_zhou", "eigen_full", "odom", "benchmark","C3VD"],
+                                 default="C3VD")
         self.parser.add_argument("--num_layers",
                                  type=int,
                                  help="number of resnet layers",
@@ -38,19 +38,19 @@ class MonodepthOptions:
         self.parser.add_argument("--dataset",
                                  type=str,
                                  help="dataset to train on",
-                                 default="colon10k",
-                                 choices=["endovis", "kitti", "kitti_odom", "kitti_depth", "kitti_test","colon10k"])
+                                 default="C3VD",
+                                 choices=["endovis", "kitti", "kitti_odom", "kitti_depth", "kitti_test","colon10k","C3VD"])
         self.parser.add_argument("--png",
                                  help="if set, trains from raw KITTI png files (instead of jpgs)",
                                  action="store_true")
         self.parser.add_argument("--height",
                                  type=int,
                                  help="input image height",
-                                 default=224)
+                                 default=256)
         self.parser.add_argument("--width",
                                  type=int,
                                  help="input image width",
-                                 default=288)
+                                 default=320)
         self.parser.add_argument("--disparity_smoothness",
                                  type=float,
                                  help="disparity smoothness weight",
