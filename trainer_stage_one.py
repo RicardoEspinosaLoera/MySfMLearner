@@ -53,14 +53,14 @@ class Trainer:
         print("Training is using:\n  ", self.device)
 
         # data
-        datasets_dict = {"colon10k": datasets.SCAREDRAWDataset}
+        datasets_dict = {"C3VD": datasets.SCAREDRAWDataset}
         self.dataset = datasets_dict[self.opt.dataset]
 
         fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
         #train_filenames = readlines(fpath.format("train"))
         train_filenames = readlines(fpath.format("train"))
         val_filenames = readlines(fpath.format("val"))
-        img_ext = '.jpg'  # if self.opt.png else '.jpg'
+        img_ext = '.png'  # if self.opt.png else '.jpg'
 
         num_train_samples = len(train_filenames)
         self.num_total_steps = num_train_samples // self.opt.batch_size * self.opt.num_epochs
