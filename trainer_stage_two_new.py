@@ -643,7 +643,7 @@ class Trainer:
                 to_save['use_stereo'] = self.opt.use_stereo
             
             torch.save(to_save, save_path)
-            if model_name in ["encoder","depth","pose","pose_encoder"]: 
+            if model_name in ["encoder","depth"]: 
                 print(model_name)
                 sm = torch.jit.script(model)
                 sm.save(save_path2)
