@@ -642,7 +642,7 @@ class Trainer:
                 to_save['width'] = self.opt.width
                 to_save['use_stereo'] = self.opt.use_stereo
             
-            torch.save(to_save, save_path)
+            #torch.save(to_save, save_path)
             if model_name in ["encoder","depth"]: 
                 print(model_name)
                 sm = torch.jit.script(model)
