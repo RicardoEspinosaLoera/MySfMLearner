@@ -50,7 +50,8 @@ class MonoDataset(data.Dataset):
         self.height = height
         self.width = width
         self.num_scales = num_scales
-        self.interp = PIL.Image.LANCZOS 
+        self.interp = Image.LANCZOS
+        
 
         self.frame_idxs = frame_idxs
 
