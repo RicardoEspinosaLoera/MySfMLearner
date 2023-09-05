@@ -28,8 +28,8 @@ class MonodepthOptions:
         self.parser.add_argument("--split",
                                  type=str,
                                  help="which training split to use",
-                                 choices=["colon10k","endovis", "eigen_zhou", "eigen_full", "odom", "benchmark","C3VD"],
-                                 default="C3VD")
+                                 choices=["colon10k","endovis", "eigen_zhou", "eigen_full", "odom", "benchmark","C3VD","RNNSLAM"],
+                                 default="RNNSLAM")
         self.parser.add_argument("--num_layers",
                                  type=int,
                                  help="number of resnet layers",
