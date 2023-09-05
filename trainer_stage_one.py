@@ -320,7 +320,7 @@ class Trainer:
         """Write an event to the tensorboard events file
         """
         #writer = self.writers[mode]
-        for l, v in losses.items():
+        #for l, v in losses.items():
             #wandb.log({mode+"_{}".format(l):v},step =self.step)
             #writer.add_scalar("{}".format(l), v, self.step)
 
