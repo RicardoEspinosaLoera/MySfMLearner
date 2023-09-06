@@ -140,7 +140,7 @@ class MonoDataset(data.Dataset):
         folder = line[0]
 
         if len(line) == 3:
-            frame_index = int(line[1])
+            frame_index = int(line[1].replace(".png",""))
         else:
             frame_index = 0
 
