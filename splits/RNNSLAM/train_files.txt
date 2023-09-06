@@ -14230,7 +14230,6 @@ Case9/left/ 259.png l
 Case9/left/ 26.png l
 Case9/left/ 260.png l
 Case9/left/ 261.png l
-Case9/left/ 262.png l
 Case9/left/ 27.png l
 Case9/left/ 28.png l
 Case9/left/ 29.png l
