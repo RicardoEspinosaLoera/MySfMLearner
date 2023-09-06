@@ -13,7 +13,13 @@ from layers import *
 from torch.utils.data import DataLoader
 import wandb
 
-wandb.init(project="AF-SfMLearner", entity="respinosa")
+wandb.login()
+
+run = wandb.init(
+    # Set the project where this run will be logged
+    project="AF-SfMLearner",
+    )
+#wandb.init(project="AF-SfMLearner", entity="respinosa")
 
 #from tensorboardX import SummaryWriter
 
