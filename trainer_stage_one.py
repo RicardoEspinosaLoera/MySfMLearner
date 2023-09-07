@@ -14,6 +14,7 @@ from torch.utils.data import DataLoader
 import wandb
 
 wandb.init(project="AF-SfMLearner", entity="respinosa")
+torch.cuda.empty_cache() 
 
 class Trainer:
     def __init__(self, options):
