@@ -15,7 +15,7 @@ import wandb
 
 wandb.init(project="AF-SfMLearner", entity="respinosa")
 
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:5000"
+
 class Trainer:
     def __init__(self, options):
         self.opt = options
