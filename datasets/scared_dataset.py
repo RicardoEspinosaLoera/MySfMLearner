@@ -26,8 +26,8 @@ class SCAREDDataset(MonoDataset):
         #RNNSLAM synthetic dataset
         #480 / 640
         #fx = 232.5044678; fy = 232.5044678; cx = 240.0; cy = 320.0; baseline = 4.5; %unit in milimeter
-        self.K = np.array([[0.36, 0, 0.375, 0],
-                           [0, 0.48,0.66, 0],
+        self.K = np.array([[0.48, 0, 0.5, 0],
+                           [0, 0.36,0.5, 0],
                            [0, 0, 1, 0],
                            [0, 0, 0, 1]], dtype=np.float32)
                            
