@@ -31,10 +31,10 @@ class SCAREDDataset(MonoDataset):
                            [0, 0, 1, 0],
                            [0, 0, 0, 1]], dtype=np.float32)"""
         #Colon10k dataset
-        #270 / 216
+        #256 / 320
         #Camera Intrinsics: Pinhole fx=145.4410 fy=145.4410 cx=135.6993 cy=107.8946 width=270 height=216
-        self.K = np.array([[0.6733, 0, 0.6282, 0],
-                           [0, 0.5386,0.3996, 0],
+        self.K = np.array([[0.4545, 0, 0.4240, 0],
+                           [0, 0.5681,0.4214, 0],
                            [0, 0, 1, 0],
                            [0, 0, 0, 1]], dtype=np.float32)
 
