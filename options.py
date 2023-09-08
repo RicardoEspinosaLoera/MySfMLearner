@@ -29,7 +29,7 @@ class MonodepthOptions:
                                  type=str,
                                  help="which training split to use",
                                  choices=["colon10k","endovis", "eigen_zhou", "eigen_full", "odom", "benchmark","C3VD","RNNSLAM"],
-                                 default="RNNSLAM")
+                                 default="colon10k")
         self.parser.add_argument("--num_layers",
                                  type=int,
                                  help="number of resnet layers",
@@ -38,7 +38,7 @@ class MonodepthOptions:
         self.parser.add_argument("--dataset",
                                  type=str,
                                  help="dataset to train on",
-                                 default="RNNSLAM",
+                                 default="colon10k",
                                  choices=["endovis", "kitti", "kitti_odom", "kitti_depth", "kitti_test","colon10k","C3VD","RNNSLAM"])
         self.parser.add_argument("--png",
                                  help="if set, trains from raw KITTI png files (instead of jpgs)",
@@ -46,11 +46,11 @@ class MonodepthOptions:
         self.parser.add_argument("--height",
                                  type=int,
                                  help="input image height",
-                                 default=640)
+                                 default=216)
         self.parser.add_argument("--width",
                                  type=int,
                                  help="input image width",
-                                 default=480)
+                                 default=270)
         self.parser.add_argument("--disparity_smoothness",
                                  type=float,
                                  help="disparity smoothness weight",
@@ -105,7 +105,7 @@ class MonodepthOptions:
         self.parser.add_argument("--batch_size",
                                  type=int,
                                  help="batch size",
-                                 default=10)
+                                 default=12)
         self.parser.add_argument("--learning_rate",
                                  type=float,
                                  help="learning rate",
