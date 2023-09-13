@@ -20,7 +20,7 @@ class PoseCNN(nn.Module):
         self.convs[6] = nn.Conv2d(256, 256, 3, 2, 1)
 
         #last layer of convolutions to then pass them to the 
-        self.lastlayer = self.convs[6]
+        #self.lastlayer = self.convs[6]
 
         self.pose_conv = nn.Conv2d(256, 6 * (num_input_frames - 1), 1)
 
@@ -35,7 +35,7 @@ class PoseCNN(nn.Module):
         for i in range(self.num_convs):
             out = self.convs[i](out)
             out = self.relu(out)
-
+        last_layer = out
         out = self.pose_conv(out)
         out = out.mean(3).mean(2)
 
@@ -44,4 +44,4 @@ class PoseCNN(nn.Module):
         axisangle = out[..., :3]
         translation = out[..., 3:]
 
-        return axisangle, translation
+        return axisangle, translation, last_layer
