@@ -282,11 +282,11 @@ class Trainer:
             outputs = self.models["depth"](features[0])
         else:
             # Otherwise, we only feed the image with frame_id 0 through the depth encoder
-            
-            #DepthNet Prediction
-            features = self.models["encoder"](inputs["color_aug", 0, 0])
-            outputs = self.models["depth"](features)
-        """
+        """    
+        #DepthNet Prediction
+        features = self.models["encoder"](inputs["color_aug", 0, 0])
+        outputs = self.models["depth"](features)
+    
         #Not used
         #if self.opt.predictive_mask:
         #    outputs["predictive_mask"] = self.models["predictive_mask"](features)
