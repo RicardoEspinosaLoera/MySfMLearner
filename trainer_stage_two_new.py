@@ -74,7 +74,7 @@ class Trainer:
         self.models["transform"].to(self.device)
         self.parameters_to_train += list(self.models["transform"].parameters())
 
-        self.models["lighting"] = networks.LightingDecoder(self.models["encoder"].num_ch_enc, self.opt.scales)
+        self.models["lighting"] = networks.LightingDecoder(self.models["encoder"].num_ch_enc, self.opt.scales))
         self.models["lighting"].to(self.device)
         self.parameters_to_train += list(self.models["depth"].parameters())
 
@@ -98,7 +98,7 @@ class Trainer:
                 self.models["pose"] = networks.PoseDecoder(
                     self.models["encoder"].num_ch_enc, self.num_pose_frames)
 
-            elif self.opt.pose_model_type == "posecnn":
+            elif self.opt.pose_model_type == "poseself.models["encoder"]cnn":
                 self.models["pose"] = networks.PoseCNN(
                     self.num_input_frames if self.opt.pose_model_input == "all" else 2)
 
@@ -344,14 +344,14 @@ class Trainer:
 
                     # Input for PoseNet
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-                    input_lighting = pose_inputs[0][2]
+                    #input_lighting = pose_inputs[0][2]
                     #input_lighting = self.models["pose_encoder"](torch.cat(inputs_all, 1)).lastlayer
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
-                    print(pose_inputs[0][2].shape)
+                    #print(pose_inputs[0][2].shape)
                     #print(len(pose_inputs))
-                    contrast, brightness = self.models["lighting"](input_lighting)
+                    contrast, brightness = self.models["lighting"](pose_inputs)
                     #print(contrast)
                     #print(brightness)
                     
