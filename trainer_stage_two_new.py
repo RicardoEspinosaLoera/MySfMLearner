@@ -343,11 +343,11 @@ class Trainer:
 
                     # Input for PoseNet
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-                    print(pose_inputs.lastlayer)
+                    input_lighting = self.models["pose_encoder"](torch.cat(inputs_all, 1)).lastlayer
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
-                    contrast, brightness = self.models["lighting"](pose_inputs.lastlayer)
+                    contrast, brightness = self.models["lighting"](input_lighting)
                     print(contrast)
                     print(brightness)
                     
