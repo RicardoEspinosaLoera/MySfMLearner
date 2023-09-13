@@ -29,20 +29,33 @@ class LightingDecoder(nn.Module):
         # decoder constrast
         self.convs = OrderedDict() # 有序字典
         for i in range(4, -1, -1):
-            # upconv_0
+            # upconv_0_constrast
             num_ch_in = self.num_ch_enc[-1] if i == 4 else self.num_ch_dec[i + 1]
             num_ch_out = self.num_ch_dec[i]
             self.convs[("upconv_c", i, 0)] = ConvBlock(num_ch_in, num_ch_out)
 
-            # upconv_1
+            # upconv_1_constrast
             num_ch_in = self.num_ch_dec[i]
             if self.use_skips and i > 0:
                 num_ch_in += self.num_ch_enc[i - 1]
             num_ch_out = self.num_ch_dec[i]
             self.convs[("upconv_c", i, 1)] = ConvBlock(num_ch_in, num_ch_out)
 
+            # upconv_0_brightness
+            num_ch_in = self.num_ch_enc[-1] if i == 4 else self.num_ch_dec[i + 1]
+            num_ch_out = self.num_ch_dec[i]
+            self.convs[("upconv_b", i, 0)] = ConvBlock(num_ch_in, num_ch_out)
+
+            # upconv_1_brightness
+            num_ch_in = self.num_ch_dec[i]
+            if self.use_skips and i > 0:
+                num_ch_in += self.num_ch_enc[i - 1]
+            num_ch_out = self.num_ch_dec[i]
+            self.convs[("upconv_b", i, 1)] = ConvBlock(num_ch_in, num_ch_out)
+
         for s in self.scales:
             self.convs[("constrast_conv", s)] = Conv3x3(self.num_ch_dec[s], self.num_output_channels)
+            self.convs[("brightness_conv", s)] = Conv3x3(self.num_ch_dec[s], self.num_output_channels)
 
         self.c_decoder = nn.ModuleList(list(self.convs.values()))
         self.c_sigmoid = nn.Sigmoid()
@@ -58,20 +71,33 @@ class LightingDecoder(nn.Module):
         # decoder lighting
         self.convs = OrderedDict() 
         for i in range(4, -1, -1):
-            # upconv_0
+            # upconv_0_contrast
             num_ch_in = self.num_ch_enc[-1] if i == 4 else self.num_ch_dec[i + 1]
             num_ch_out = self.num_ch_dec[i]
-            self.convs[("upconv_l", i, 0)] = ConvBlock(num_ch_in, num_ch_out)
+            self.convs[("upconv_c", i, 0)] = ConvBlock(num_ch_in, num_ch_out)
 
-            # upconv_1
+            # upconv_1_contrast
             num_ch_in = self.num_ch_dec[i]
             if self.use_skips and i > 0:
                 num_ch_in += self.num_ch_enc[i - 1]
             num_ch_out = self.num_ch_dec[i]
-            self.convs[("upconv_l", i, 1)] = ConvBlock(num_ch_in, num_ch_out)
+            self.convs[("upconv_c", i, 1)] = ConvBlock(num_ch_in, num_ch_out)
+
+            # upconv_0_brightness
+            num_ch_in = self.num_ch_enc[-1] if i == 4 else self.num_ch_dec[i + 1]
+            num_ch_out = self.num_ch_dec[i]
+            self.convs[("upconv_b", i, 0)] = ConvBlock(num_ch_in, num_ch_out)
+
+            # upconv_1_brightness
+            num_ch_in = self.num_ch_dec[i]
+            if self.use_skips and i > 0:
+                num_ch_in += self.num_ch_enc[i - 1]
+            num_ch_out = self.num_ch_dec[i]
+            self.convs[("upconv_b", i, 1)] = ConvBlock(num_ch_in, num_ch_out)
 
         for s in self.scales:
-            self.convs[("lighting_conv", s)] = Conv3x3(self.num_ch_dec[s], self.num_output_channels)
+            self.convs[("constrast_conv", s)] = Conv3x3(self.num_ch_dec[s], self.num_output_channels)
+            self.convs[("brightness_conv", s)] = Conv3x3(self.num_ch_dec[s], self.num_output_channels)
 
         self.decoder = nn.ModuleList(list(self.convs.values()))
         #self.sigmoid = nn.Sigmoid()
@@ -91,14 +117,15 @@ class LightingDecoder(nn.Module):
             if i in self.scales:
                 self.outputs[("constrast", i)] = self.convs[("constrast_conv", i)](x)
 
-            y = self.convs[("upconv_c", i, 0)](x)
-            y = [upsample(x)]
+            y = self.convs[("upconv_b", i, 0)](x)
+            y = [upsample(y)]
             if self.use_skips and i > 0:
                 y += [input_features[i - 1]]
-            y = torch.cat(x, 1)
-            y = self.convs[("upconv_c", i, 1)](x)
+            y = torch.cat(y, 1)
+            y = self.convs[("upconv_b", i, 1)](y)
             if i in self.scales:
-                self.outputs[("lighting", i)] = self.convs[("lighting_conv", i)](x)
+                self.outputs[("constrast", i)] = self.convs[("constrast_conv", i)](x)
+                self.outputs[("brightness", i)] = self.convs[("brightness_conv", i)](y)
 
         return self.outputs
 """
