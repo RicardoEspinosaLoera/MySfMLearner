@@ -105,6 +105,7 @@ class LightingDecoder(nn.Module):
 
     def forward(self, input_features):
         self.outputs = {}
+        #x = [f[-1] for f in input_features]
         # decoder
         x = input_features[-1]
         for i in range(4, -1, -1):
