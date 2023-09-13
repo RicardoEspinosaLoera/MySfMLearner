@@ -44,4 +44,4 @@ class PoseCNN(nn.Module):
         axisangle = out[..., :3]
         translation = out[..., 3:]
 
-        return axisangle, translation, lastlayer
+        return axisangle, translation
