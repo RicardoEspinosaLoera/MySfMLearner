@@ -19,7 +19,7 @@ class LightingDecoder(nn.Module):
         super(LightingDecoder, self).__init__()
 
         self.num_output_channels = num_output_channels
-        self.use_skips = false
+        self.use_skips = False
         self.upsample_mode = 'nearest'
         self.scales = scales
 
