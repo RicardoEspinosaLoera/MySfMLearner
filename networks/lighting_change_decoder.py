@@ -48,7 +48,7 @@ class LightingDecoder(nn.Module):
         self.c_sigmoid = nn.Sigmoid()
 
         self.num_output_channels = num_output_channels
-        self.use_skips = false
+        self.use_skips = False
         self.upsample_mode = 'nearest'
         self.scales = scales
 
