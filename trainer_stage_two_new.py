@@ -347,7 +347,7 @@ class Trainer:
                     print(len(pose_inputs))
                     #input_lighting = pose_inputs[0][2]
                     #input_lighting = self.models["pose_encoder"](torch.cat(inputs_all, 1)).lastlayer
-                    axisangle, translation = self.models["pose"](pose_inputs)
+                    axisangle, translation = self.models["pose"](pose_inputs[0])
 
                     # Input for Lighting
                     #print(pose_inputs[0][2].shape)
