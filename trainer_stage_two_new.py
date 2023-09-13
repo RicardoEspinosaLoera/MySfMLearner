@@ -76,7 +76,7 @@ class Trainer:
 
         self.models["lighting"] = networks.LightingDecoder(self.models["encoder"].num_ch_enc, self.opt.scales)
         self.models["lighting"].to(self.device)
-        self.parameters_to_train += list(self.models["depth"].parameters())
+        self.parameters_to_train += list(self.models["lighting"].parameters())
 
         if self.use_pose_net:
 
@@ -352,7 +352,7 @@ class Trainer:
                     # Input for Lighting
                     #print(pose_inputs[0][2].shape)
                     #print(len(pose_inputs))
-                    contrast, brightness = self.models["lighting"](pose_inputs)
+                    contrast = self.models["lighting"](pose_inputs)
                     #print(contrast)
                     #print(brightness)
                     

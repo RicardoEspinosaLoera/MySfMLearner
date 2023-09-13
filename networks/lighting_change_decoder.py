@@ -46,7 +46,7 @@ class LightingDecoder(nn.Module):
         self.decoder = nn.ModuleList(list(self.convs.values()))
         #self.sigmoid = nn.Sigmoid()
 
-    def forward(self, input_features: List[torch.Tensor]):
+    def forward(self, input_features):
         self.outputs = {}
         # decoder
         x = input_features[-1]
