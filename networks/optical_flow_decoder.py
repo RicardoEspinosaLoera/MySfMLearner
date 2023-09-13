@@ -79,7 +79,7 @@ class PositionDecoder(nn.Module):
         super(PositionDecoder, self).__init__()
 
         self.num_output_channels = num_output_channels
-        self.use_skips = use_skips
+        self.use_skips = False
         self.upsample_mode = 'nearest'
         self.scales = scales
 
