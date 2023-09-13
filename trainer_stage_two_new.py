@@ -81,6 +81,7 @@ class Trainer:
         if self.use_pose_net:
 
             if self.opt.pose_model_type == "separate_resnet":
+                print("Pose encoder ResnetEncoder")
                 self.models["pose_encoder"] = networks.ResnetEncoder(
                     self.opt.num_layers,
                     self.opt.weights_init == "pretrained",
