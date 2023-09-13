@@ -347,7 +347,7 @@ class Trainer:
                     print(len(pose_inputs))
                     #input_lighting = pose_inputs[0][2]
                     #input_lighting = self.models["pose_encoder"](torch.cat(inputs_all, 1)).lastlayer
-                    axisangle, translation = self.models["pose"](pose_inputs[0])
+                    axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
                     #print(pose_inputs[0][2].shape)
@@ -361,8 +361,8 @@ class Trainer:
                     outputs["translation_0_"+str(f_i)] = translation
                     outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
                         axisangle[:, 0], translation[:, 0])
-                    outputs["constrast_0_"+str(f_1)] = contrast
-                    outputs["constrast_0_"+str(f_1)] = brightness
+                    #outputs["constrast_0_"+str(f_1)] = contrast
+                    #outputs["constrast_0_"+str(f_1)] = brightness
 
 
                     for scale in self.opt.scales:
