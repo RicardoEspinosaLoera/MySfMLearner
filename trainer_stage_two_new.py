@@ -348,7 +348,7 @@ class Trainer:
 
                     # Input for Lighting
                     print(pose_inputs)
-                    print(pose_inputs.shape)
+                    print(len(pose_inputs))
                     #contrast, brightness = self.models["lighting"](input_lighting)
                     #print(contrast)
                     #print(brightness)
