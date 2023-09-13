@@ -98,7 +98,7 @@ class Trainer:
                 self.models["pose"] = networks.PoseDecoder(
                     self.models["encoder"].num_ch_enc, self.num_pose_frames)
 
-            elif self.opt.pose_model_type == "poseself.models["encoder"]cnn":
+            elif self.opt.pose_model_type == "cnn":
                 self.models["pose"] = networks.PoseCNN(
                     self.num_input_frames if self.opt.pose_model_input == "all" else 2)
 
