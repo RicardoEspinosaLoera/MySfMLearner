@@ -13,7 +13,7 @@ from layers import *
 from torch.utils.data import DataLoader
 import wandb
 
-wandb.init(project="AF-SfMLearner", entity="respinosa")
+wandb.init(project="MySfMLearner", entity="respinosa")
 
 #from tensorboardX import SummaryWriter
 
@@ -73,6 +73,9 @@ class Trainer:
             self.models["transform_encoder"].num_ch_enc, self.opt.scales)
         self.models["transform"].to(self.device)
         self.parameters_to_train += list(self.models["transform"].parameters())
+
+        self.models["lighting"].to(self.device)
+        self.parameters_to_train += list(self.models["depth"].parameters())
 
         if self.use_pose_net:
 
@@ -263,6 +266,7 @@ class Trainer:
             inputs[key] = ipt.to(self.device)
         
         #Not used
+        """
         if self.opt.pose_model_type == "shared":
             # If we are using a shared encoder for both depth and pose (as advocated
             # in monodepthv1), then all images are fed separately through the depth encoder.
@@ -281,7 +285,7 @@ class Trainer:
             #DepthNet Prediction
             features = self.models["encoder"](inputs["color_aug", 0, 0])
             outputs = self.models["depth"](features)
-        
+        """
         #Not used
         #if self.opt.predictive_mask:
         #    outputs["predictive_mask"] = self.models["predictive_mask"](features)
@@ -303,27 +307,20 @@ class Trainer:
                 pose_feats = {f_i: features[f_i] for f_i in self.opt.frame_ids}
             else:
                 pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
-            #print(pose_feats[0].shape)
-            #print(pose_feats[-1].shape)
-            #print(pose_feats[1].shape)
+
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
                     
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
-                    #print("inputs_all",inputs_all[0].shape)
-                    #print("inputs_all_reverse",inputs_all[1].shape)
                     
-                    # OF Prediction
+                    # OF Prediction normal and reversed
                     position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
                     position_inputs_reverse = self.models["position_encoder"](torch.cat(inputs_all_reverse, 1))
                     outputs_0 = self.models["position"](position_inputs)
                     outputs_1 = self.models["position"](position_inputs_reverse)
-                    #print(outputs_0['position', 0][0][0])
-                    #print(outputs_0['position', 0][0][1])
-                    #print(outputs_1['position', 0][0][1].shape)
-                    #print(len(outputs_1))
+
                     for scale in self.opt.scales:
                         outputs["p_"+str(scale)+"_"+str(f_i)] = outputs_0["position_"+str(scale)]
                         outputs["ph_"+str(scale)+"_"+str(f_i)] = F.interpolate(
@@ -343,6 +340,22 @@ class Trainer:
                     transform_inputs = self.models["transform_encoder"](torch.cat(transform_input, 1))
                     outputs_2 = self.models["transform"](transform_inputs)
 
+                    # Input for PoseNet
+                    pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+                    axisangle, translation,input_lighting = self.models["pose"](pose_inputs)
+                    # Input for Lighting
+                    contrast, brightness = self.models["lighting"](input_lighting)
+                    print(contrast)
+                    print(brightness)
+
+                    outputs["axisangle_0_"+str(f_i)] = axisangle
+                    outputs["translation_0_"+str(f_i)] = translation
+                    outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
+                        axisangle[:, 0], translation[:, 0])
+                    outputs["constrast_0_"+str(f_1)] = constrast
+                    outputs["constrast_0_"+str(f_1)] = brightness
+
+
                     for scale in self.opt.scales:
 
                         outputs["t_"+str(scale)+"_"+str(f_i)] = outputs_2[("transform", scale)]
@@ -352,15 +365,7 @@ class Trainer:
                         outputs["ref_"+str(scale)+"_"+str(f_i)] = (outputs["th_"+str(scale)+"_"+str(f_i)] * outputs["omaskb_"+str(scale)+"_"+str(f_i)].detach()  + inputs[("color", 0, 0)])
                         outputs["ref_"+str(scale)+"_"+str(f_i)] = torch.clamp(outputs["ref_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)
 
-                    # Input for PoseNet
-                    pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-                    axisangle, translation = self.models["pose"](pose_inputs)
-
-                    outputs["axisangle_0_"+str(f_i)] = axisangle
-                    outputs["translation_0_"+str(f_i)] = translation
-                    outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
-                        axisangle[:, 0], translation[:, 0])
-
+                   
                     
         return outputs
 
@@ -413,16 +418,6 @@ class Trainer:
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border")
 
-                """print("Cam points")
-                print(cam_points.shape)
-                print("K")
-                print(inputs[("K", source_scale)].shape)
-                print("T")
-                print(T.shape)
-                outputs[("position_depth", scale, frame_id)] = self.position_depth[source_scale](
-                        cam_points, inputs[("K", source_scale)], T)
-                print(outputs[("position_depth", scale, frame_id)][0].shape)
-                print(outputs[("position_depth", scale, frame_id)][0])"""
                 
     def compute_reprojection_loss(self, pred, target):
 
@@ -529,8 +524,6 @@ class Trainer:
         else:
             # Otherwise, we only feed the image with frame_id 0 through the depth encoder
             features = self.models["encoder"](inputs["color_aug", 0, 0])
-            #print(type(features))
-            #print(len(features))
             outputs = self.models["depth"](features)
 
         if self.opt.predictive_mask:
