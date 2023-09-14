@@ -344,7 +344,7 @@ class Trainer:
 
                     # Input for PoseNet
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-                    print(len(pose_inputs))
+                    #print(len(pose_inputs))
                     #input_lighting = pose_inputs[0][2]
                     #input_lighting = self.models["pose_encoder"](torch.cat(inputs_all, 1)).lastlayer
                     axisangle, translation = self.models["pose"](pose_inputs)
@@ -368,7 +368,9 @@ class Trainer:
 
 
                     for scale in self.opt.scales:
-
+                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("brightness", scale)]  
+                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("constrast", scale)] 
+                         
                         outputs["t_"+str(scale)+"_"+str(f_i)] = outputs_2[("transform", scale)]
                         outputs["th_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["t_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
