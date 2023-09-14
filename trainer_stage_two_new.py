@@ -351,7 +351,7 @@ class Trainer:
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
-                    print(outputs_lighting["lighting",0].shape)
+                    #print(outputs_lighting["lighting",0].shape)
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
@@ -362,8 +362,11 @@ class Trainer:
 
 
                     for scale in self.opt.scales:
-                        #outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("brightness", scale)]  
-                        #outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("constrast", scale)] 
+                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,:,:]
+                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,:,:] 
+
+                        print(outputs["b_"+str(scale)+"_"+str(f_i)].shape)
+                        print(outputs["c_"+str(scale)+"_"+str(f_i)].shape)
 
                         outputs["t_"+str(scale)+"_"+str(f_i)] = outputs_2[("transform", scale)]
                         outputs["th_"+str(scale)+"_"+str(f_i)] = F.interpolate(
