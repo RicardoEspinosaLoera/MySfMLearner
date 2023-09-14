@@ -296,6 +296,7 @@ class Trainer:
             outputs.update(self.predict_poses(inputs, features, outputs))
 
         self.generate_images_pred(inputs, outputs)
+
         losses = self.compute_losses(inputs, outputs)
 
         return outputs, losses
@@ -436,8 +437,8 @@ class Trainer:
                 print(outputs["b_"+str(scale)+"_"+str(frame_id)].shape)
                 print("Img")
                 print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)"""
-                #outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["c_"+str(source_scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(source_scale)]  + outputs["c_"+str(source_scale)+"_"+str(frame_id)]
-                #outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["c_"+str(source_scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(source_scale)]  + outputs["b_"+str(source_scale)+"_"+str(frame_id)]
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
 
                 
     def compute_reprojection_loss(self, pred, target):
