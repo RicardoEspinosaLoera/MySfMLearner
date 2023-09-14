@@ -431,7 +431,7 @@ class Trainer:
                 print("Brightness")
                 print(outputs["b_"+str(scale)+"_"+str(frame_id)].shape)
                 print("Img")
-                print(outputs["color_"+str(scale)+"_"+str(frame_id)].shape)
+                print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
                 #outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["c_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["c_"+str(scale)+"_"+str(frame_id)]
 
 
