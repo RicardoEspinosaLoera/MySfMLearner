@@ -611,11 +611,11 @@ class Trainer:
                    
                     wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)][j].data)},step=self.step)
+                    wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
 
-                    wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["b_"+str(scale)+"_"+str(f_i)][j].data)},step=self.step)
+                    wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["b_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
-                    wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["c_"+str(scale)+"_"+str(f_i)][j].data)},step=self.step)
+                    wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["c_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
  
                     if s == 0:
