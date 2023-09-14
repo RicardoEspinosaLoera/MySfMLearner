@@ -368,8 +368,8 @@ class Trainer:
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,:,:] 
                         outputs["c_"+str(scale)+"_"+str(f_i)].reshape(outputs["c_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["c_"+str(scale)+"_"+str(f_i)].shape[1],outputs["c_"+str(scale)+"_"+str(f_i)].shape[2])
 
-                        #print(outputs["b_"+str(scale)+"_"+str(f_i)].shape)
-                        #print(outputs["c_"+str(scale)+"_"+str(f_i)].shape)
+                        print(outputs["b_"+str(scale)+"_"+str(f_i)].shape)
+                        print(outputs["c_"+str(scale)+"_"+str(f_i)].shape)
 
                         outputs["t_"+str(scale)+"_"+str(f_i)] = outputs_2[("transform", scale)]
                         outputs["th_"+str(scale)+"_"+str(f_i)] = F.interpolate(
