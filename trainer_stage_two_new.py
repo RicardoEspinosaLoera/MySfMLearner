@@ -350,15 +350,8 @@ class Trainer:
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
-                    #print(pose_inputs[0][2].shape)
-                    #print(len(pose_inputs))
-                    outputs_lighting = self.models["lighting"](pose_inputs[0])
-                    #print(outputs_lighting)
-                    """
-                    for i in self.opt.scales:
-                        print(outputs[("brightness", i)].shape)
-                        print(outputs[("constrast", i)].shape)
-                    """
+                    #outputs_lighting = self.models["lighting"](pose_inputs[0])
+
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
                     outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
@@ -368,9 +361,9 @@ class Trainer:
 
 
                     for scale in self.opt.scales:
-                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("brightness", scale)]  
-                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("constrast", scale)] 
-                         
+                        #outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("brightness", scale)]  
+                        #outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("constrast", scale)] 
+
                         outputs["t_"+str(scale)+"_"+str(f_i)] = outputs_2[("transform", scale)]
                         outputs["th_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["t_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
