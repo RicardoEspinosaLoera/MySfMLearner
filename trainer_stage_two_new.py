@@ -351,6 +351,7 @@ class Trainer:
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
+                    print(outputs_lighting["lighting",0].shape)
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
@@ -361,14 +362,14 @@ class Trainer:
 
 
                     for scale in self.opt.scales:
-                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("brightness", scale)]  
-                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("constrast", scale)] 
+                        #outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("brightness", scale)]  
+                        #outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("constrast", scale)] 
 
                         outputs["t_"+str(scale)+"_"+str(f_i)] = outputs_2[("transform", scale)]
                         outputs["th_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["t_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
 
-                        outputs["ref_"+str(scale)+"_"+str(f_i)] = (outputs["th_"+str(scale)+"_"+str(f_i)] * outputs["omaskb_"+str(scale)+"_"+str(f_i)].detach()  + inputs[("color", 0, 0)])
+                        outputs["ref_"+str(scale)+"_"+str(f_i)] = (outputs["th_"+str(scale)+"_"+str(f_i)] * outputs["omaskb_"+str(scale)+"_"+str(f_i)].detach() + inputs[("color", 0, 0)])
                         outputs["ref_"+str(scale)+"_"+str(f_i)] = torch.clamp(outputs["ref_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)
                         #It = Ct * I't + Bt
                         #outputs["ref_n"+str(scale)+"_"+str(f_i)] = (outputs["c_"+str(scale)+"_"+str(f_i)] * outputs["ref_"+str(scale)+"_"+str(f_i)] + (outputs["c_"+str(scale)+"_"+str(f_i)])
@@ -432,8 +433,8 @@ class Trainer:
                 print(outputs["b_"+str(scale)+"_"+str(frame_id)].shape)
                 print("Img")
                 print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)"""
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["c_"+str(source_scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(source_scale)]  + outputs["c_"+str(source_scale)+"_"+str(frame_id)]
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+                #outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["c_"+str(source_scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(source_scale)]  + outputs["c_"+str(source_scale)+"_"+str(frame_id)]
+                #outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
 
                 
     def compute_reprojection_loss(self, pred, target):
@@ -613,9 +614,9 @@ class Trainer:
                     
                     wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
 
-                    wandb.log({mode+"_Brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["b_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    #wandb.log({mode+"_Brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["b_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
-                    wandb.log({mode+"_Constrast_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["c_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    #wandb.log({mode+"_Constrast_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["c_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
  
                     if s == 0:

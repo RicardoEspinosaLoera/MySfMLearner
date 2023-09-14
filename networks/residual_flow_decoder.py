@@ -13,12 +13,12 @@ from collections import OrderedDict
 from layers import *
 
 
-class LightingDecoder(nn.Module):
-    def __init__(self, num_ch_enc, scales= range(4), num_output_channels=2, use_skips=False):
-        super(LightingDecoder, self).__init__()
+class ResidualFLowDecoder(nn.Module):
+    def __init__(self, num_ch_enc, scales= range(4), num_output_channels=2, use_skips=True):
+        super(ResidualFLowDecoder, self).__init__()
 
         self.num_output_channels = num_output_channels
-        self.use_skips = use_skips
+        self.use_skips = False
         self.upsample_mode = 'nearest'
         self.scales = scales
 
@@ -50,21 +50,21 @@ class LightingDecoder(nn.Module):
         self.outputs = {}
         # decoder
         x = input_features[-1]
-        #y = input_features[-1]
+        y = input_features[-1]
         for i in range(4, -1, -1):
             x = self.convs[("upconv", i, 0)](x)
-            #y = self.convs[("upconv", i, 0)](y)
+            y = self.convs[("upconv", i, 0)](y)
             x = [upsample(x)]
-            #y = [upsample(y)]
+            y = [upsample(y)]
             #if self.use_skips and i > 0:
             #    x += [input_features[i - 1]]
             x = torch.cat(x, 1)
-            #y = torch.cat(y, 1)
+            y = torch.cat(y, 1)
             x = self.convs[("upconv", i, 1)](x)
-            #y = self.convs[("upconv", i, 1)](y)
+            y = self.convs[("upconv", i, 1)](y)
             if i in self.scales:
-                self.outputs[("lighting", i)] = self.convs[("lighting_conv", i)](x)
-                #self.outputs[("constrast", i)] = self.convs[("lighting_conv", i)](y)
+                self.outputs[("brightness", i)] = self.convs[("lighting_conv", i)](x)
+                self.outputs[("constrast", i)] = self.convs[("lighting_conv", i)](y)
 
         return self.outputs
 """
