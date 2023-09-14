@@ -368,8 +368,8 @@ class Trainer:
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         #outputs["c_"+str(scale)+"_"+str(f_i)].reshape((outputs["c_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["c_"+str(scale)+"_"+str(f_i)].shape[1],outputs["c_"+str(scale)+"_"+str(f_i)].shape[2]))
 
-                        print(outputs["b_"+str(scale)+"_"+str(f_i)].shape)
-                        print(outputs["c_"+str(scale)+"_"+str(f_i)].shape)
+                        #print(outputs["b_"+str(scale)+"_"+str(f_i)].shape)
+                        #print(outputs["c_"+str(scale)+"_"+str(f_i)].shape)
 
                         outputs["t_"+str(scale)+"_"+str(f_i)] = outputs_2[("transform", scale)]
                         outputs["th_"+str(scale)+"_"+str(f_i)] = F.interpolate(
@@ -439,7 +439,7 @@ class Trainer:
                 print(outputs["b_"+str(source_scale)+"_"+str(frame_id)].shape)
                 print("Img")
                 print(outputs["color_"+str(frame_id)+"_"+str(source_scale)].shape)
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["b_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["b_"+str(scale)+"_"+str(frame_id)]
+                #outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["b_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["b_"+str(scale)+"_"+str(frame_id)]
                 #outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
 
                 
