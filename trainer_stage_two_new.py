@@ -354,7 +354,7 @@ class Trainer:
                     #print(len(pose_inputs))
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
 
-                    for i in range(4, -1, -1):
+                    for i in self.opt.scales:
                         print(outputs[("brightness", i)].shape)
                         print(outputs[("constrast", i)].shape)
 
