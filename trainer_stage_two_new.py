@@ -439,8 +439,12 @@ class Trainer:
                 print(outputs["b_"+str(scale)+"_"+str(frame_id)].shape)
                 print("Img")
                 print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
-                #outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["b_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["b_"+str(scale)+"_"+str(frame_id)]
-                #outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+                outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
+                            outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
+                            outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
 
                 
     def compute_reprojection_loss(self, pred, target):
