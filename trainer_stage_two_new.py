@@ -425,15 +425,15 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border")
-                
+                """
                 print("Constrast")
                 print(outputs["c_"+str(scale)+"_"+str(frame_id)].shape)
                 print("Brightness")
                 print(outputs["b_"+str(scale)+"_"+str(frame_id)].shape)
                 print("Img")
-                print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["c_"+str(source_scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(source_scale)]  + outputs["c_"+str(source_scale)+"_"+str(frame_id)]
-
+                print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)"""
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["c_"+str(source_scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(source_scale)]  + outputs["c_"+str(source_scale)+"_"+str(frame_id)]
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
 
                 
     def compute_reprojection_loss(self, pred, target):
@@ -610,6 +610,14 @@ class Trainer:
                     wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                    
                     wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    
+                    wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)][j].data)},step=self.step)
+
+                    wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["b_"+str(scale)+"_"+str(f_i)][j].data)},step=self.step)
+
+                    wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["c_"+str(scale)+"_"+str(f_i)][j].data)},step=self.step)
+                    
+ 
                     if s == 0:
                         #writer.add_image(
                         #    "occu_mask_backward_{}_{}/{}".format(frame_id, s, j),
