@@ -426,7 +426,13 @@ class Trainer:
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border")
                 
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["c_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["c_"+str(scale)+"_"+str(frame_id)]
+                print("Constrast")
+                print(outputs["c_"+str(scale)+"_"+str(frame_id)].shape)
+                print("Brightness")
+                print(outputs["b_"+str(scale)+"_"+str(frame_id)].shape)
+                print("Img")
+                print(outputs["color_"+str(scale)+"_"+str(frame_id)].shape)
+                #outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["c_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["c_"+str(scale)+"_"+str(frame_id)]
 
 
                 
