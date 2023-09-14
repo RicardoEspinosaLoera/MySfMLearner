@@ -364,9 +364,9 @@ class Trainer:
 
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,:,:]
-                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs["b_"+str(scale)+"_"+str(f_i)].expand(1,*outputs_lighting[("lighting", scale)].shape[1:])
+                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs["b_"+str(scale)+"_"+str(f_i)].expand(1,*outputs["b_"+str(scale)+"_"+str(f_i)].shape[1:])
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,:,:] 
-                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs["c_"+str(scale)+"_"+str(f_i)].expand(1,*outputs_lighting[("lighting", scale)].shape[1:])
+                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs["c_"+str(scale)+"_"+str(f_i)].expand(1,*outputs["b_"+str(scale)+"_"+str(f_i)].shape[1:])
 
                         #print(outputs["b_"+str(scale)+"_"+str(f_i)].shape)
                         #print(outputs["c_"+str(scale)+"_"+str(f_i)].shape)
