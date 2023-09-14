@@ -370,6 +370,8 @@ class Trainer:
 
                         outputs["ref_"+str(scale)+"_"+str(f_i)] = (outputs["th_"+str(scale)+"_"+str(f_i)] * outputs["omaskb_"+str(scale)+"_"+str(f_i)].detach()  + inputs[("color", 0, 0)])
                         outputs["ref_"+str(scale)+"_"+str(f_i)] = torch.clamp(outputs["ref_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)
+                        #It = Ct * I't + Bt
+                        #outputs["ref_n"+str(scale)+"_"+str(f_i)] = (outputs["c_"+str(scale)+"_"+str(f_i)] * outputs["ref_"+str(scale)+"_"+str(f_i)] + (outputs["c_"+str(scale)+"_"+str(f_i)])
 
                    
                     
@@ -423,6 +425,10 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border")
+                
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = 
+                (outputs["c_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + (outputs["c_"+str(scale)+"_"+str(frame_id)])
+
 
                 
     def compute_reprojection_loss(self, pred, target):
