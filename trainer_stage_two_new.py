@@ -354,8 +354,9 @@ class Trainer:
                     #print(len(pose_inputs))
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
 
-                    print(outputs_lighting["brightness"].shape)
-                    print(outputs_lighting["constras"].shape)                    
+                    for i in range(4, -1, -1):
+                        print(outputs[("brightness", i)].shape)
+                        print(outputs[("constrast", i)].shape)
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
