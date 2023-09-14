@@ -352,10 +352,10 @@ class Trainer:
                     # Input for Lighting
                     #print(pose_inputs[0][2].shape)
                     #print(len(pose_inputs))
-                    contrast = self.models["lighting"](pose_inputs[0])
-                    #print(contrast)
-                    #print(brightness)
-                    
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])
+
+                    print(outputs_lighting["brightness"].shape)
+                    print(outputs_lighting["constras"].shape)                    
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation

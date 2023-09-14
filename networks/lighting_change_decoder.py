@@ -18,7 +18,7 @@ class LightingDecoder(nn.Module):
         super(LightingDecoder, self).__init__()
 
         self.num_output_channels = num_output_channels
-        self.use_skips = use_skips
+        self.use_skips = False
         self.upsample_mode = 'nearest'
         self.scales = scales
 
@@ -41,7 +41,7 @@ class LightingDecoder(nn.Module):
             self.convs[("upconv", i, 1)] = ConvBlock(num_ch_in, num_ch_out)
 
         for s in self.scales:
-            self.convs[("dispconv", s)] = Conv3x3(self.num_ch_dec[s], self.num_output_channels)
+            self.convs[("lighting_conv", s)] = Conv3x3(self.num_ch_dec[s], self.num_output_channels)
 
         self.decoder = nn.ModuleList(list(self.convs.values()))
         #self.sigmoid = nn.Sigmoid()
@@ -50,15 +50,21 @@ class LightingDecoder(nn.Module):
         self.outputs = {}
         # decoder
         x = input_features[-1]
+        y = input_features[-1]
         for i in range(4, -1, -1):
             x = self.convs[("upconv", i, 0)](x)
+            y = self.convs[("upconv", i, 0)](y)
             x = [upsample(x)]
-            if self.use_skips and i > 0:
-                x += [input_features[i - 1]]
+            y = [upsample(y)]
+            #if self.use_skips and i > 0:
+            #    x += [input_features[i - 1]]
             x = torch.cat(x, 1)
+            y = torch.cat(y, 1)
             x = self.convs[("upconv", i, 1)](x)
+            y = self.convs[("upconv", i, 1)](y)
             if i in self.scales:
-                self.outputs[("disp", i)] = self.convs[("dispconv", i)](x)
+                self.outputs[("brightness", i)] = self.convs[("lighting_conv", i)](x)
+                self.outputs[("constrast", i)] = self.convs[("lighting_conv", i)](y)
 
         return self.outputs
 """
