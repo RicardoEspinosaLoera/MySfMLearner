@@ -353,11 +353,12 @@ class Trainer:
                     #print(pose_inputs[0][2].shape)
                     #print(len(pose_inputs))
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
-                    print(outputs_lighting)
+                    #print(outputs_lighting)
+                    """
                     for i in self.opt.scales:
                         print(outputs[("brightness", i)].shape)
                         print(outputs[("constrast", i)].shape)
-
+                    """
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
                     outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(

@@ -63,6 +63,7 @@ class LightingDecoder(nn.Module):
             x = self.convs[("upconv", i, 1)](x)
             y = self.convs[("upconv", i, 1)](y)
             if i in self.scales:
+                print(i)
                 self.outputs[("brightness", i)] = self.convs[("lighting_conv", i)](x)
                 self.outputs[("constrast", i)] = self.convs[("lighting_conv", i)](y)
 
