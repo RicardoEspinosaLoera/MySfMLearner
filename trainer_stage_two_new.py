@@ -493,8 +493,8 @@ class Trainer:
                 loss_transform += (
                     torch.abs(outputs["r_"+str(scale)+"_"+str(frame_id)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     # self.compute_reprojection_loss(outputs[("refined", scale, frame_id)], outputs[("registration", 0, frame_id)].detach()) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                loss_cvt += get_smooth_bright(
-                    outputs["th_"+str(scale)+"_"+str(frame_id)], inputs[("color", 0, 0)], outputs["r_"+str(scale)+"_"+str(frame_id)].detach(), occu_mask_backward)
+                #loss_cvt += get_smooth_bright(
+                #    outputs["th_"+str(scale)+"_"+str(frame_id)], inputs[("color", 0, 0)], outputs["r_"+str(scale)+"_"+str(frame_id)].detach(), occu_mask_backward)
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
@@ -616,7 +616,7 @@ class Trainer:
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
-                    wandb.log({mode+"_brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["th_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    #wandb.log({mode+"_brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["th_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
                     wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                    
