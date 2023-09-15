@@ -338,10 +338,10 @@ class Trainer:
                                                                                                           outputs["prh_"+str(scale)+"_"+str(f_i)])
 
                     # Input for the AFNet
-                    transform_input = [outputs["r_0"+"_"+str(f_i)], inputs[("color", 0, 0)]]
+                    #transform_input = [outputs["r_0"+"_"+str(f_i)], inputs[("color", 0, 0)]]
                     # Output from AFNet
-                    transform_inputs = self.models["transform_encoder"](torch.cat(transform_input, 1))
-                    outputs_2 = self.models["transform"](transform_inputs)
+                    #transform_inputs = self.models["transform_encoder"](torch.cat(transform_input, 1))
+                    #outputs_2 = self.models["transform"](transform_inputs)
 
                     # Input for PoseNet
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
@@ -371,12 +371,12 @@ class Trainer:
                         #print(outputs["b_"+str(scale)+"_"+str(f_i)].shape)
                         #print(outputs["c_"+str(scale)+"_"+str(f_i)].shape)
 
-                        outputs["t_"+str(scale)+"_"+str(f_i)] = outputs_2[("transform", scale)]
-                        outputs["th_"+str(scale)+"_"+str(f_i)] = F.interpolate(
-                            outputs["t_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                        #outputs["t_"+str(scale)+"_"+str(f_i)] = outputs_2[("transform", scale)]
+                        #outputs["th_"+str(scale)+"_"+str(f_i)] = F.interpolate(
+                        #    outputs["t_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
 
-                        outputs["ref_"+str(scale)+"_"+str(f_i)] = (outputs["th_"+str(scale)+"_"+str(f_i)] * outputs["omaskb_"+str(scale)+"_"+str(f_i)].detach() + inputs[("color", 0, 0)])
-                        outputs["ref_"+str(scale)+"_"+str(f_i)] = torch.clamp(outputs["ref_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)
+                        #outputs["ref_"+str(scale)+"_"+str(f_i)] = (outputs["th_"+str(scale)+"_"+str(f_i)] * outputs["omaskb_"+str(scale)+"_"+str(f_i)].detach() + inputs[("color", 0, 0)])
+                        #outputs["ref_"+str(scale)+"_"+str(f_i)] = torch.clamp(outputs["ref_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)
                         #It = Ct * I't + Bt
                         #outputs["ref_n"+str(scale)+"_"+str(f_i)] = (outputs["c_"+str(scale)+"_"+str(f_i)] * outputs["ref_"+str(scale)+"_"+str(f_i)] + (outputs["c_"+str(scale)+"_"+str(f_i)])
 
@@ -620,9 +620,9 @@ class Trainer:
                     
                     wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                    
-                    wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    #wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    wandb.log({mode+"_refinedCB_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_ImageO_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(s)][j].data),mode+"_refinedCB_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
 
                     wandb.log({mode+"_Brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
@@ -639,7 +639,8 @@ class Trainer:
                 #    "disp_{}/{}".format(s, j),
                 #   normalize_image(outputs[("disp", s)][j]), self.step)
                 wandb.log({mode+"_disp_{}/{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
-
+                #wandb.log({mode+"_refinedCB_{}_{}".format(frame_id, s): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)].data)},step=self.step)
+                
                     
 
     def save_opts(self):
