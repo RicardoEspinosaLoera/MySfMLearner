@@ -502,7 +502,7 @@ class Trainer:
 
             loss += loss_reprojection / 2.0
             loss += self.opt.transform_constraint * (loss_transform / 2.0)
-            #loss += self.opt.transform_smoothness * (loss_cvt / 2.0) 
+            loss += self.opt.transform_smoothness * (loss_cvt / 2.0) 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
             total_loss += loss
