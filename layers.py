@@ -427,7 +427,7 @@ class SpatialTransformer(nn.Module):
             new_locs = new_locs.permute(0, 2, 3, 4, 1)
             new_locs = new_locs[..., [2, 1, 0]]
 
-        return F.grid_sample(src, new_locs, mode=self.mode, padding_mode="border")
+        return F.grid_sample(src, new_locs, mode=self.mode, padding_mode="border",align_corners="True")
 
 
 class optical_flow(nn.Module):
