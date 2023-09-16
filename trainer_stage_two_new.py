@@ -618,15 +618,15 @@ class Trainer:
                 for frame_id in self.opt.frame_ids[1:]:
                     #wandb.log({mode+"_brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["th_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    #wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                    
                     #wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
                     wandb.log({mode+"_ImageO_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["colorO_"+str(frame_id)+"_"+str(s)][j].data),mode+"_refinedCB_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
 
-                    wandb.log({mode+"_Brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
-                    wandb.log({mode+"_Constrast_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    wandb.log({mode+"_Constrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
  
                     if s == 0:
