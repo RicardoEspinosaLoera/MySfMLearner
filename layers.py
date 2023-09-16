@@ -427,7 +427,7 @@ class SpatialTransformer(nn.Module):
             new_locs = new_locs.permute(0, 2, 3, 4, 1)
             new_locs = new_locs[..., [2, 1, 0]]
 
-        return F.grid_sample(src, new_locs, mode=self.mode, padding_mode="border",align_corners=True)
+        return F.grid_sample(src, new_locs, mode=self.mode, padding_mode="border",align_corners=False)
 
 
 class optical_flow(nn.Module):
@@ -513,7 +513,7 @@ class get_occu_mask_bidirection(nn.Module):
             new_locs = new_locs.permute(0, 2, 3, 4, 1)
             new_locs = new_locs[..., [2, 1, 0]]
 
-        flow21_warped = F.grid_sample(flow21, new_locs, mode=self.mode, padding_mode="border",align_corners=True)
+        flow21_warped = F.grid_sample(flow21, new_locs, mode=self.mode, padding_mode="border",align_corners=False)
         flow12_diff = torch.abs(flow12 + flow21_warped)
         # mag = (flow12 * flow12).sum(1, keepdim=True) + \
         # (flow21_warped * flow21_warped).sum(1, keepdim=True)
