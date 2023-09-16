@@ -428,20 +428,14 @@ class Trainer:
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
-                print("Constrast")
-                print(outputs["c_"+str(scale)+"_"+str(frame_id)].shape)
-                print("Brightness")
-                print(outputs["b_"+str(scale)+"_"+str(frame_id)].shape)
-                print("Img")
-                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
-
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = (outputs["c_"+str(scale)+"_"+str(frame_id)] * outputs["sample_"+str(frame_id)+"_"+str(scale)])  + outputs["b_"+str(scale)+"_"+str(frame_id)]
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
-
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border")
+
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = (outputs["c_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["b_"+str(scale)+"_"+str(frame_id)]
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+
                 outputs["colorO_"+str(frame_id)+"_"+str(scale)] = outputs["color_"+str(frame_id)+"_"+str(scale)]
                 """
                 print("Constrast")
