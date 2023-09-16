@@ -629,11 +629,11 @@ class Trainer:
                     wandb.log({mode+"_Constrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
  
-                    if s == 0:
+                    #if s == 0:
                         #writer.add_image(
                         #    "occu_mask_backward_{}_{}/{}".format(frame_id, s, j),
                         #    outputs[("occu_mask_backward", s, frame_id)][j].data, self.step)
-                        wandb.log({mode+"_occu_mask_backward_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["omaskb_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                        #wandb.log({mode+"_occu_mask_backward_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["omaskb_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
                 #writer.add_image(
                 #    "disp_{}/{}".format(s, j),
