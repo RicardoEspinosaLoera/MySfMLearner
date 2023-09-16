@@ -428,7 +428,7 @@ class Trainer:
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = (outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["sample_"+str(frame_id)+"_"+str(scale)])  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = (outputs["c_"+str(scale)+"_"+str(frame_id)] * outputs["sample_"+str(frame_id)+"_"+str(scale)])  + outputs["b_"+str(scale)+"_"+str(frame_id)]
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
