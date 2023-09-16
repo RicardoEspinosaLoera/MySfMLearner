@@ -432,28 +432,20 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border")
-
-                
+                outputs["colorO_"+str(frame_id)+"_"+str(scale)] = outputs["color_"+str(frame_id)+"_"+str(scale)]
+                """
                 print("Constrast")
                 print(outputs["c_"+str(scale)+"_"+str(frame_id)].shape)
                 print("Brightness")
                 print(outputs["b_"+str(scale)+"_"+str(frame_id)].shape)
                 print("Img")
-                print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
-                print("Sample")
-                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
-
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = (outputs["c_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["b_"+str(scale)+"_"+str(frame_id)]
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
-
-                outputs["colorO_"+str(frame_id)+"_"+str(scale)] = outputs["color_"+str(frame_id)+"_"+str(scale)]
-          
-                """outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
+                print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)"""
+                outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
-                """
-                
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.matmul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
 
                 
     def compute_reprojection_loss(self, pred, target):
