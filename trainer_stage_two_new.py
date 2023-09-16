@@ -428,6 +428,9 @@ class Trainer:
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = (outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["sample_"+str(frame_id)+"_"+str(scale)])  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
@@ -445,8 +448,7 @@ class Trainer:
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
                 """
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = (outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+                
 
                 
     def compute_reprojection_loss(self, pred, target):
