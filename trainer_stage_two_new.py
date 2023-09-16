@@ -432,6 +432,7 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border")
+                outputs["colorO_"+str(frame_id)+"_"+str(scale)] = outputs["color_"+str(frame_id)+"_"+str(scale)]
                 """
                 print("Constrast")
                 print(outputs["c_"+str(scale)+"_"+str(frame_id)].shape)
@@ -622,7 +623,7 @@ class Trainer:
                    
                     #wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    wandb.log({mode+"_ImageO_{}_{}_{}".format(frame_id, s, j): wandb.Image(inputs["color_aug", str(frame_id),str(s)][j].data),mode+"_refinedCB_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_ImageO_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["colorO_"+str(frame_id)+"_"+str(s)][j].data),mode+"_refinedCB_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
 
                     wandb.log({mode+"_Brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
