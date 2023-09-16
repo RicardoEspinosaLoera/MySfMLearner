@@ -440,6 +440,8 @@ class Trainer:
                 print(outputs["b_"+str(scale)+"_"+str(frame_id)].shape)
                 print("Img")
                 print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
+                print("Sample")
+                print(outputs["sample_"+str(frame_id)+"_"+str(scale).shape)
 
                 outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = (outputs["c_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["b_"+str(scale)+"_"+str(frame_id)]
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
