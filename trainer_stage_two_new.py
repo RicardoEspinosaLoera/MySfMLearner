@@ -431,7 +431,7 @@ class Trainer:
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
-                    padding_mode="border", align_corners=True)
+                    padding_mode="border")
                 outputs["colorO_"+str(frame_id)+"_"+str(scale)] = outputs["color_"+str(frame_id)+"_"+str(scale)]
                 """
                 print("Constrast")
