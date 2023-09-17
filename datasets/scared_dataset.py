@@ -60,21 +60,10 @@ class SCAREDRAWDataset(SCAREDDataset):
         super(SCAREDRAWDataset, self).__init__(*args, **kwargs)
 
     def get_image_path(self, folder, frame_index, side):
-        #SCADER
+        #SCATER
         f_str = "{}{}".format(frame_index, self.img_ext)
-        #f_str = str(frame_index)
         image_path = os.path.join(self.data_path, folder, "data", f_str)
-        #print(frame_index)
-        """
-        if(len(str(frame_index))==1):
-            f_str = ("0000"+str(frame_index) + self.img_ext)
-        elif(len(str(frame_index))==2):
-            f_str = ("000"+str(frame_index) + self.img_ext)
-        elif(len(str(frame_index))==3):
-            f_str = ("00"+str(frame_index) + self.img_ext)
-        elif(len(str(frame_index))==4):
-            f_str = ("0"+str(frame_index) + self.img_ext)
-        """
+        #COLON10k
         #f_str=str(frame_index) + self.img_ext
         #image_path = os.path.join(self.data_path, folder, f_str)
             
