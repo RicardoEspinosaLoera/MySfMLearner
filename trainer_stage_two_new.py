@@ -663,20 +663,13 @@ class Trainer:
 
         for model_name, model in self.models.items():
             save_path = os.path.join(save_folder, "{}.pth".format(model_name))
-            #save_path2 = os.path.join(save_folder, "{}.pt".format(model_name))
             to_save = model.state_dict()
-            
             if model_name == 'encoder':
                 # save the sizes - these are needed at prediction time
                 to_save['height'] = self.opt.height
                 to_save['width'] = self.opt.width
                 to_save['use_stereo'] = self.opt.use_stereo
-            
             torch.save(to_save, save_path)
-            """if model_name in ["encoder","depth"]: 
-                print(model_name)
-                sm = torch.jit.script(model)
-                sm.save(save_path2)"""
 
         save_path = os.path.join(save_folder, "{}.pth".format("adam"))
         torch.save(self.model_optimizer.state_dict(), save_path)
