@@ -446,7 +446,7 @@ class Trainer:
                             outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
 
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = (torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(0)+"_"+str(0)]))  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = (torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 
                 
@@ -491,7 +491,7 @@ class Trainer:
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
                 print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
-                print(inputs[("color",frame_id,scale)].shape)
+                print(inputs[("color",0,)].shape)
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #loss_transform += (
