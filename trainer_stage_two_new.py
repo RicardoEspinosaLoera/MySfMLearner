@@ -494,7 +494,7 @@ class Trainer:
                 #loss_transform += (
                 #    torch.abs(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     # self.compute_reprojection_loss(outputs[("refined", scale, frame_id)], outputs[("registration", 0, frame_id)].detach()) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                loss_cvt += get_smooth_bright(outputs["bh_"+str(scale)+"_"+str(frame_id)], inputs[("color", 0, 0)], outputs["r_"+str(scale)+"_"+str(frame_id)].detach(), occu_mask_backward)
+                #loss_cvt += get_smooth_bright(outputs["bh_"+str(scale)+"_"+str(frame_id)], inputs[("color", 0, 0)], outputs["r_"+str(scale)+"_"+str(frame_id)].detach(), occu_mask_backward)
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
@@ -502,8 +502,8 @@ class Trainer:
 
             loss += loss_reprojection / 2.0
             #loss += self.opt.transform_constraint * (loss_transform / 2.0)
-            loss += self.opt.transform_smoothness * (loss_cvt / 2.0) 
-            loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
+            #loss += self.opt.transform_smoothness * (loss_cvt / 2.0) 
+            #loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
