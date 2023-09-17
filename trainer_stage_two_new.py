@@ -129,7 +129,7 @@ class Trainer:
         print("Training is using:\n  ", self.device)
 
         # data
-        datasets_dict = {"colon10k": datasets.SCAREDRAWDataset}
+        datasets_dict = {"endovis": datasets.SCAREDRAWDataset}
         self.dataset = datasets_dict[self.opt.dataset]
 
         fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
@@ -503,7 +503,7 @@ class Trainer:
             loss += loss_reprojection / 2.0
             #loss += self.opt.transform_constraint * (loss_transform / 2.0)
             #loss += self.opt.transform_smoothness * (loss_cvt / 2.0) 
-            #loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
+            loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
