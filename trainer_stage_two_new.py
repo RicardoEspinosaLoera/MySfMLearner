@@ -492,9 +492,8 @@ class Trainer:
                 
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
                 #print(inputs[("color",0,)].shape)
-                ref = F.interpolate(outputs["color_"+str(frame_id)+"_"+str(scale)], [color.shape[0], color.shape[1]], mode="bilinear", align_corners=False)
                 loss_reprojection += (
-                    self.compute_reprojection_loss(ref, color) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #loss_transform += (
                 #    torch.abs(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     # self.compute_reprojection_loss(outputs[("refined", scale, frame_id)], outputs[("registration", 0, frame_id)].detach()) * occu_mask_backward).sum() / occu_mask_backward.sum()
