@@ -490,8 +490,8 @@ class Trainer:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
-                print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
-                print(inputs[("color",0,)].shape)
+                #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
+                #print(inputs[("color",0,)].shape)
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #loss_transform += (
