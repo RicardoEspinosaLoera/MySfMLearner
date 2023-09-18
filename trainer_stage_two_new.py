@@ -432,7 +432,7 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
-                outputs["colorO_"+str(frame_id)+"_"+str(scale)] = outputs["color_"+str(frame_id)+"_"+str(scale)]
+                #outputs["colorO_"+str(frame_id)+"_"+str(scale)] = outputs["color_"+str(frame_id)+"_"+str(scale)]
                 """
                 print("Constrast")
                 print(outputs["c_"+str(scale)+"_"+str(frame_id)].shape)
