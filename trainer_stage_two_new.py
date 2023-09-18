@@ -432,7 +432,7 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
-                #outputs["colorO_"+str(frame_id)+"_"+str(scale)] = outputs["color_"+str(frame_id)+"_"+str(scale)]
+                outputs["colorO_"+str(frame_id)+"_"+str(scale)] = outputs["color_"+str(frame_id)+"_"+str(scale)]
                 """
                 print("Constrast")
                 print(outputs["c_"+str(scale)+"_"+str(frame_id)].shape)
@@ -625,7 +625,7 @@ class Trainer:
                    
                     #wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    wandb.log({mode+"_ImageO_{}_{}_{}".format(frame_id, s, j): wandb.Image(inputs[("color", 0, s)][j].data),mode+"_refinedCB_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_ImageO_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["colorO_"+str(frame_id)+"_"+str(s)][j].data),mode+"_refinedCB_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
 
                     wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
@@ -673,8 +673,7 @@ class Trainer:
                 to_save['width'] = self.opt.width
                 to_save['use_stereo'] = self.opt.use_stereo
             torch.save(to_save, save_path)
-            print(log_path)
-            print(model_name)
+
 
         save_path = os.path.join(save_folder, "{}.pth".format("adam"))
         torch.save(self.model_optimizer.state_dict(), save_path)
