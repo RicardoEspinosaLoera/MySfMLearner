@@ -112,7 +112,7 @@ def evaluate(opt):
                     input_color = torch.cat((input_color, torch.flip(input_color, [3])), 0)
 
                 output = depth_decoder(encoder(input_color))
-                pred_disp, _ = disp_to_depth(outputs["disp_0"], opt.min_depth, opt.max_depth)
+                pred_disp, _ = disp_to_depth(output["disp_0"], opt.min_depth, opt.max_depth)
                 pred_disp = pred_disp.cpu()[:, 0].numpy()
 
                 if opt.post_process:
