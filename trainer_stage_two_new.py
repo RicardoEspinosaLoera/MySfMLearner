@@ -226,8 +226,8 @@ class Trainer:
         self.start_time = time.time()
         for self.epoch in range(self.opt.num_epochs):
             self.run_epoch()
-            if (self.epoch + 1) % self.opt.save_frequency == 0:
-                self.save_model()
+            #if (self.epoch + 1) % self.opt.save_frequency == 0:
+            self.save_model()
 
     def run_epoch(self):
         """Run a single epoch of training and validation
@@ -625,7 +625,7 @@ class Trainer:
                    
                     #wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    wandb.log({mode+"_ImageO_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["colorO_"+str(frame_id)+"_"+str(s)][j].data),mode+"_refinedCB_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_ImageO_{}_{}_{}".format(frame_id, s, j): wandb.Image(inputs[("color", str(frame_id), str(s))][j].data),mode+"_refinedCB_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
 
                     wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
