@@ -673,6 +673,7 @@ class Trainer:
                 to_save['width'] = self.opt.width
                 to_save['use_stereo'] = self.opt.use_stereo
             torch.save(to_save, save_path)
+            print(log_path)
             print(model_name)
 
         save_path = os.path.join(save_folder, "{}.pth".format("adam"))
