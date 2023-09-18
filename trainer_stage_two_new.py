@@ -640,7 +640,7 @@ class Trainer:
                 #    "disp_{}/{}".format(s, j),
                 #   normalize_image(outputs[("disp", s)][j]), self.step)
                 wandb.log({mode+"_disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
-                wandb.log({mode+"_ImageO_{}_{}".format(s, j): wandb.Image(inputs["color",0,s][j].data),mode+"_refinedCB_{}_{}".format(s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(0)][j].data)},step=self.step)
+                wandb.log({mode+"_ImageO_{}_{}".format(s, j): wandb.Image(inputs["color",0,s][j].data),mode+"_refinedCB_{}_{}".format(s, j): wandb.Image(outputs["refinedCB_"+str(0)+"_"+str(s)][j].data)},step=self.step)
                 #wandb.log({mode+"_refinedCB_{}_{}".format(frame_id, s): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)].data)},step=self.step)
                 
                     
