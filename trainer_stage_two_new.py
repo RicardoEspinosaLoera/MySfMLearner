@@ -493,7 +493,7 @@ class Trainer:
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
                 #print(inputs[("color",0,)].shape)
                 loss_reprojection += (
-                    #self.compute_reprojection_loss(outputs[("color", frame_id, scale)], outputs[("refined", scale, frame_id)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    #self.compute_reprojection_loss(Source, Target) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 loss_transform += (
                     #torch.abs(outputs[("refined", scale, frame_id)] - outputs[("registration", 0, frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
@@ -508,7 +508,7 @@ class Trainer:
             loss += loss_reprojection / 2.0
             loss += self.opt.transform_constraint * (loss_transform / 2.0)
             #loss += self.opt.transform_smoothness * (loss_cvt / 2.0) 
-            #loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
+            loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
