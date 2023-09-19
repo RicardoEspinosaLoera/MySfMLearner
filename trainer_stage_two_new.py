@@ -631,7 +631,7 @@ class Trainer:
 
                     wandb.log({mode+"_Constrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    wandb.log({mode+"_ImageO_{}_{}".format(s, j): wandb.Image(inputs["color",0,s][j].data),mode+"_refinedCB_{}_{}".format(s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_ImageO_{}_{}".format(s, j): wandb.Image(inputs["color",0,0][j].data),mode+"_refinedCB_{}_{}".format(s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
  
                     #if s == 0:
                         #writer.add_image(
