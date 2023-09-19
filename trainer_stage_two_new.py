@@ -494,10 +494,10 @@ class Trainer:
                 #print(inputs[("color",0,)].shape)
                 loss_reprojection += (
                     #self.compute_reprojection_loss(outputs[("color", frame_id, scale)], outputs[("refined", scale, frame_id)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",frame_id,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 loss_transform += (
                     #torch.abs(outputs[("refined", scale, frame_id)] - outputs[("registration", 0, frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                    torch.abs(outputs["color_"+str(frame_id)+"_"+str(scale)] - outputs["colorO_"+str(frame_id)+"_"+str(scale)]).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    torch.abs(outputs["color_"+str(frame_id)+"_"+str(scale)] - inputs[("color",frame_id,0)]).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     # self.compute_reprojection_loss(outputs[("refined", scale, frame_id)], outputs[("registration", 0, frame_id)].detach()) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #loss_cvt += get_smooth_bright(outputs["bh_"+str(scale)+"_"+str(frame_id)], inputs[("color", 0, 0)], outputs["r_"+str(scale)+"_"+str(frame_id)].detach(), occu_mask_backward)
 
