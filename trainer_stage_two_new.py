@@ -503,7 +503,7 @@ class Trainer:
                 #self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["ref_"+str(scale)+"_"+str(frame_id)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 loss_reprojection += (
                     #self.compute_reprojection_loss(Source, Target) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                    self.compute_reprojection_loss(inputs[("color", 0, 0)],outputs["color_"+str(-1)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(inputs[("color", 0, 0)],outputs["color_"+str(0)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #loss_transform += (
                 #    torch.abs( outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     #torch.abs(outputs[("refined", scale, frame_id)] - outputs[("registration", 0, frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
@@ -595,7 +595,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["color_"+str(0)+"_"+str(0)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
