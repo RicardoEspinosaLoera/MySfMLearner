@@ -327,6 +327,7 @@ class Trainer:
                     outputs_1 = self.models["position"](position_inputs_reverse)
 
                     for scale in self.opt.scales:
+                        """
                         outputs["p_"+str(scale)+"_"+str(f_i)] = outputs_0["position_"+str(scale)]
                         outputs["ph_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["p_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
@@ -334,7 +335,7 @@ class Trainer:
                         outputs["pr_"+str(scale)+"_"+str(f_i)] = outputs_1["position_"+str(scale)]
                         outputs["prh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["pr_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                        
+                        """
                         outputs["omaskb_"+str(scale)+"_"+str(f_i)],  outputs["omapb_"+str(scale)+"_"+str(f_i)]= self.get_occu_mask_backward(outputs["prh_"+str(scale)+"_"+str(f_i)])
                         outputs["omapbi_"+str(scale)+"_"+str(f_i)] = self.get_occu_mask_bidirection(outputs["ph_"+str(scale)+"_"+str(f_i)],
                                                                                                           outputs["prh_"+str(scale)+"_"+str(f_i)])
@@ -369,14 +370,13 @@ class Trainer:
                         #outputs["b_"+str(scale)+"_"+str(f_i)].reshape((outputs["b_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["b_"+str(scale)+"_"+str(f_i)].shape[1],outputs["b_"+str(scale)+"_"+str(f_i)].shape[2]))
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         #outputs["c_"+str(scale)+"_"+str(f_i)].reshape((outputs["c_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["c_"+str(scale)+"_"+str(f_i)].shape[1],outputs["c_"+str(scale)+"_"+str(f_i)].shape[2]))
-
+                        """
                         outputs["ch_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                         outputs["bh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
-
-
-                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(f_i)],inputs[("color", 0, 0)]))  + outputs["bh_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)
+                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(f_i)],inputs[("color", 0, 0)]))  + outputs["bh_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)                            
+                        """
                         
                         #print(outputs["b_"+str(scale)+"_"+str(f_i)].shape)
                         #print(outputs["c_"+str(scale)+"_"+str(f_i)].shape)
@@ -451,14 +451,14 @@ class Trainer:
                 print("Img")
                 print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)"""
 
-                """outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
+                outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
 
                 outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["bh_"+str(scale)+"_"+str(frame_id)], min=0.0, max=1.0)
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]"""
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 
                 
     def compute_reprojection_loss(self, pred, target):
@@ -504,9 +504,9 @@ class Trainer:
                 #self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["ref_"+str(scale)+"_"+str(frame_id)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 loss_reprojection += (
                     #self.compute_reprojection_loss(Source, Target) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                loss_transform += (
-                    torch.abs( outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(color,outputs["color_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                #loss_transform += (
+                #    torch.abs( outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     #torch.abs(outputs[("refined", scale, frame_id)] - outputs[("registration", 0, frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     #torch.abs(outputs["color_"+str(frame_id)+"_"+str(scale)] - inputs[("color",0,0)]).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     #self.compute_reprojection_loss(outputs[("refined", scale, frame_id)], outputs[("registration", 0, frame_id)].detach()) * occu_mask_backward).sum() / occu_mask_backward.sum()
@@ -517,7 +517,7 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            loss += self.opt.transform_constraint * (loss_transform / 2.0)
+            #loss += self.opt.transform_constraint * (loss_transform / 2.0)
             #loss += self.opt.transform_smoothness * (loss_cvt / 2.0) 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
@@ -596,7 +596,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["r_"+str(scale)+"_"+str(frame_id)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
