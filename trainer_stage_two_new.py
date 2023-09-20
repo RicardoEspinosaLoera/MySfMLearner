@@ -287,6 +287,8 @@ class Trainer:
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color_aug", 0, 0])
         outputs = self.models["depth"](features)
+        print("Shape of feaures depth encoder")
+        print(features[1].shape)
     
         #Not used
         #if self.opt.predictive_mask:
