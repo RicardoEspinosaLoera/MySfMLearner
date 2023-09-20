@@ -315,7 +315,7 @@ class Trainer:
 
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
-                    
+                    print("Frame: "f_i)
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
@@ -503,7 +503,7 @@ class Trainer:
                 #self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["ref_"+str(scale)+"_"+str(frame_id)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 loss_reprojection += (
                     #self.compute_reprojection_loss(Source, Target) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                    self.compute_reprojection_loss(inputs[("color",frame_id, 0)],outputs["color_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(inputs[("color", 0, 0)],outputs["color_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #loss_transform += (
                 #    torch.abs( outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     #torch.abs(outputs[("refined", scale, frame_id)] - outputs[("registration", 0, frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
