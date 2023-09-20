@@ -327,15 +327,14 @@ class Trainer:
                     outputs_1 = self.models["position"](position_inputs_reverse)
 
                     for scale in self.opt.scales:
-                        """
+                        
                         outputs["p_"+str(scale)+"_"+str(f_i)] = outputs_0["position_"+str(scale)]
                         outputs["ph_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["p_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                        outputs["r_"+str(scale)+"_"+str(f_i)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["ph_"+str(scale)+"_"+str(f_i)])
+                        #outputs["r_"+str(scale)+"_"+str(f_i)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["ph_"+str(scale)+"_"+str(f_i)])
                         outputs["pr_"+str(scale)+"_"+str(f_i)] = outputs_1["position_"+str(scale)]
                         outputs["prh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["pr_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                        """
                         outputs["omaskb_"+str(scale)+"_"+str(f_i)],  outputs["omapb_"+str(scale)+"_"+str(f_i)]= self.get_occu_mask_backward(outputs["prh_"+str(scale)+"_"+str(f_i)])
                         outputs["omapbi_"+str(scale)+"_"+str(f_i)] = self.get_occu_mask_bidirection(outputs["ph_"+str(scale)+"_"+str(f_i)],
                                                                                                           outputs["prh_"+str(scale)+"_"+str(f_i)])
