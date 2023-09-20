@@ -315,7 +315,7 @@ class Trainer:
 
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
-                    print("Frame: "f_i)
+                    print("Frame: "+str(f_i))
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
