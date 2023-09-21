@@ -556,7 +556,7 @@ class Trainer:
 
             target = inputs[("color", 0, 0)]
 
-            for frame_id in self.opt.frame_ids[1:]:
+            for i, frame_id in enumerate(self.opt.frame_ids[1:]):
                 registration_losses.append(
                     ncc_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
@@ -593,7 +593,8 @@ class Trainer:
 
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
-                for frame_id in self.opt.frame_ids[1:]:
+                #for frame_id in self.opt.frame_ids[1:]:
+                for i, frame_id in enumerate(self.opt.frame_ids[1:]):                    
                     #wandb.log({mode+"_brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["th_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
                     #wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
