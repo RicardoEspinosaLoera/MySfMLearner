@@ -391,7 +391,7 @@ class Trainer:
 
             source_scale = 0
             for i, frame_id in enumerate(self.opt.frame_ids[1:]):
-                print("generate_images_pred"+str(frame_id))
+                
                 if frame_id == "s":
                     T = inputs["stereo_T"]
                 else:
@@ -468,9 +468,9 @@ class Trainer:
             target = inputs[("color", 0, source_scale)]
 
             for frame_id in self.opt.frame_ids[1:]:
-                print("compute_losses"+str(frame_id))
+                #print("compute_losses"+str(frame_id))
                 #pred = outputs[("refinedCB_", frame_id, scale)]
-                pred = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+                pred = outputs["color_"+str(frame_id)+"_"+str(scale)]
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
                 loss_reprojection += (
@@ -559,7 +559,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
@@ -601,9 +601,9 @@ class Trainer:
                    
                     #wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    #wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
-                    wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    #wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
  
                     #if s == 0:
@@ -611,8 +611,8 @@ class Trainer:
                         #    "occu_mask_backward_{}_{}/{}".format(frame_id, s, j),
                         #    outputs[("occu_mask_backward", s, frame_id)][j].data, self.step)
                         #wandb.log({mode+"_occu_mask_backward_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["omaskb_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
-                for frame_id in self.opt.frame_ids[1:]:
-                    wandb.log({mode+"_ImageO_{}_{}".format(s, j): wandb.Image(inputs[("color", 0, s)][j].data),mode+"_refinedCB_{}_{}".format(s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                #for frame_id in self.opt.frame_ids[1:]:
+                    #wandb.log({mode+"_ImageO_{}_{}".format(s, j): wandb.Image(inputs[("color", 0, s)][j].data),mode+"_refinedCB_{}_{}".format(s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
                 #writer.add_image(
                 #    "disp_{}/{}".format(s, j),
                 #   normalize_image(outputs[("disp", s)][j]), self.step)
