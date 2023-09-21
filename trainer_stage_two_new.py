@@ -391,7 +391,7 @@ class Trainer:
 
             source_scale = 0
             for i, frame_id in enumerate(self.opt.frame_ids[1:]):
-                #print(frame_id)
+                print(frame_id)
                 if frame_id == "s":
                     T = inputs["stereo_T"]
                 else:
@@ -464,16 +464,15 @@ class Trainer:
             #disp = outputs[("disp", scale,0)]
             #disp = outputs[scale]
             disp = outputs["disp_"+str(scale)]
-            color = inputs[("color", 0, scale)]
-            #print(outputs.keys())
-            #print(inputs.keys())
-            #for frame_id in self.opt.frame_ids[1:]:
-            for i, frame_id in enumerate(self.opt.frame_ids[1:]):
-                
+            color = inputs[("color", 0, scale)] 
+            target = inputs[("color", 0, source_scale)]
+
+            for frame_id in self.opt.frame_ids[1:]:
+                pred = outputs[("refinedCB_", frame_id, scale)]
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",frame_id,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(pred, target) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     
 
             mean_disp = disp.mean(2, True).mean(3, True)
@@ -556,7 +555,7 @@ class Trainer:
 
             target = inputs[("color", 0, 0)]
 
-            for i, frame_id in enumerate(self.opt.frame_ids[1:]):
+            for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
                     ncc_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
@@ -593,8 +592,7 @@ class Trainer:
 
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
-                #for frame_id in self.opt.frame_ids[1:]:
-                for i, frame_id in enumerate(self.opt.frame_ids[1:]):                    
+                for frame_id in self.opt.frame_ids[1:]:
                     #wandb.log({mode+"_brightness_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["th_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
                     #wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
@@ -605,19 +603,18 @@ class Trainer:
 
                     wandb.log({mode+"_Constrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    wandb.log({mode+"_ImageO_{}_{}".format(s, j): wandb.Image(inputs[("color", frame_id, s)][j].data),mode+"_refinedCB_{}_{}".format(s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
  
                     #if s == 0:
                         #writer.add_image(
                         #    "occu_mask_backward_{}_{}/{}".format(frame_id, s, j),
                         #    outputs[("occu_mask_backward", s, frame_id)][j].data, self.step)
                         #wandb.log({mode+"_occu_mask_backward_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["omaskb_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
-
+                for frame_id in self.opt.frame_ids[1:]:
+                    wandb.log({mode+"_ImageO_{}_{}".format(s, j): wandb.Image(inputs[("color", 0, s)][j].data),mode+"_refinedCB_{}_{}".format(s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
                 #writer.add_image(
                 #    "disp_{}/{}".format(s, j),
                 #   normalize_image(outputs[("disp", s)][j]), self.step)
                 wandb.log({mode+"_disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
-                
                 #wandb.log({mode+"_refinedCB_{}_{}".format(frame_id, s): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)].data)},step=self.step)
                 
                     
