@@ -545,6 +545,38 @@ class Trainer:
         return outputs, losses
 
     def compute_losses_val(self, inputs, outputs):
+
+        losses = {}
+        total_loss = 0
+
+        #outputs = outputs.reverse()
+        for scale in self.opt.scales:
+            
+            loss = 0            
+            if self.opt.v1_multiscale:
+                source_scale = scale
+            else:
+                source_scale = 0
+
+            color = inputs[("color", 0, scale)] 
+            target = inputs[("color", 0, source_scale)]
+
+            for frame_id in self.opt.frame_ids[1:]:
+                
+                loss_reprojection += (
+                    self.compute_reprojection_loss(pred, target))
+
+            loss += loss_reprojection / 2.0
+
+            total_loss += loss
+            losses["loss/{}".format(scale)] = loss
+
+        total_loss /= self.num_scales
+        losses["loss"] = total_loss
+        return losses
+
+    """
+    def compute_losses_val(self, inputs, outputs):
         """Compute the reprojection, perception_loss and smoothness losses for a minibatch
         """
         losses = {}
@@ -571,7 +603,7 @@ class Trainer:
         total_loss /= self.num_scales
         losses["loss"] = -1 * total_loss
 
-        return losses
+        return losses"""
 
     def log_time(self, batch_idx, duration, loss):
         """Print a logging statement to the terminal
