@@ -267,33 +267,12 @@ class Trainer:
         for key, ipt in inputs.items():
             inputs[key] = ipt.to(self.device)
         
-        #Not used
-        """
-        if self.opt.pose_model_type == "shared":
-            # If we are using a shared encoder for both depth and pose (as advocated
-            # in monodepthv1), then all images are fed separately through the depth encoder.
-            all_color_aug = torch.cat([inputs[("color_aug", i, 0)] for i in self.opt.frame_ids])
-            all_features = self.models["encoder"](all_color_aug)
-            all_features = [torch.split(f, self.opt.batch_size) for f in all_features]
-
-            features = {}
-            for i, k in enumerate(self.opt.frame_ids):
-                features[k] = [f[i] for f in all_features]
-
-            outputs = self.models["depth"](features[0])
-        else:
-            # Otherwise, we only feed the image with frame_id 0 through the depth encoder
-        """    
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color_aug", 0, 0])
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
         #print(features[1].shape)
     
-        #Not used
-        #if self.opt.predictive_mask:
-        #    outputs["predictive_mask"] = self.models["predictive_mask"](features)
-
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
 
@@ -412,7 +391,6 @@ class Trainer:
 
             source_scale = 0
             for i, frame_id in enumerate(self.opt.frame_ids[1:]):
-
                 if frame_id == "s":
                     T = inputs["stereo_T"]
                 else:
@@ -447,7 +425,7 @@ class Trainer:
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
-                #outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["bh_"+str(scale)+"_"+str(frame_id)], min=0.0, max=1.0)
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["bh_"+str(scale)+"_"+str(frame_id)], min=0.0, max=1.0)
                 #outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 
                 
@@ -492,7 +470,7 @@ class Trainer:
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",frame_id,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     
 
             mean_disp = disp.mean(2, True).mean(3, True)
@@ -577,7 +555,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
@@ -623,7 +601,7 @@ class Trainer:
 
                     wandb.log({mode+"_Constrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    #wandb.log({mode+"_ImageO_{}_{}".format(s, j): wandb.Image(inputs[("color", frame_id, s)][j].data),mode+"_refinedCB_{}_{}".format(s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_ImageO_{}_{}".format(s, j): wandb.Image(inputs[("color", 0, s)][j].data),mode+"_refinedCB_{}_{}".format(s, j): wandb.Image(outputs["refinedCB_"+str(0)+"_"+str(s)][j].data)},step=self.step)
  
                     #if s == 0:
                         #writer.add_image(
