@@ -455,7 +455,6 @@ class Trainer:
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
-
                 outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["bh_"+str(scale)+"_"+str(frame_id)], min=0.0, max=1.0)
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 
@@ -502,8 +501,8 @@ class Trainer:
                 
                 #self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["ref_"+str(scale)+"_"+str(frame_id)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 loss_reprojection += (
-                    #self.compute_reprojection_loss(Source, Target) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                    self.compute_reprojection_loss(inputs[("color", 0, 0)],outputs["color_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    #self.compute_reprojection_loss(inputs[("color", 0, 0)],outputs["color_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #loss_transform += (
                 #    torch.abs( outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     #torch.abs(outputs[("refined", scale, frame_id)] - outputs[("registration", 0, frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
