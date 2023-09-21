@@ -548,7 +548,7 @@ class Trainer:
 
         losses = {}
         total_loss = 0
-
+        loss_reprojection = 0
         #outputs = outputs.reverse()
         for scale in self.opt.scales:
             
