@@ -391,6 +391,7 @@ class Trainer:
 
             source_scale = 0
             for i, frame_id in enumerate(self.opt.frame_ids[1:]):
+                print("generate_images_pred"+str(frame_id))
                 if frame_id == "s":
                     T = inputs["stereo_T"]
                 else:
@@ -425,7 +426,7 @@ class Trainer:
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
                 
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["bh_"+str(scale)+"_"+str(frame_id)], min=0.0, max=1.0)
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp(torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["bh_"+str(scale)+"_"+str(frame_id)], min=0.0, max=1.0)
                 #outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 
                 
@@ -467,7 +468,7 @@ class Trainer:
             target = inputs[("color", 0, source_scale)]
 
             for frame_id in self.opt.frame_ids[1:]:
-                
+                print("compute_losses"+str(frame_id))
                 #pred = outputs[("refinedCB_", frame_id, scale)]
                 pred = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
@@ -602,7 +603,7 @@ class Trainer:
                     
                     wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
-                    wandb.log({mode+"_Constrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
  
                     #if s == 0:
