@@ -391,7 +391,7 @@ class Trainer:
 
             source_scale = 0
             for i, frame_id in enumerate(self.opt.frame_ids[1:]):
-                print(frame_id)
+                #print(frame_id)
                 if frame_id == "s":
                     T = inputs["stereo_T"]
                 else:
@@ -465,9 +465,10 @@ class Trainer:
             #disp = outputs[scale]
             disp = outputs["disp_"+str(scale)]
             color = inputs[("color", 0, scale)]
-            print(outputs.keys())
-            print(inputs.keys())
-            for frame_id in self.opt.frame_ids[1:]:
+            #print(outputs.keys())
+            #print(inputs.keys())
+            #for frame_id in self.opt.frame_ids[1:]:
+            for i, frame_id in enumerate(self.opt.frame_ids[1:]):
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
