@@ -562,7 +562,7 @@ class Trainer:
             target = inputs[("color", 0, source_scale)]
 
             for frame_id in self.opt.frame_ids[1:]:
-                
+                pred = outputs["color_"+str(frame_id)+"_"+str(s)]
                 loss_reprojection += (
                     self.compute_reprojection_loss(pred, target))
 
