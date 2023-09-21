@@ -390,9 +390,7 @@ class Trainer:
             outputs["depth_"+str(scale)] = depth
 
             source_scale = 0
-            #for i, frame_id in enumerate(self.opt.frame_ids[1:]):
-            for frame_id in self.opt.frame_ids[1:]:
-                print(frame_id)
+            for i, frame_id in enumerate(self.opt.frame_ids[1:]):
                 if frame_id == "s":
                     T = inputs["stereo_T"]
                 else:
@@ -470,7 +468,8 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 
-                pred = outputs[("refinedCB_", frame_id, scale)]
+                #pred = outputs[("refinedCB_", frame_id, scale)]
+                pred = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
                 loss_reprojection += (
