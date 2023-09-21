@@ -391,6 +391,7 @@ class Trainer:
 
             source_scale = 0
             for i, frame_id in enumerate(self.opt.frame_ids[1:]):
+                print(frame_id)
                 if frame_id == "s":
                     T = inputs["stereo_T"]
                 else:
