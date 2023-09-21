@@ -577,8 +577,8 @@ class Trainer:
 
     """
     def compute_losses_val(self, inputs, outputs):
-        """Compute the reprojection, perception_loss and smoothness losses for a minibatch
-        """
+        #Compute the reprojection, perception_loss and smoothness losses for a minibatch
+        
         losses = {}
         total_loss = 0
 
