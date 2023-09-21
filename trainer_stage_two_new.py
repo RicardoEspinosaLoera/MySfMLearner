@@ -464,7 +464,8 @@ class Trainer:
             #disp = outputs[scale]
             disp = outputs["disp_"+str(scale)]
             color = inputs[("color", 0, scale)]
-
+            print(outputs.keys())
+            print(inputs.keys())
             for frame_id in self.opt.frame_ids[1:]:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
