@@ -56,8 +56,8 @@ class LightingDecoder(nn.Module):
             #y = self.convs[("upconv", i, 0)](y)
             x = [upsample(x)]
             #y = [upsample(y)]
-            #if self.use_skips and i > 0:
-            #    x += [input_features[i - 1]]
+            if self.use_skips and i > 0:
+                x += [input_features[i - 1]]
             x = torch.cat(x, 1)
             #y = torch.cat(y, 1)
             x = self.convs[("upconv", i, 1)](x)
@@ -67,6 +67,7 @@ class LightingDecoder(nn.Module):
                 #self.outputs[("constrast", i)] = self.convs[("lighting_conv", i)](y)
 
         return self.outputs
+
 """
 from __future__ import absolute_import, division, print_function
 
