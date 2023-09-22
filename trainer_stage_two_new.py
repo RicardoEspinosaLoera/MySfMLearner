@@ -565,7 +565,8 @@ class Trainer:
             target = inputs[("color", 0, source_scale)]
 
             for frame_id in self.opt.frame_ids[1:]:
-                pred = outputs["color_"+str(frame_id)+"_"+str(scale)]
+                #pred = outputs["color_"+str(frame_id)+"_"+str(scale)]
+                pred = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 loss_reprojection += (
                     self.compute_reprojection_loss(pred, target))
 
@@ -631,7 +632,7 @@ class Trainer:
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
                     wandb.log({mode+"_Output_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
-                    wandb.log({mode+"_Refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_Refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
                     
                     #wandb.log({mode+"_registration_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["r_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                    
