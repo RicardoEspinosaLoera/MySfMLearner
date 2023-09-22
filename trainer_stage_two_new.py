@@ -424,7 +424,7 @@ class Trainer:
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                 #Lighting compensation
-                outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["c_"+str(scale)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["b_"+str(scale)], min=0.0, max=1.0)                            
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["c_"+str(scale)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["b_"+str(scale)], min=0.0, max=1.0)                            
                 #outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             #outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 #outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
