@@ -332,7 +332,7 @@ class Trainer:
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
-                    outputs_lighting = self.models["lighting"](pose_inputs[0])
+                    
                     
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
@@ -345,6 +345,7 @@ class Trainer:
 
                     
                     for scale in self.opt.scales:
+                        outputs_lighting = self.models["lighting"](pose_inputs[scale])
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         #outputs["b_"+str(scale)+"_"+str(f_i)].reshape((outputs["b_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["b_"+str(scale)+"_"+str(f_i)].shape[1],outputs["b_"+str(scale)+"_"+str(f_i)].shape[2]))
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
@@ -352,11 +353,11 @@ class Trainer:
                         #print(outputs["b_"+str(scale)].shape)
                         #print(outputs["c_"+str(scale)].shape)
 
-                        outputs["ch_"+str(scale)+"_"+str(f_i)] = F.interpolate(
-                            outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                        outputs["bh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
-                            outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
-                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(f_i)],inputs[("color", 0, 0)]) + outputs["bh_"+str(scale)+"_"+str(f_i)]), min=0.0, max=1.0)                          
+                        #outputs["ch_"+str(scale)+"_"+str(f_i)] = F.interpolate(
+                            #outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                        #outputs["bh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
+                            #outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
+                        #outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["c_"+str(scale)+"_"+str(f_i)],inputs[("color", 0, scale)]) + outputs["b_"+str(scale)+"_"+str(f_i)]), min=0.0, max=1.0)                          
                         
                         """
                         outputs["ch_"+str(scale)+"_"+str(f_i)] = F.interpolate(
@@ -432,10 +433,12 @@ class Trainer:
                     padding_mode="border",align_corners=True)
                 #Lighting compensation
                 #outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["c_"+str(0)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["b_"+str(0)], min=0.0, max=1.0)                            
-                #outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                            #outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                #outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                            #outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
+                outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
+                            outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
+                            outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
+                
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)]) + outputs["bh_"+str(scale)+"_"+str(frame_id)]), min=0.0, max=1.0)                          
                 
                 #outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 
@@ -475,13 +478,13 @@ class Trainer:
             #disp = outputs[scale]
             disp = outputs["disp_"+str(scale)]
             color = inputs[("color", 0, scale)] 
-            #target = inputs[("color", 0, source_scale)]
+            target = inputs[("color", 0, source_scale)]
             #pred = outputs["color_"+str(frame_id)+"_"+str(scale)]
 
             for frame_id in self.opt.frame_ids[1:]:
                 #print("compute_losses"+str(frame_id))
-                pred = outputs["color_"+str(frame_id)+"_"+str(0)]
-                target = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+                pred = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+                #target = outputs["refinedCB_"+str(frame_id)+"_"+str(0)]
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
                 loss_reprojection += (
@@ -554,7 +557,7 @@ class Trainer:
         losses = self.compute_losses_val(inputs, outputs)
 
         return outputs, losses
-
+    """
     def compute_losses_val(self, inputs, outputs):
 
         losses = {}
@@ -586,8 +589,8 @@ class Trainer:
         total_loss /= self.num_scales
         losses["loss"] = total_loss
         return losses
-
     """
+
     def compute_losses_val(self, inputs, outputs):
         #Compute the reprojection, perception_loss and smoothness losses for a minibatch
         
@@ -600,10 +603,12 @@ class Trainer:
             registration_losses = []
 
             target = inputs[("color", 0, 0)]
+            
 
             for frame_id in self.opt.frame_ids[1:]:
+                #target = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 registration_losses.append(
-                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
@@ -615,7 +620,7 @@ class Trainer:
         total_loss /= self.num_scales
         losses["loss"] = -1 * total_loss
 
-        return losses"""
+        return losses
 
     def log_time(self, batch_idx, duration, loss):
         """Print a logging statement to the terminal
