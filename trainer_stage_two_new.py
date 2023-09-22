@@ -343,9 +343,9 @@ class Trainer:
                     #outputs["constrast_0_"+str(f_1)] = brightness
 
 
-                    
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])
                     for scale in self.opt.scales:
-                        outputs_lighting = self.models["lighting"](pose_inputs[scale])
+                        
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         #outputs["b_"+str(scale)+"_"+str(f_i)].reshape((outputs["b_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["b_"+str(scale)+"_"+str(f_i)].shape[1],outputs["b_"+str(scale)+"_"+str(f_i)].shape[2]))
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
