@@ -351,7 +351,7 @@ class Trainer:
                         #outputs["c_"+str(scale)+"_"+str(f_i)].reshape((outputs["c_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["c_"+str(scale)+"_"+str(f_i)].shape[1],outputs["c_"+str(scale)+"_"+str(f_i)].shape[2]))
                         #print(outputs["b_"+str(scale)].shape)
                         #print(outputs["c_"+str(scale)].shape)
-                        
+
                         outputs["ch_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                         outputs["bh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
@@ -646,9 +646,9 @@ class Trainer:
                    
                     #wandb.log({mode+"_refined_{}_{}/{}".format(frame_id, s, j): wandb.Image(outputs["ref_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
-                    #wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
-                    #wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                    wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
  
                     #if s == 0:
@@ -661,8 +661,8 @@ class Trainer:
                 #writer.add_image(
                 #    "disp_{}/{}".format(s, j),
                 #   normalize_image(outputs[("disp", s)][j]), self.step)
-                wandb.log({mode+"_Brightness_{}_{}".format(s, j): wandb.Image(outputs["b_"+str(s)][j].data)},step=self.step)
-                wandb.log({mode+"_Contrast_{}_{}".format(s, j): wandb.Image(outputs["c_"+str(s)][j].data)},step=self.step)
+                #wandb.log({mode+"_Brightness_{}_{}".format(s, j): wandb.Image(outputs["b_"+str(s)][j].data)},step=self.step)
+                #wandb.log({mode+"_Contrast_{}_{}".format(s, j): wandb.Image(outputs["c_"+str(s)][j].data)},step=self.step)
                 wandb.log({mode+"_disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
                 #wandb.log({mode+"_refinedCB_{}_{}".format(frame_id, s): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)].data)},step=self.step)
                 
