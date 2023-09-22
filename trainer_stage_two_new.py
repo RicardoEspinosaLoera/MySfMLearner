@@ -332,7 +332,8 @@ class Trainer:
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
-                    outputs_lighting = self.models["lighting"](pose_inputs)
+                    print(pose_inputs[0].shape)
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])
                     #print(outputs_lighting["lighting",0].shape)
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
@@ -471,7 +472,7 @@ class Trainer:
                 #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #Cambios
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum(
+                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #loss_transform += (
                 #    torch.abs(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     # self.compute_reprojection_loss(outputs[("refined", scale, frame_id)], outputs[("registration", 0, frame_id)].detach()) * occu_mask_backward).sum() / occu_mask_backward.sum()
