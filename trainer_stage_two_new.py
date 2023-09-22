@@ -470,11 +470,11 @@ class Trainer:
             disp = outputs["disp_"+str(scale)]
             color = inputs[("color", 0, scale)] 
             #target = inputs[("color", 0, source_scale)]
-            pred = outputs["color_"+str(frame_id)+"_"+str(scale)]
+            #pred = outputs["color_"+str(frame_id)+"_"+str(scale)]
 
             for frame_id in self.opt.frame_ids[1:]:
                 #print("compute_losses"+str(frame_id))
-                #pred = outputs[("refinedCB_", frame_id, scale)]
+                pred = outputs[("color_", frame_id, scale)]
                 target = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
