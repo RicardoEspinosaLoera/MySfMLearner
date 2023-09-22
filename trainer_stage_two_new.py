@@ -351,10 +351,10 @@ class Trainer:
                         #outputs["c_"+str(scale)+"_"+str(f_i)].reshape((outputs["c_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["c_"+str(scale)+"_"+str(f_i)].shape[1],outputs["c_"+str(scale)+"_"+str(f_i)].shape[2]))
                         #print(outputs["b_"+str(scale)].shape)
                         #print(outputs["c_"+str(scale)].shape)
-                        outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                            outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                        outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                            outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
+                        outputs["ch_"+str(scale)+"_"+str(f_i)] = F.interpolate(
+                            outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                        outputs["bh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
+                            outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
                         outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)],inputs[("color", 0, 0)]) + outputs["bh_"+str(scale)]), min=0.0, max=1.0)                          
                         """
                         outputs["ch_"+str(scale)+"_"+str(f_i)] = F.interpolate(
