@@ -333,7 +333,7 @@ class Trainer:
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
-                    print(outputs_lighting["lighting",0].shape)
+                    
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
@@ -343,19 +343,21 @@ class Trainer:
                     #outputs["constrast_0_"+str(f_1)] = brightness
 
 
-                    """
+                    
                     for scale in self.opt.scales:
-                        outputs["b_"+str(f_i)+"_"+str(scale)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+                        outputs["b_"+str(scale)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         #outputs["b_"+str(scale)+"_"+str(f_i)].reshape((outputs["b_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["b_"+str(scale)+"_"+str(f_i)].shape[1],outputs["b_"+str(scale)+"_"+str(f_i)].shape[2]))
-                        outputs["c_"+str(f_i)+"_"+str(scale)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
+                        outputs["c_"+str(scale)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         #outputs["c_"+str(scale)+"_"+str(f_i)].reshape((outputs["c_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["c_"+str(scale)+"_"+str(f_i)].shape[1],outputs["c_"+str(scale)+"_"+str(f_i)].shape[2]))
-                        
+                        print(outputs["b_"+str(scale)].shape)
+                        print(outputs["c_"+str(scale)].shape)
+                        """
                         outputs["ch_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                         outputs["bh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
                         outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(f_i)],inputs[("color", 0, 0)]))  + outputs["bh_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)                            
-                        
+                        """
                         
                         #print(outputs["b_"+str(scale)+"_"+str(f_i)].shape)
                         #print(outputs["c_"+str(scale)+"_"+str(f_i)].shape)
@@ -368,7 +370,7 @@ class Trainer:
                         #outputs["ref_"+str(scale)+"_"+str(f_i)] = torch.clamp(outputs["ref_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)
                         #It = Ct * I't + Bt
                         #outputs["ref_n"+str(scale)+"_"+str(f_i)] = (outputs["c_"+str(scale)+"_"+str(f_i)] * outputs["ref_"+str(scale)+"_"+str(f_i)] + (outputs["c_"+str(scale)+"_"+str(f_i)])
-                    """
+                    
            
                     
         return outputs
