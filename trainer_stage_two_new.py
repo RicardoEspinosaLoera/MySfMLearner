@@ -351,6 +351,7 @@ class Trainer:
                         #outputs["c_"+str(scale)+"_"+str(f_i)].reshape((outputs["c_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["c_"+str(scale)+"_"+str(f_i)].shape[1],outputs["c_"+str(scale)+"_"+str(f_i)].shape[2]))
                         #print(outputs["b_"+str(scale)].shape)
                         #print(outputs["c_"+str(scale)].shape)
+                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["c_"+str(scale)],inputs[("color", 0, 0)]) + outputs["b_"+str(scale)], min=0.0, max=1.0)                            
                         """
                         outputs["ch_"+str(scale)+"_"+str(f_i)] = F.interpolate(
                             outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
@@ -424,7 +425,7 @@ class Trainer:
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                 #Lighting compensation
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["c_"+str(0)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["b_"+str(0)], min=0.0, max=1.0)                            
+                #outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["c_"+str(0)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["b_"+str(0)], min=0.0, max=1.0)                            
                 #outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             #outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 #outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
@@ -468,12 +469,13 @@ class Trainer:
             #disp = outputs[scale]
             disp = outputs["disp_"+str(scale)]
             color = inputs[("color", 0, scale)] 
-            target = inputs[("color", 0, source_scale)]
+            #target = inputs[("color", 0, source_scale)]
+            pred = outputs["color_"+str(frame_id)+"_"+str(scale)]
 
             for frame_id in self.opt.frame_ids[1:]:
                 #print("compute_losses"+str(frame_id))
                 #pred = outputs[("refinedCB_", frame_id, scale)]
-                pred = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+                target = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 
                 loss_reprojection += (
