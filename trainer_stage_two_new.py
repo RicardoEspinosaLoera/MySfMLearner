@@ -332,9 +332,9 @@ class Trainer:
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
-                    print(len(pose_inputs))
+                    #print(len(pose_inputs))
                     #pose_inputs = torch.stack(pose_inputs).to(device)
-                    outputs_lighting = self.models["lighting"](torch.cat(pose_inputs, 0))
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])
                     #print(outputs_lighting["lighting",0].shape)
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
