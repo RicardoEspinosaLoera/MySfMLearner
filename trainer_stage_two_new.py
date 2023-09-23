@@ -292,7 +292,7 @@ class Trainer:
                 pose_feats = {f_i: features[f_i] for f_i in self.opt.frame_ids}
             else:
                 #pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
-                pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
+                pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
             
             
             for f_i in self.opt.frame_ids[1:]:
