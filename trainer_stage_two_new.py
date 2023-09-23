@@ -399,7 +399,7 @@ class Trainer:
                     T = inputs["stereo_T"]
                 else:
                     T = outputs["cam_T_cam_0_"+str(frame_id)]
-                print("generate_images_pred"+str(frame_id))
+                #print("generate_images_pred"+str(frame_id))
                 #   from the authors of https://arxiv.org/abs/1712.00175
                 if self.opt.pose_model_type == "posecnn":
 
