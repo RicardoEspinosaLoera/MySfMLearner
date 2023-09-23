@@ -423,6 +423,10 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
+
+                wandb.log({"color_"+str(frame_id): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
+                #wandb.log({"color_"+str(frame_id): wandb.Image(inputs_all[1].data)},step=self.step)
+
                 #Lighting compensation - Funciona
                 outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=True)
