@@ -298,7 +298,11 @@ class Trainer:
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
                     #print("predict_poses"+str(f_i))
-                    inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    #inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    if f_i < 0:
+                        inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    else:
+                        inputs_all = [pose_feats[0], pose_feats[f_i]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
                     #wandb.log({"inputs_all_0": wandb.Image(inputs_all[0].data)},step=self.step)
@@ -351,7 +355,7 @@ class Trainer:
                         axisangle[:, 0], translation[:, 0])
                     #outputs["constrast_0_"+str(f_1)] = contrast
                     #outputs["constrast_0_"+str(f_1)] = brightness
-
+                    
 
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
