@@ -293,19 +293,16 @@ class Trainer:
             else:
                 #pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
                 pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
-            print(pose_feats.keys())
-            print(pose_feats[-1].shape)
-            print(pose_feats[0].shape)
-            print(pose_feats[1].shape)
-            wandb.log({"pose_feats[-1]": wandb.Image(pose_feats[-1][0].data)},step=self.step)
-            wandb.log({"pose_feats[0]": wandb.Image(pose_feats[0][0].data)},step=self.step)
-            wandb.log({"pose_feats[1]": wandb.Image(pose_feats[1][0].data)},step=self.step)
+            
+            
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
                     print("predict_poses"+str(f_i))
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
+                    wandb.log({"inputs_all[0]": wandb.Image(inputs_all[0].data)},step=self.step)
+                    wandb.log({"inputs_all[1]": wandb.Image(inputs_all[1].data)},step=self.step)
                     
                     # OF Prediction normal and reversed
                     position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
@@ -342,7 +339,7 @@ class Trainer:
                     # Input for Lighting
                     #print(len(pose_inputs))
                     #pose_inputs = torch.stack(pose_inputs).to(device)
-                    #outputs_lighting = self.models["lighting"](pose_inputs[0])
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])
                     #print(outputs_lighting["lighting",0].shape)
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
