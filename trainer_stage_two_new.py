@@ -294,9 +294,12 @@ class Trainer:
                 #pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
                 pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
             print(pose_feats.keys())
+            print(pose_feats[-1].shape)
+            print(pose_feats[0].shape)
+            print(pose_feats[1].shape)
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
-                    print("predict_poses"+f_i)
+                    print("predict_poses"+str(f_i))
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
