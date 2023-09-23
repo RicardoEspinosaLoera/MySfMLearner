@@ -155,8 +155,8 @@ class MonoDataset(data.Dataset):
                 inputs[("color", i, -1)] = self.get_color(folder, frame_index, other_side, do_flip)
             else:
                 inputs[("color", i, -1)] = self.get_color(folder, frame_index + i, side, do_flip)
-                print("Dataloader"+str(i))
-                print("frame_index"+str(frame_index))
+                print("Frame idx: "+str(i)+"Name: "+str(frame_index))
+                #print("frame_index"+str(frame_index))
                 #inputs[("color", i, -1)] = self.get_color(folder, frame_index, side, do_flip)
 
         # adjusting intrinsics to match each scale in the pyramid
