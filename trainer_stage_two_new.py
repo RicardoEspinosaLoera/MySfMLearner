@@ -301,8 +301,11 @@ class Trainer:
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
-                    #wandb.log({"inputs_all"+str(f_i): wandb.Image(inputs_all[0].data)},step=self.step)
-                    #wandb.log({"inputs_all"+str(f_i): wandb.Image(inputs_all[1].data)},step=self.step)
+                    wandb.log({"inputs_all_0": wandb.Image(inputs_all[0].data)},step=self.step)
+                    wandb.log({"inputs_all_1": wandb.Image(inputs_all[1].data)},step=self.step)
+                    
+                    wandb.log({"inputs_all_rev_0": wandb.Image(inputs_all_reverse[0].data)},step=self.step)
+                    wandb.log({"inputs_all_rev_1": wandb.Image(inputs_all_reverse[1].data)},step=self.step)
                     
                     # OF Prediction normal and reversed
                     position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
@@ -396,7 +399,7 @@ class Trainer:
                     T = inputs["stereo_T"]
                 else:
                     T = outputs["cam_T_cam_0_"+str(frame_id)]
-                print("generate_images_pred"+str(frame_id))
+                print("generate_images_pred"+frame_id)
                 # from the authors of https://arxiv.org/abs/1712.00175
                 if self.opt.pose_model_type == "posecnn":
 
