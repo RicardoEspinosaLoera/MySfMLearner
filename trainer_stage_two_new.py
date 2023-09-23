@@ -268,7 +268,8 @@ class Trainer:
             inputs[key] = ipt.to(self.device)
         
         #DepthNet Prediction
-        features = self.models["encoder"](inputs["color_aug", 0, 0])
+        #features = self.models["encoder"](inputs["color_aug", 0, 0])
+        features = self.models["encoder"](inputs["color", 0, 0])
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
         #print(features[1].shape)
@@ -290,11 +291,12 @@ class Trainer:
             if self.opt.pose_model_type == "shared":
                 pose_feats = {f_i: features[f_i] for f_i in self.opt.frame_ids}
             else:
-                pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
-
+                #pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
+                pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
+            print(pose_feats.keys())
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
-                    
+                    print("predict_poses"+f_i)
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
@@ -334,7 +336,7 @@ class Trainer:
                     # Input for Lighting
                     #print(len(pose_inputs))
                     #pose_inputs = torch.stack(pose_inputs).to(device)
-                    outputs_lighting = self.models["lighting"](pose_inputs[0])
+                    #outputs_lighting = self.models["lighting"](pose_inputs[0])
                     #print(outputs_lighting["lighting",0].shape)
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
@@ -391,7 +393,7 @@ class Trainer:
                     T = inputs["stereo_T"]
                 else:
                     T = outputs["cam_T_cam_0_"+str(frame_id)]
-
+                print("generate_images_pred"+frame_id)
                 # from the authors of https://arxiv.org/abs/1712.00175
                 if self.opt.pose_model_type == "posecnn":
 
@@ -415,7 +417,7 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
-                #Lighting compensation
+                #Lighting compensation - Funciona
                 outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=True)
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
@@ -423,7 +425,7 @@ class Trainer:
 
 
                 outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp((torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)]))  + outputs["bh_"+str(scale)+"_"+str(frame_id)], min=0.0, max=1.0)
-                #outputs["color_"+str(frame_id)+"_"+str(scale)] = outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]
+                
                 
                 
     def compute_reprojection_loss(self, pred, target):
@@ -472,6 +474,7 @@ class Trainer:
                 #loss_reprojection += (
                 #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #Cambios
+                
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #loss_transform += (
@@ -534,7 +537,8 @@ class Trainer:
             outputs = self.models["depth"](features[0])
         else:
             # Otherwise, we only feed the image with frame_id 0 through the depth encoder
-            features = self.models["encoder"](inputs["color_aug", 0, 0])
+            #features = self.models["encoder"](inputs["color_aug", 0, 0])
+            features = self.models["encoder"](inputs["color", 0, 0])
             outputs = self.models["depth"](features)
 
         if self.opt.predictive_mask:
