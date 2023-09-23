@@ -297,6 +297,9 @@ class Trainer:
             print(pose_feats[-1].shape)
             print(pose_feats[0].shape)
             print(pose_feats[1].shape)
+            wandb.log({"pose_feats[-1]": wandb.Image(pose_feats[-1][0].data)},step=self.step)
+            wandb.log({"pose_feats[0]": wandb.Image(pose_feats[0][0].data)},step=self.step)
+            wandb.log({"pose_feats[1]": wandb.Image(pose_feats[1][0].data)},step=self.step)
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
                     print("predict_poses"+str(f_i))
