@@ -268,7 +268,7 @@ class Trainer:
             inputs[key] = ipt.to(self.device)
         
         #DepthNet Prediction
-        features = self.models["encoder"](inputs["color_aug", 0, 0])
+        features = self.models["encoder"](inputs["color", 0, 0])
         #features = self.models["encoder"](inputs["color", 0, 0])
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
@@ -297,15 +297,15 @@ class Trainer:
             
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
-                    print("predict_poses"+str(f_i))
+                    #print("predict_poses"+str(f_i))
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
-                    wandb.log({"inputs_all_0": wandb.Image(inputs_all[0].data)},step=self.step)
-                    wandb.log({"inputs_all_1": wandb.Image(inputs_all[1].data)},step=self.step)
+                    #wandb.log({"inputs_all_0": wandb.Image(inputs_all[0].data)},step=self.step)
+                    #wandb.log({"inputs_all_1": wandb.Image(inputs_all[1].data)},step=self.step)
                     
-                    wandb.log({"inputs_all_rev_0": wandb.Image(inputs_all_reverse[0].data)},step=self.step)
-                    wandb.log({"inputs_all_rev_1": wandb.Image(inputs_all_reverse[1].data)},step=self.step)
+                    #wandb.log({"inputs_all_rev_0": wandb.Image(inputs_all_reverse[0].data)},step=self.step)
+                    #wandb.log({"inputs_all_rev_1": wandb.Image(inputs_all_reverse[1].data)},step=self.step)
                     
                     # OF Prediction normal and reversed
                     position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
@@ -543,8 +543,8 @@ class Trainer:
             outputs = self.models["depth"](features[0])
         else:
             # Otherwise, we only feed the image with frame_id 0 through the depth encoder
-            features = self.models["encoder"](inputs["color_aug", 0, 0])
-            #features = self.models["encoder"](inputs["color", 0, 0])
+            features = self.models["encoder"](inputs["color", 0, 0])
+            #features = self.models["encoder"](inputs["color_aug", 0, 0])
             outputs = self.models["depth"](features)
 
         if self.opt.predictive_mask:
