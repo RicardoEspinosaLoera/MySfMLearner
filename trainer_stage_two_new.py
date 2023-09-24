@@ -617,7 +617,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] .mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["refinedCB_"+str(-1)+"_"+str(scale)] .mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
