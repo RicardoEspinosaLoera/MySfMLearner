@@ -297,20 +297,10 @@ class Trainer:
             
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
-                    #print("predict_poses"+str(f_i))
-                    #inputs_all = [pose_feats[f_i], pose_feats[0]]
-                    #if f_i < 0:
+
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
-                    #else:
-                    #inputs_all = [pose_feats[0], pose_feats[f_i]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
-                    #wandb.log({"inputs_all_0": wandb.Image(inputs_all[0].data)},step=self.step)
-                    #wandb.log({"inputs_all_1": wandb.Image(inputs_all[1].data)},step=self.step)
-                    
-                    #wandb.log({"inputs_all_rev_0": wandb.Image(inputs_all_reverse[0].data)},step=self.step)
-                    #wandb.log({"inputs_all_rev_1": wandb.Image(inputs_all_reverse[1].data)},step=self.step)
-                    
                     # OF Prediction normal and reversed
                     position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
                     position_inputs_reverse = self.models["position_encoder"](torch.cat(inputs_all_reverse, 1))
@@ -353,9 +343,6 @@ class Trainer:
                     outputs["translation_0_"+str(f_i)] = translation
                     outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
                         axisangle[:, 0], translation[:, 0])
-                    # Invert the matrix if the frame id is negative
-                    outputs[("cam_T_cam", 0, f_i)] = transformation_from_parameters(
-                        axisangle[:, 0], translation[:, 0], invert=(f_i < 0))
                     #outputs["constrast_0_"+str(f_1)] = contrast
                     #outputs["constrast_0_"+str(f_1)] = brightness
                     
@@ -387,18 +374,18 @@ class Trainer:
         """
         outputs = {}
         pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
+        for f_i in self.opt.frame_ids[1:]:
+            inputs_all = [pose_feats[f_i], pose_feats[0]]
+    
+            # Input for Lighting
+            pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+            outputs_lighting = self.models["lighting"](pose_inputs[0])
+            #print(outputs_lighting["lighting",0].shape)
 
-        inputs_all = [pose_feats[f_i], pose_feats[0]]
-  
-        # Input for Lighting
-        pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-        outputs_lighting = self.models["lighting"](pose_inputs[0])
-        #print(outputs_lighting["lighting",0].shape)
-
-        for scale in self.opt.scales:
-            outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
-            outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                    
+            for scale in self.opt.scales:
+                outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+                outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
+                        
         return outputs
 
     def generate_images_pred(self, inputs, outputs):
