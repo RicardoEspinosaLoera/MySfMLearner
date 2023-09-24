@@ -445,7 +445,7 @@ class Trainer:
 
 
                 outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
-                wandb.log({"refinedCB_{}_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
+                wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
                 
                 
     def compute_reprojection_loss(self, pred, target):
