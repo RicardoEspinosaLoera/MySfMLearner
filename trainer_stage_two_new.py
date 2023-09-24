@@ -276,7 +276,7 @@ class Trainer:
     
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
-
+            outputs.update(self.predict_lighting(inputs, features, outputs))
         self.generate_images_pred(inputs, outputs)
 
         losses = self.compute_losses(inputs, outputs)
@@ -346,7 +346,7 @@ class Trainer:
                     # Input for Lighting
                     #print(len(pose_inputs))
                     #pose_inputs = torch.stack(pose_inputs).to(device)
-                    outputs_lighting = self.models["lighting"](pose_inputs[0])
+                    #outputs_lighting = self.models["lighting"](pose_inputs[0])
                     #print(outputs_lighting["lighting",0].shape)
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
@@ -357,10 +357,10 @@ class Trainer:
                     #outputs["constrast_0_"+str(f_1)] = brightness
                     
 
-                    for scale in self.opt.scales:
-                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+                    #for scale in self.opt.scales:
+                    #    outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         #outputs["b_"+str(scale)+"_"+str(f_i)].reshape((outputs["b_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["b_"+str(scale)+"_"+str(f_i)].shape[1],outputs["b_"+str(scale)+"_"+str(f_i)].shape[2]))
-                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
+                    #    outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         #outputs["c_"+str(scale)+"_"+str(f_i)].reshape((outputs["c_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["c_"+str(scale)+"_"+str(f_i)].shape[1],outputs["c_"+str(scale)+"_"+str(f_i)].shape[2]))
 
                         #print(outputs["b_"+str(scale)+"_"+str(f_i)].shape)
@@ -376,6 +376,30 @@ class Trainer:
                         #outputs["ref_n"+str(scale)+"_"+str(f_i)] = (outputs["c_"+str(scale)+"_"+str(f_i)] * outputs["ref_"+str(scale)+"_"+str(f_i)] + (outputs["c_"+str(scale)+"_"+str(f_i)])
 
                    
+                    
+        return outputs
+
+    def predict_lighting(self, inputs, features, disps):
+        """Predict poses between input frames for monocular sequences.
+        """
+        outputs = {}
+        pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
+
+        for f_i in self.opt.frame_ids[1:]:
+            if f_i < 0:
+                inputs_all = [pose_feats[f_i], pose_feats[0]]
+            else:
+                inputs_all = [pose_feats[0], pose_feats[f_i]]     
+
+            # Input for Lighting
+            pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+            outputs_lighting = self.models["lighting"](pose_inputs[0])
+            #print(outputs_lighting["lighting",0].shape)
+
+            for scale in self.opt.scales:
+                outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+                #outputs["b_"+str(scale)+"_"+str(f_i)].reshape((outputs["b_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["b_"+str(scale)+"_"+str(f_i)].shape[1],outputs["b_"+str(scale)+"_"+str(f_i)].shape[2]))
+                outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                     
         return outputs
 
@@ -560,7 +584,8 @@ class Trainer:
 
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
-
+            outputs.update(self.predict_lighting(inputs, features, outputs))
+            
         self.generate_images_pred(inputs, outputs)
         losses = self.compute_losses_val(inputs, outputs)
 
