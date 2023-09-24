@@ -447,8 +447,8 @@ class Trainer:
                     outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                                 outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
-
-                    outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                    #torch.clamp(outputs["ref_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)
+                    outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp(outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)], min=0.0, max=1.0)
                     #wandb.log({"CH_{}_{}".format(frame_id, scale): wandb.Image(outputs["ch_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
