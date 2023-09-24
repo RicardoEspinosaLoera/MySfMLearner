@@ -353,6 +353,9 @@ class Trainer:
                     outputs["translation_0_"+str(f_i)] = translation
                     outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
                         axisangle[:, 0], translation[:, 0])
+                    # Invert the matrix if the frame id is negative
+                    outputs[("cam_T_cam", 0, f_i)] = transformation_from_parameters(
+                        axisangle[:, 0], translation[:, 0], invert=(f_i < 0))
                     #outputs["constrast_0_"+str(f_1)] = contrast
                     #outputs["constrast_0_"+str(f_1)] = brightness
                     
@@ -385,21 +388,16 @@ class Trainer:
         outputs = {}
         pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
 
-        for f_i in self.opt.frame_ids[1:]:
-            if f_i < 0:
-                inputs_all = [pose_feats[f_i], pose_feats[0]]
-            else:
-                inputs_all = [pose_feats[0], pose_feats[f_i]]     
+        inputs_all = [pose_feats[f_i], pose_feats[0]]
+  
+        # Input for Lighting
+        pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+        outputs_lighting = self.models["lighting"](pose_inputs[0])
+        #print(outputs_lighting["lighting",0].shape)
 
-            # Input for Lighting
-            pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-            outputs_lighting = self.models["lighting"](pose_inputs[0])
-            #print(outputs_lighting["lighting",0].shape)
-
-            for scale in self.opt.scales:
-                outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
-                #outputs["b_"+str(scale)+"_"+str(f_i)].reshape((outputs["b_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["b_"+str(scale)+"_"+str(f_i)].shape[1],outputs["b_"+str(scale)+"_"+str(f_i)].shape[2]))
-                outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
+        for scale in self.opt.scales:
+            outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+            outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                     
         return outputs
 
@@ -452,11 +450,8 @@ class Trainer:
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
 
-                #wandb.log({"color_"+str(frame_id): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
-                #wandb.log({"color_"+str(frame_id): wandb.Image(inputs_all[1].data)},step=self.step)
-
                 #Lighting compensation - Funciona
-                """
+                
                 outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=True)
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
@@ -464,7 +459,7 @@ class Trainer:
 
 
                 outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
-                """
+                
                 
                 
     def compute_reprojection_loss(self, pred, target):
@@ -506,28 +501,20 @@ class Trainer:
             for frame_id in self.opt.frame_ids[1:]:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
-                
-                #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
-                #print(inputs[("color",0,)].shape)
+
                 #Original
                 #loss_reprojection += (
                 #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                #Cambios
-                
+                #Cambios                
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                #loss_transform += (
-                #    torch.abs(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                    # self.compute_reprojection_loss(outputs[("refined", scale, frame_id)], outputs[("registration", 0, frame_id)].detach()) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                #loss_cvt += get_smooth_bright(outputs["bh_"+str(scale)+"_"+str(frame_id)], inputs[("color", 0, 0)], outputs["r_"+str(scale)+"_"+str(frame_id)].detach(), occu_mask_backward)
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            #loss += self.opt.transform_constraint * (loss_transform / 2.0)
-            #loss += self.opt.transform_smoothness * (loss_cvt / 2.0) 
+
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
             total_loss += loss
