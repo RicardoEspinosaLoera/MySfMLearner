@@ -254,7 +254,7 @@ class Trainer:
             if phase:
 
                 self.log_time(batch_idx, duration, losses["loss"].cpu().data)
-                self.log("train", inputs, outputs, losses)
+                #self.log("train", inputs, outputs, losses)
                 self.val()
 
             self.step += 1
@@ -445,6 +445,8 @@ class Trainer:
 
 
                 outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                wandb.log({"CH_{}_{}".format(frame_id, scale): wandb.Image(outputs["ch_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
+                wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                 wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
                 
                 
@@ -522,7 +524,7 @@ class Trainer:
 
         with torch.no_grad():
             outputs, losses = self.process_batch_val(inputs)
-            self.log("val", inputs, outputs, losses)
+            #self.log("val", inputs, outputs, losses)
             del inputs, outputs, losses
 
         self.set_train()
