@@ -299,10 +299,10 @@ class Trainer:
                 if f_i != "s":
                     #print("predict_poses"+str(f_i))
                     #inputs_all = [pose_feats[f_i], pose_feats[0]]
-                    if f_i < 0:
-                        inputs_all = [pose_feats[f_i], pose_feats[0]]
-                    else:
-                        inputs_all = [pose_feats[0], pose_feats[f_i]]
+                    #if f_i < 0:
+                    inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    #else:
+                        #inputs_all = [pose_feats[0], pose_feats[f_i]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
 
                     #wandb.log({"inputs_all_0": wandb.Image(inputs_all[0].data)},step=self.step)
