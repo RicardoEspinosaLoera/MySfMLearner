@@ -292,13 +292,13 @@ class Trainer:
                 pose_feats = {f_i: features[f_i] for f_i in self.opt.frame_ids}
             else:
                 #pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
-                pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
-            
+                pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
+            #pose_feats_ref = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
             
             for f_i in self.opt.frame_ids[1:]:
                 if f_i != "s":
                     #print("predict_poses"+str(f_i))
-                    #inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    inputs_all = [pose_feats[f_i], pose_feats[0]]
                     if f_i < 0:
                         inputs_all = [pose_feats[f_i], pose_feats[0]]
                     else:
@@ -356,8 +356,9 @@ class Trainer:
                     #outputs["constrast_0_"+str(f_1)] = contrast
                     #outputs["constrast_0_"+str(f_1)] = brightness
                     
-
+                
                     for scale in self.opt.scales:
+                        
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         #outputs["b_"+str(scale)+"_"+str(f_i)].reshape((outputs["b_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["b_"+str(scale)+"_"+str(f_i)].shape[1],outputs["b_"+str(scale)+"_"+str(f_i)].shape[2]))
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
