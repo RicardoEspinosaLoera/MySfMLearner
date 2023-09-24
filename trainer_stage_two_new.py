@@ -296,7 +296,7 @@ class Trainer:
             
             
             for f_i in self.opt.frame_ids[1:]:
-                print("Entro"+str(f_i))
+                #print("Entro"+str(f_i))
                 if f_i != "s":
 
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
@@ -332,8 +332,8 @@ class Trainer:
                     #print(len(pose_inputs))
                     #input_lighting = pose_inputs[0][2]
                     #input_lighting = self.models["pose_encoder"](torch.cat(inputs_all, 1)).lastlayer
+                    wandb.log({"inputs_pose_{}_{}".format(f_i, scale): wandb.Image(inputs_all[f_i])},step=self.step)
                     wandb.log({"inputs_pose_{}_{}".format(f_i, scale): wandb.Image(inputs_all[0])},step=self.step)
-                    wandb.log({"inputs_pose_{}_{}".format(f_i, scale): wandb.Image(inputs_all[1])},step=self.step)
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
