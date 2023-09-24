@@ -331,6 +331,7 @@ class Trainer:
                     #print(len(pose_inputs))
                     #input_lighting = pose_inputs[0][2]
                     #input_lighting = self.models["pose_encoder"](torch.cat(inputs_all, 1)).lastlayer
+                    wandb.log({"inputs_pose_{}_{}".format(frame_id, scale): wandb.Image(inputs_all.data)},step=self.step)
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
@@ -439,12 +440,12 @@ class Trainer:
                 #Lighting compensation - Funciona
                 
                 outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                            outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=True)
+                            outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                            outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=True)                            
+                            outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
 
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
                 wandb.log({"CH_{}_{}".format(frame_id, scale): wandb.Image(outputs["ch_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                 wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                 wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
