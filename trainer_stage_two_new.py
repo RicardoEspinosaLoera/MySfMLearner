@@ -441,7 +441,7 @@ class Trainer:
                     padding_mode="border",align_corners=True)
 
                 #Lighting compensation - Funciona
-                if f_i < 0:
+                if frame_id < 0:
                     outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                                 outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                     outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
