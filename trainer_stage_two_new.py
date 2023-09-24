@@ -296,6 +296,7 @@ class Trainer:
             
             
             for f_i in self.opt.frame_ids[1:]:
+                print("Entro"+str(f_i))
                 if f_i != "s":
 
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
