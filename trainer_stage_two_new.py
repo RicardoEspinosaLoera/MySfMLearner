@@ -456,6 +456,7 @@ class Trainer:
                 #wandb.log({"color_"+str(frame_id): wandb.Image(inputs_all[1].data)},step=self.step)
 
                 #Lighting compensation - Funciona
+                """
                 outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=True)
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
@@ -463,7 +464,7 @@ class Trainer:
 
 
                 outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.mul(outputs["ch_"+str(scale)+"_"+str(frame_id)],outputs["color_"+str(frame_id)+"_"+str(scale)])  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
-                
+                """
                 
                 
     def compute_reprojection_loss(self, pred, target):
@@ -514,7 +515,7 @@ class Trainer:
                 #Cambios
                 
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #loss_transform += (
                 #    torch.abs(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] - outputs["r_"+str(scale)+"_"+str(frame_id)].detach()).mean(1, True) * occu_mask_backward).sum() / occu_mask_backward.sum()
                     # self.compute_reprojection_loss(outputs[("refined", scale, frame_id)], outputs[("registration", 0, frame_id)].detach()) * occu_mask_backward).sum() / occu_mask_backward.sum()
@@ -585,7 +586,7 @@ class Trainer:
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
             outputs.update(self.predict_lighting(inputs, features, outputs))
-            
+
         self.generate_images_pred(inputs, outputs)
         losses = self.compute_losses_val(inputs, outputs)
 
@@ -639,7 +640,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)] .mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
