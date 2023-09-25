@@ -8,6 +8,10 @@ import numpy as np
 import torch.optim as optim
 import torch.nn as nn
 
+# generate random integer values
+from random import seed
+from random import randint
+
 from utils import *
 from layers import *
 from torch.utils.data import DataLoader
@@ -267,12 +271,21 @@ class Trainer:
         for key, ipt in inputs.items():
             inputs[key] = ipt.to(self.device)
         
-        #DepthNet Prediction
+        #DepthNet Prediction 0
         features = self.models["encoder"](inputs["color_aug", 0, 0])
+        #DepthNet Prediction -1
+        #features_prev = self.models["encoder"](inputs["color_aug", -1, 0])
         #features = self.models["encoder"](inputs["color", 0, 0])
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
         #print(features[1].shape)
+        #Getting the features for (Feature Similarity Objective)
+        #r = randint(0, 64)
+        #f1 = features[0]
+        #f2 = features_prev[0]
+        #print(r)
+        #print(f1)
+        #print(f2)
     
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
@@ -350,7 +363,7 @@ class Trainer:
                     #outputs["constrast_0_"+str(f_1)] = contrast
                     #outputs["constrast_0_"+str(f_1)] = brightness
                     
-                    if f_i < 0:
+                    if f_i > 0:
                         for scale in self.opt.scales:
                             outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                             #outputs["b_"+str(scale)+"_"+str(f_i)].reshape((outputs["b_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["b_"+str(scale)+"_"+str(f_i)].shape[1],outputs["b_"+str(scale)+"_"+str(f_i)].shape[2]))
@@ -441,14 +454,14 @@ class Trainer:
                     padding_mode="border",align_corners=True)
 
                 #Lighting compensation - Funciona
-                if frame_id < 0:
+                if frame_id > 0:
                     outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                                 outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                     outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                                 outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
                     #torch.clamp(outputs["ref_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)
-                    outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp(outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)], min=0.0, max=1.0)
+                    outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
                     #wandb.log({"CH_{}_{}".format(frame_id, scale): wandb.Image(outputs["ch_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
@@ -497,7 +510,7 @@ class Trainer:
                 #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #Cambios                
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(-1)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["refinedCB_"+str(1)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
@@ -617,7 +630,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["refinedCB_"+str(-1)+"_"+str(scale)] .mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["refinedCB_"+str(1)+"_"+str(scale)] .mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
