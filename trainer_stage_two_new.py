@@ -279,6 +279,7 @@ class Trainer:
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
         #Getting the features for (Feature Similarity Objective)
+        print(features[0].shape)
         outputs.update(self.get_features(features,features2))
         print(outputs.keys())
         #print(r)
@@ -508,7 +509,7 @@ class Trainer:
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(-1)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
             
             feature_similarity_loss += (
-                    self.compute_feature_similarity_loss(output["f1"],output["f2"]))
+                    self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]))
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
