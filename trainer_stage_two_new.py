@@ -274,7 +274,7 @@ class Trainer:
         #DepthNet Prediction 0
         features = self.models["encoder"](inputs["color_aug", 0, 0])
         #DepthNet Prediction -1
-        features2 = self.models["encoder"](inputs["color_aug", 1, 0])
+        features2 = self.models["encoder"](inputs["color_aug", -1, 0])
         #features = self.models["encoder"](inputs["color", 0, 0])
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
@@ -471,7 +471,7 @@ class Trainer:
 
     def  compute_feature_similarity_loss(self, pred, target):
 
-            fs_loss = self.ssim(pred, target).mean(1, True)
+        fs_loss = self.ssim(pred, target).mean(1, True)
 
         return fs_loss
 
@@ -485,7 +485,7 @@ class Trainer:
             
             loss = 0
             loss_reprojection = 0
-            loss_transform = 0
+            feature_similarity_loss = 0
             loss_cvt = 0
             
             if self.opt.v1_multiscale:
@@ -506,12 +506,16 @@ class Trainer:
                 #Cambios                
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(-1)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+            
+            feature_similarity_loss += (
+                    self.compute_feature_similarity_loss(output["f1"],output["f2"]))
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
+            loss += feature_similarity_loss / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
