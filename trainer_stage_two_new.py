@@ -470,10 +470,10 @@ class Trainer:
         f1 = pred[0][:,r,:, :]
         f2 = target[0][:,r,:, :]
         fs_loss = 0
-        for idx in enumerate(self.batch_size):
+        for idx in enumerate(12):
             fs_loss += self.ssim(f1[idx], f2[idx]).mean(1, True)
 
-        return fs_loss/self.batch_size
+        return fs_loss/12
 
     def compute_losses(self, inputs, outputs):
 
