@@ -259,7 +259,7 @@ class Trainer:
 
                 self.log_time(batch_idx, duration, losses["loss"].cpu().data)
                 self.log("train", inputs, outputs, losses)
-                self.val()
+                self.val(r)
 
             self.step += 1
             
@@ -532,7 +532,7 @@ class Trainer:
         losses["loss"] = total_loss 
         return losses
     
-    def val(self):
+    def val(self,r):
         """Validate the model on a single minibatch
         """
         self.set_eval()
@@ -545,13 +545,13 @@ class Trainer:
             #inputs = self.val_iter.next()
 
         with torch.no_grad():
-            outputs, losses = self.process_batch_val(inputs)
+            outputs, losses = self.process_batch_val(inputs,r)
             self.log("val", inputs, outputs, losses)
             del inputs, outputs, losses
 
         self.set_train()
 
-    def process_batch_val(self, inputs):
+    def process_batch_val(self, inputs,r):
         """Pass a minibatch through the network and generate images and losses
         """
         for key, ipt in inputs.items():
@@ -582,7 +582,7 @@ class Trainer:
             outputs.update(self.predict_poses(inputs, features, outputs))
             #outputs.update(self.predict_lighting(inputs, features, outputs))
 
-        self.generate_images_pred(inputs, outputs)
+        self.generate_images_pred(inputs, outputs,r)
         losses = self.compute_losses_val(inputs, outputs)
 
         return outputs, losses
