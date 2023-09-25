@@ -274,15 +274,13 @@ class Trainer:
         #DepthNet Prediction 0
         features = self.models["encoder"](inputs["color_aug", 0, 0])
         #DepthNet Prediction -1
-        #features_prev = self.models["encoder"](inputs["color_aug", -1, 0])
+        features2 = self.models["encoder"](inputs["color_aug", 1, 0])
         #features = self.models["encoder"](inputs["color", 0, 0])
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
-        #print(features[1].shape)
         #Getting the features for (Feature Similarity Objective)
-        #r = randint(0, 64)
-        #f1 = features[0]
-        #f2 = features_prev[0]
+        outputs.update(get_features(features,features2))
+        print(outputs.keys())
         #print(r)
         #print(f1)
         #print(f2)
@@ -295,6 +293,15 @@ class Trainer:
         losses = self.compute_losses(inputs, outputs)
 
         return outputs, losses
+
+    def get_features(self,features1,features2):
+        f = {}
+        r = randint(0, 64)
+        f1 = features[0][:,r,:, :]
+        f2 = features2[0][:,r,:, :]
+        f["f1"] = f1
+        f["f2"] = f2
+        return f
 
     def predict_poses(self, inputs, features, disps):
         """Predict poses between input frames for monocular sequences.
@@ -352,7 +359,7 @@ class Trainer:
                     # Input for Lighting
                     #print(len(pose_inputs))
                     #pose_inputs = torch.stack(pose_inputs).to(device)
-                    if f_i > 0: 
+                    if f_i < 0: 
                         outputs_lighting = self.models["lighting"](pose_inputs[0])
                     #print(outputs_lighting["lighting",0].shape)
 
@@ -363,7 +370,7 @@ class Trainer:
                     #outputs["constrast_0_"+str(f_1)] = contrast
                     #outputs["constrast_0_"+str(f_1)] = brightness
                     
-                    if f_i > 0:
+                    if f_i < 0:
                         for scale in self.opt.scales:
                             outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                             #outputs["b_"+str(scale)+"_"+str(f_i)].reshape((outputs["b_"+str(scale)+"_"+str(f_i)].shape[0],1,outputs["b_"+str(scale)+"_"+str(f_i)].shape[1],outputs["b_"+str(scale)+"_"+str(f_i)].shape[2]))
@@ -436,7 +443,7 @@ class Trainer:
                     padding_mode="border",align_corners=True)
 
                 #Lighting compensation - Funciona
-                if frame_id > 0:
+                if frame_id < 0:
                     outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                                 outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                     outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
@@ -461,6 +468,12 @@ class Trainer:
             reprojection_loss = 0.85 * ssim_loss + 0.15 * l1_loss
 
         return reprojection_loss
+
+    def  compute_feature_similarity_loss(self, pred, target):
+
+            fs_loss = self.ssim(pred, target).mean(1, True)
+
+        return fs_loss
 
     def compute_losses(self, inputs, outputs):
 
@@ -492,7 +505,7 @@ class Trainer:
                 #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #Cambios                
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(1)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["refinedCB_"+str(-1)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
@@ -612,7 +625,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["refinedCB_"+str(1)+"_"+str(scale)] .mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["refinedCB_"+str(-1)+"_"+str(scale)] .mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
@@ -647,7 +660,7 @@ class Trainer:
         for j in range(min(4, self.opt.batch_size)):  # write a maxmimum of four images
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
-                    if frame_id > 0:
+                    if frame_id < 0:
                         wandb.log({mode+"_Output_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
                         wandb.log({mode+"_Refined_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
                         
