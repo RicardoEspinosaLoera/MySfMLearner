@@ -514,7 +514,7 @@ class Trainer:
             loss += loss_reprojection / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-
+            print(loss)
             loss += self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]) / 2.0
 
             total_loss += loss
