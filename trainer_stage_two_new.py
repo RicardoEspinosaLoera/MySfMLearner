@@ -512,20 +512,19 @@ class Trainer:
 
      
             loss += loss_reprojection / 2.0
-            
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
+
+            loss += self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]) / 2.0
 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
 
         
-        feature_similarity_loss += (
-                    self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]))    
-        feature_similarity_loss = feature_similarity_loss / 2.0
+       
 
         total_loss /= self.num_scales
-        losses["loss"] = total_loss + feature_similarity_loss
+        losses["loss"] = total_loss 
         return losses
     
     def val(self):
