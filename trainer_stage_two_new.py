@@ -467,8 +467,8 @@ class Trainer:
 
     def  compute_feature_similarity_loss(self, pred, target):
         r = randint(0, 64)
-        f1 = features1[0][:,r,:, :]
-        f2 = features2[0][:,r,:, :]
+        f1 = pred[0][:,r,:, :]
+        f2 = target[0][:,r,:, :]
 
         fs_loss = self.ssim(f1, f2).mean(1, True)
         fs_loss = fs_loss
