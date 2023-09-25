@@ -450,7 +450,7 @@ class Trainer:
         # Feature similairty 
         
         outputs["f1"] = self.models["encoder"](inputs[("color", 0, 0)])[0][:,r,:, :]
-        outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        outputs["f2"] = self.models["encoder"](outputs["refinedCB_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
         
         #f1 = outputs["f1"][0][:,r,:, :]
         #f2 = target[0][:,r,:, :]
