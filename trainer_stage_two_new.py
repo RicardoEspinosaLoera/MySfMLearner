@@ -279,9 +279,9 @@ class Trainer:
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
         #Getting the features for (Feature Similarity Objective)
-        print(features[0].shape)
-        outputs.update(self.get_features(features,features2))
-        print(outputs.keys())
+        #print(features[0].shape)
+        outputs["f1"] = features
+        #print(outputs.keys())
         #print(r)
         #print(f1)
         #print(f2)
@@ -295,16 +295,6 @@ class Trainer:
 
         return outputs, losses
 
-    def get_features(self,features1,features2):
-        f = {}
-        r = randint(0, 64)
-        f1 = features1[0][:,r,:, :]
-        f2 = features2[0][:,r,:, :]
-        print(f1.shape)
-        print(f2.shape)
-        f["f1"] = f1
-        f["f2"] = f2
-        return f
 
     def predict_poses(self, inputs, features, disps):
         """Predict poses between input frames for monocular sequences.
@@ -457,7 +447,9 @@ class Trainer:
                     #wandb.log({"CH_{}_{}".format(frame_id, scale): wandb.Image(outputs["ch_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
-                
+        # Feature similairty 
+        outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])
+        
                 
     def compute_reprojection_loss(self, pred, target):
 
@@ -472,10 +464,14 @@ class Trainer:
 
         return reprojection_loss
 
-    def  compute_feature_similarity_loss(self, pred, target):
 
-        fs_loss = self.ssim(pred, target).mean(1, True)
-        fs_loss = 1.0 * fs_loss
+    def  compute_feature_similarity_loss(self, pred, target):
+        r = randint(0, 64)
+        f1 = features1[0][:,r,:, :]
+        f2 = features2[0][:,r,:, :]
+
+        fs_loss = self.ssim(f1, f2).mean(1, True)
+        fs_loss = fs_loss
 
         return fs_loss
 
@@ -510,22 +506,23 @@ class Trainer:
                 #Cambios                
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(-1)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-            
-            feature_similarity_loss += (
-                    self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]))
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
             smooth_loss = get_smooth_loss(norm_disp, color)
 
-            print(loss_reprojection)
+            
             loss += loss_reprojection / 2.0
-            loss += feature_similarity_loss / 2.0
+            
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
+
+        feature_similarity_loss += (
+                    self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]))
+        loss += feature_similarity_loss / 2.0
 
         total_loss /= self.num_scales
         losses["loss"] = total_loss
