@@ -244,8 +244,8 @@ class Trainer:
         for batch_idx, inputs in enumerate(self.train_loader):
             
             before_op_time = time.time()
-
-            outputs, losses = self.process_batch(inputs)
+            r = randint(0, 63)
+            outputs, losses = self.process_batch(inputs,r)
 
             self.model_optimizer.zero_grad()
             losses["loss"].backward()
@@ -265,7 +265,7 @@ class Trainer:
             
         self.model_lr_scheduler.step()
 
-    def process_batch(self, inputs):
+    def process_batch(self, inputs,r):
         """Pass a minibatch through the network and generate images and losses
         """
         for key, ipt in inputs.items():
@@ -289,7 +289,7 @@ class Trainer:
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
             #outputs.update(self.predict_lighting(inputs, features, outputs))
-        self.generate_images_pred(inputs, outputs)
+        self.generate_images_pred(inputs, outputs,r)
 
         losses = self.compute_losses(inputs, outputs)
 
@@ -386,7 +386,7 @@ class Trainer:
                     
         return outputs
 
-    def generate_images_pred(self, inputs, outputs):
+    def generate_images_pred(self, inputs, outputs,r):
         """Generate the warped (reprojected) color images for a minibatch.
         Generated images are saved into the `outputs` dictionary.
         """
@@ -448,7 +448,7 @@ class Trainer:
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         # Feature similairty 
-        r = randint(0, 63)
+        
         outputs["f1"] = self.models["encoder"](inputs[("color", 0, 0)])[0][:,r,:, :]
         outputs["f2"] = self.models["encoder"](outputs["refinedCB_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
         
