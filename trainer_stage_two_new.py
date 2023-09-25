@@ -279,7 +279,7 @@ class Trainer:
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
         #Getting the features for (Feature Similarity Objective)
-        outputs.update(get_features(features,features2))
+        outputs.update(self.get_features(features,features2))
         print(outputs.keys())
         #print(r)
         #print(f1)
@@ -531,7 +531,7 @@ class Trainer:
         """
         self.set_eval()
         try:
-            #inputs = self.val_iter.next()
+            #inputs = self.val_iter.next()process_batch
             inputs = next(self.val_iter)
         except StopIteration:
             self.val_iter = iter(self.val_loader)
