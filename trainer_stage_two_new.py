@@ -274,13 +274,13 @@ class Trainer:
         #DepthNet Prediction 0
         features = self.models["encoder"](inputs["color_aug", 0, 0])
         #DepthNet Prediction -1
-        features2 = self.models["encoder"](inputs["color_aug", -1, 0])
+        #features2 = self.models["encoder"](inputs["color_aug", -1, 0])
         #features = self.models["encoder"](inputs["color", 0, 0])
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
         #Getting the features for (Feature Similarity Objective)
         #print(features[0].shape)
-        outputs["f1"] = features
+        #outputs["f1"] = features
         #print(outputs.keys())
         #print(r)
         #print(f1)
@@ -450,7 +450,7 @@ class Trainer:
         # Feature similairty 
         print(outputs["color_"+str(-1)+"_"+str(0)].shape)
         r = randint(0, 64)
-        outputs["f1"] = outputs["f1"][0][:,r,:, :]
+        outputs["f1"] = self.models["encoder"](inputs[("color", 0, 0)])[0][:,r,:, :]
         outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
         print(r)
         print(outputs["f1"].shape)
