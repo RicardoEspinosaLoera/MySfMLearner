@@ -470,7 +470,7 @@ class Trainer:
 
     def  compute_feature_similarity_loss(self, pred, target):
         
-        fs_loss = self.ssim(pred[idx], target[idx]).mean(1, True)
+        fs_loss = self.ssim(pred, target).mean(1, True)
 
         return fs_loss
 
