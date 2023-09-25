@@ -473,7 +473,7 @@ class Trainer:
         print(f2.shape)
 
         fs_loss = self.ssim(f1, f2).mean(1, True)
-        fs_loss = fs_loss
+        fs_loss = fs_loss.reshape(12,160)
 
         return fs_loss
 
