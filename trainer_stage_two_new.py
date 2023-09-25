@@ -509,7 +509,7 @@ class Trainer:
             norm_disp = disp / (mean_disp + 1e-7)
             smooth_loss = get_smooth_loss(norm_disp, color)
 
-            print(loss_reprojection.shape)
+            print(loss_reprojection)
             loss += loss_reprojection / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
