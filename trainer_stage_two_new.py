@@ -300,6 +300,8 @@ class Trainer:
         r = randint(0, 64)
         f1 = features1[0][:,r,:, :]
         f2 = features2[0][:,r,:, :]
+        print(f1.shape)
+        print(f2.shape)
         f["f1"] = f1
         f["f2"] = f2
         return f
