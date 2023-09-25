@@ -451,7 +451,7 @@ class Trainer:
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         # Feature similairty 
         self.models["encoder"].eval()
-        outputs["f2"] = self.models["encoder"](outputs["refinedCB_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
         self.models["encoder"].train()
         
         #f1 = outputs["f1"][0][:,r,:, :]
