@@ -470,7 +470,8 @@ class Trainer:
         f1 = pred[0][:,r,:, :]
         f2 = target[0][:,r,:, :]
         fs_loss = 0
-        for idx in enumerate(12):
+        for idx in range(12):
+            print(idx)
             fs_loss += self.ssim(f1[idx], f2[idx]).mean(1, True)
 
         return fs_loss/12
