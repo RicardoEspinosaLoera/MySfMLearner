@@ -451,6 +451,10 @@ class Trainer:
         r = randint(0, 64)
         outputs["f1"] = outputs["f1"][0][:,r,:, :]
         outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        print(r)
+        print(outputs["f1"].shape)
+        print(outputs["f2"].shape)
+        
         
         #f1 = outputs["f1"][0][:,r,:, :]
         #f2 = target[0][:,r,:, :]
