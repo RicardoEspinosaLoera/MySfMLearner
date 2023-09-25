@@ -469,6 +469,8 @@ class Trainer:
         r = randint(0, 64)
         f1 = pred[0][:,r,:, :]
         f2 = target[0][:,r,:, :]
+        print(f1.shape)
+        print(f2.shape)
 
         fs_loss = self.ssim(f1, f2).mean(1, True)
         fs_loss = fs_loss
