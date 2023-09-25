@@ -519,12 +519,14 @@ class Trainer:
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
 
+        
         feature_similarity_loss += (
                     self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]))    
         feature_similarity_loss = feature_similarity_loss / 2.0
+        print(feature_similarity_loss)
 
         total_loss /= self.num_scales
-        losses["loss"] = total_loss + feature_similarity_loss
+        losses["loss"] = total_loss 
         return losses
     
     def val(self):
