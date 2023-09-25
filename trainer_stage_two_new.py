@@ -511,12 +511,12 @@ class Trainer:
 
             loss += loss_reprojection / 2.0
 
-            occu_mask_backward_n = F.interpolate(
+            """occu_mask_backward_n = F.interpolate(
                              outputs["omaskb_"+str(0)+"_"+str(-1)].detach(), [128, 160], mode="bilinear", align_corners=False)
-            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]) * occu_mask_backward_n).sum() /  occu_mask_backward_n.sum()
+            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum()
             occu_mask_backward_n = F.interpolate(
-                             outputs["omaskb_"+str(0)+"_"+str(1)].detach(), [128, 160], mode="bilinear", align_corners=False)
-            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]) * occu_mask_backward_n).sum() /  occu_mask_backward_n.sum()
+                             outputs["omaskb_"+str(0)+"_"+str(1)].detach(), [128, 160], mode="bilinear", align_corners=False)"""
+            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum() 
 
             loss += 0.1 * (feature_similarity_loss / 2.0)
 
