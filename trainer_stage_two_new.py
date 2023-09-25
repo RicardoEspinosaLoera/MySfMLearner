@@ -522,7 +522,7 @@ class Trainer:
 
         feature_similarity_loss += (
                     self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]))
-        print(feature_similarity_loss)      
+        print(feature_similarity_loss.shape)      
         loss += feature_similarity_loss / 2.0
 
         total_loss /= self.num_scales
