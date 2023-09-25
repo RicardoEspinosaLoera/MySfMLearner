@@ -78,10 +78,6 @@ class Trainer:
         self.models["transform"].to(self.device)
         self.parameters_to_train += list(self.models["transform"].parameters())
 
-        self.models["lighting"] = networks.LightingDecoder(self.models["encoder"].num_ch_enc, self.opt.scales)
-        self.models["lighting"].to(self.device)
-        self.parameters_to_train += list(self.models["lighting"].parameters())
-
         if self.use_pose_net:
 
             if self.opt.pose_model_type == "separate_resnet":
@@ -108,6 +104,10 @@ class Trainer:
 
             self.models["pose"].to(self.device)
             self.parameters_to_train += list(self.models["pose"].parameters())
+
+            self.models["lighting"] = networks.LightingDecoder(self.models["pose_encoder"].num_ch_enc, self.opt.scales)
+            self.models["lighting"].to(self.device)
+            self.parameters_to_train += list(self.models["lighting"].parameters())
 
         if self.opt.predictive_mask:
             assert self.opt.disable_automasking, \
@@ -273,10 +273,12 @@ class Trainer:
         
         #DepthNet Prediction 0
         features = self.models["encoder"](inputs["color", 0, 0])
+        
         #DepthNet Prediction -1
         #features2 = self.models["encoder"](inputs["color_aug", -1, 0])
         #features = self.models["encoder"](inputs["color", 0, 0])
         outputs = self.models["depth"](features)
+        outputs["f1"] = features[0][:,r,:, :]
         #print("Shape of feaures depth encoder")
         #Getting the features for (Feature Similarity Objective)
         #print(features[0].shape)
@@ -449,7 +451,6 @@ class Trainer:
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         # Feature similairty 
         
-        outputs["f1"] = self.models["encoder"](inputs[("color", 0, 0)])[0][:,r,:, :]
         outputs["f2"] = self.models["encoder"](outputs["refinedCB_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
         
         #f1 = outputs["f1"][0][:,r,:, :]
