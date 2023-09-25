@@ -518,6 +518,7 @@ class Trainer:
             norm_disp = disp / (mean_disp + 1e-7)
             smooth_loss = get_smooth_loss(norm_disp, color)
 
+            print(loss_reprojection)
             loss += loss_reprojection / 2.0
             loss += feature_similarity_loss / 2.0
 
