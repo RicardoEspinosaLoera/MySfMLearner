@@ -272,7 +272,7 @@ class Trainer:
             inputs[key] = ipt.to(self.device)
         
         #DepthNet Prediction 0
-        features = self.models["encoder"](inputs["color_aug", 0, 0])
+        features = self.models["encoder"](inputs["color", 0, 0])
         #DepthNet Prediction -1
         #features2 = self.models["encoder"](inputs["color_aug", -1, 0])
         #features = self.models["encoder"](inputs["color", 0, 0])
@@ -450,7 +450,7 @@ class Trainer:
         # Feature similairty 
         
         outputs["f1"] = self.models["encoder"](inputs[("color", 0, 0)])[0][:,r,:, :]
-        outputs["f2"] = self.models["encoder"](outputs["refinedCB_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
         
         #f1 = outputs["f1"][0][:,r,:, :]
         #f2 = target[0][:,r,:, :]
@@ -560,7 +560,7 @@ class Trainer:
         if self.opt.pose_model_type == "shared":
             # If we are using a shared encoder for both depth and pose (as advocated
             # in monodepthv1), then all images are fed separately through the depth encoder.
-            all_color_aug = torch.cat([inputs[("color_aug", i, 0)] for i in self.opt.frame_ids])
+            all_color_aug = torch.cat([inputs[("color", i, 0)] for i in self.opt.frame_ids])
             all_features = self.models["encoder"](all_color_aug)
             all_features = [torch.split(f, self.opt.batch_size) for f in all_features]
 
