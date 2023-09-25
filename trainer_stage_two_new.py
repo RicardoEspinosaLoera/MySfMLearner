@@ -471,7 +471,7 @@ class Trainer:
     def  compute_feature_similarity_loss(self, pred, target):
         
         fs_loss = self.ssim(pred, target).mean(1, True)
-        return fs_loss.sum()
+        return fs_loss
 
     def compute_losses(self, inputs, outputs):
 
@@ -504,16 +504,17 @@ class Trainer:
                 #Cambios                
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(-1)+"_"+str(0)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-
+                feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]) * occu_mask_backward).sum() /  occu_mask_backward.sum()
+            
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
+            loss += feature_similarity_loss / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            loss += self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]) / 2.0
-
+            
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
 
