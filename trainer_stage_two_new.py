@@ -448,6 +448,7 @@ class Trainer:
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         # Feature similairty 
+        print(outputs["color_"+str(-1)+"_"+str(0)].shape)
         r = randint(0, 64)
         outputs["f1"] = outputs["f1"][0][:,r,:, :]
         outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
