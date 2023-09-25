@@ -237,14 +237,14 @@ class Trainer:
         """Run a single epoch of training and validation
         """
         # self.model_lr_scheduler.step()
-
-        print("Training")
+        r = randint(0, 63)
+        print("Training" + str(r))
         self.set_train()
-
+        
         for batch_idx, inputs in enumerate(self.train_loader):
             
             before_op_time = time.time()
-            r = randint(0, 63)
+            
             outputs, losses = self.process_batch(inputs,r)
 
             self.model_optimizer.zero_grad()
