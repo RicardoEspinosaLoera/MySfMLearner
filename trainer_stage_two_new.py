@@ -352,7 +352,7 @@ class Trainer:
                     # Input for Lighting
                     #print(len(pose_inputs))
                     #pose_inputs = torch.stack(pose_inputs).to(device)
-                    if f_i < 0: 
+                    if f_i > 0: 
                         outputs_lighting = self.models["lighting"](pose_inputs[0])
                     #print(outputs_lighting["lighting",0].shape)
 
@@ -384,24 +384,6 @@ class Trainer:
 
                    
                     
-        return outputs
-
-    def predict_lighting(self, inputs, features, disps):
-        """Predict poses between input frames for monocular sequences.
-        """
-        outputs = {}
-        pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
-        for f_i in self.opt.frame_ids[1:]:
-            inputs_all = [pose_feats[f_i], pose_feats[0]]
-    
-            # Input for Lighting
-            pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-            outputs_lighting = self.models["lighting"](pose_inputs[0])
-
-            for scale in self.opt.scales:
-                outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
-                outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        
         return outputs
 
     def generate_images_pred(self, inputs, outputs):
