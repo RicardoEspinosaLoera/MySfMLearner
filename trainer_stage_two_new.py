@@ -465,7 +465,7 @@ class Trainer:
         else:
             ssim_loss = self.ssim(pred, target).mean(1, True)
             reprojection_loss = 0.85 * ssim_loss + 0.15 * l1_loss
-        print(reprojection_loss)
+
         return reprojection_loss
 
     def  compute_feature_similarity_loss(self, pred, target):
@@ -509,11 +509,11 @@ class Trainer:
             norm_disp = disp / (mean_disp + 1e-7)
             smooth_loss = get_smooth_loss(norm_disp, color)
 
-     
+            print(loss_reprojection.shape)
             loss += loss_reprojection / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            print(loss.shape)
+            #print(loss.shape)
             loss += self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]) / 2.0
 
             total_loss += loss
