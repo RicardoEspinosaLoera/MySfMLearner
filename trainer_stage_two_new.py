@@ -465,13 +465,12 @@ class Trainer:
         else:
             ssim_loss = self.ssim(pred, target).mean(1, True)
             reprojection_loss = 0.85 * ssim_loss + 0.15 * l1_loss
-
+        print(reprojection_loss)
         return reprojection_loss
 
     def  compute_feature_similarity_loss(self, pred, target):
         
         fs_loss = self.ssim(pred, target).mean(1, True)
-        print(fs_loss)
         return fs_loss
 
     def compute_losses(self, inputs, outputs):
