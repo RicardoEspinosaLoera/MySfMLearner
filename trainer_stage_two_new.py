@@ -494,31 +494,33 @@ class Trainer:
             disp = outputs["disp_"+str(scale)]
             color = inputs[("color", 0, scale)]
 
-            for frame_id in self.opt.frame_ids[1:]:
+            #for frame_id in self.opt.frame_ids[1:]:
                 
-                occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
+            occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(-1)].detach()
 
-                #Original
-                #loss_reprojection += (
-                #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                #Cambios                
-                loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(-1)+"_"+str(0)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+            #Original
+            #loss_reprojection += (
+            #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+            #Cambios                
+            loss_reprojection += (
+                self.compute_reprojection_loss(outputs["refinedCB_"+str(-1)+"_"+str(0)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
             smooth_loss = get_smooth_loss(norm_disp, color)
 
-            loss += loss_reprojection / 2.0
+            #loss += loss_reprojection / 2.0
+            loss += loss_reprojection
 
             occu_mask_backward_n = F.interpolate(
                              outputs["omaskb_"+str(0)+"_"+str(-1)].detach(), [128, 160], mode="bilinear", align_corners=False)
             feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]) * occu_mask_backward_n).sum() /  occu_mask_backward_n.sum()
-            occu_mask_backward_n = F.interpolate(
-                             outputs["omaskb_"+str(0)+"_"+str(1)].detach(), [128, 160], mode="bilinear", align_corners=False)
-            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]) * occu_mask_backward_n).sum() /  occu_mask_backward_n.sum()
+            #occu_mask_backward_n = F.interpolate(
+            #                 outputs["omaskb_"+str(0)+"_"+str(1)].detach(), [128, 160], mode="bilinear", align_corners=False)
+            #feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"]) * occu_mask_backward_n).sum() /  occu_mask_backward_n.sum()
 
-            loss += feature_similarity_loss / 2.0
+            #loss += feature_similarity_loss / 2.0
+            loss += feature_similarity_loss 
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
