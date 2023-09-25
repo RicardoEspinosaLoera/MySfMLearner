@@ -510,7 +510,7 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             #loss += loss_reprojection / 2.0
-            loss += loss_reprojection
+            loss += 0.1*loss_reprojection
 
             occu_mask_backward_n = F.interpolate(
                              outputs["omaskb_"+str(0)+"_"+str(-1)].detach(), [128, 160], mode="bilinear", align_corners=False)
