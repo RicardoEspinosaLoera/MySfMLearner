@@ -7,6 +7,9 @@ import networks
 import numpy as np
 import torch.optim as optim
 import torch.nn as nn
+# generate random integer values
+from random import seed
+from random import randint
 
 from utils import *
 from layers import *
