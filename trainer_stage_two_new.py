@@ -514,7 +514,7 @@ class Trainer:
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
-            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum() 
+            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"].detach(),outputs["f2"].detach())).sum() 
 
             loss += 0.01 * feature_similarity_loss / 2.0
 
