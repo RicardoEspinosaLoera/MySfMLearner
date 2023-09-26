@@ -519,9 +519,9 @@ class Trainer:
             feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum()
             occu_mask_backward_n = F.interpolate(
                              outputs["omaskb_"+str(0)+"_"+str(1)].detach(), [128, 160], mode="bilinear", align_corners=False)"""
-            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum() 
+            #feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum() 
 
-            loss += 0.01 * feature_similarity_loss / 2.0
+            #loss += 0.01 * feature_similarity_loss / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
