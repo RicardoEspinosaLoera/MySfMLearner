@@ -518,7 +518,7 @@ class Trainer:
             b = outputs["f2"].detach()
             feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
 
-            loss += 0.01 * feature_similarity_loss / 2.0
+            loss += 0.1 * feature_similarity_loss / 2.0
 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
