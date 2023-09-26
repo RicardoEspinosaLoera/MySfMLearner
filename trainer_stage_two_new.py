@@ -275,10 +275,10 @@ class Trainer:
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color", 0, 0])
         #self.models["acual_encoder_depth"]=copy.deepcopy(self.models["encoder"])
-        weights_path = 'depth_weights_temp.pth'
-        torch.save(self.models["encoder"].state_dict(), weights_path)
+        #weights_path = 'depth_weights_temp.pth'
+        #torch.save(self.models["encoder"].state_dict(), weights_path)
         outputs = self.models["depth"](features)
-        outputs["f1"] = features[0][:,r,:, :]
+        outputs["f1"] = features[0][:,r,:, :].detach()
         #print("Shape of feaures depth encoder")
         #print(features[1].shape)
     
@@ -443,13 +443,17 @@ class Trainer:
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         #Feature similairty 
-        #self.models["encoder"].eval()
+        self.models["encoder"].eval()
+        outputs["f2"] = self.models["encoder"](outputs["color_"+str(0)+"_"+str(0)]).detach()[0][:,r,:, :]
+        self.models["encoder"].train()
+        """
         weights_path = 'depth_weights_temp.pth'
         model_prev = networks.ResnetEncoder(
             self.opt.num_layers, self.opt.weights_init == "pretrained")
         model_prev.load_state_dict(torch.load('depth_weights_temp.pth'))
         model_prev.to(self.device)
-        outputs["f2"] = model_prev(outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        outputs["f2"] = model_prev(outputs["color_"+str(0)+"_"+str(0)])[0][:,r,:, :]
+        """
         #self.models["encoder"].train()    
                 
     def compute_reprojection_loss(self, pred, target):
