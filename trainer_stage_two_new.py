@@ -485,6 +485,7 @@ class Trainer:
             loss_reprojection = 0
             loss_transform = 0
             loss_cvt = 0
+            feature_similarity_loss = 0
             
             if self.opt.v1_multiscale:
                 source_scale = scale
