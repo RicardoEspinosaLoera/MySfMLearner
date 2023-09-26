@@ -278,7 +278,7 @@ class Trainer:
         #weights_path = 'depth_weights_temp.pth'
         #torch.save(self.models["encoder"].state_dict(), weights_path)
         outputs = self.models["depth"](features)
-        outputs["f1"] = features[0][:,r,:, :]
+        outputs["f1"] = features[0][:,r,:, :].detach()
         #print("Shape of feaures depth encoder")
         #print(features[1].shape)
     
