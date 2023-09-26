@@ -8,10 +8,6 @@ import numpy as np
 import torch.optim as optim
 import torch.nn as nn
 
-# generate random integer values
-from random import seed
-from random import randint
-
 from utils import *
 from layers import *
 from torch.utils.data import DataLoader
@@ -81,7 +77,7 @@ class Trainer:
         self.models["lighting"] = networks.LightingDecoder(self.models["encoder"].num_ch_enc, self.opt.scales)
         self.models["lighting"].to(self.device)
         self.parameters_to_train += list(self.models["lighting"].parameters())
-        
+
         if self.use_pose_net:
 
             if self.opt.pose_model_type == "separate_resnet":
@@ -108,8 +104,6 @@ class Trainer:
 
             self.models["pose"].to(self.device)
             self.parameters_to_train += list(self.models["pose"].parameters())
-
-            
 
         if self.opt.predictive_mask:
             assert self.opt.disable_automasking, \
@@ -239,15 +233,15 @@ class Trainer:
         """Run a single epoch of training and validation
         """
         # self.model_lr_scheduler.step()
-        r = randint(0, 63)
-        print("Training" + str(r))
+
+        print("Training")
         self.set_train()
-        
+
         for batch_idx, inputs in enumerate(self.train_loader):
             
             before_op_time = time.time()
-            
-            outputs, losses = self.process_batch(inputs,r)
+
+            outputs, losses = self.process_batch(inputs)
 
             self.model_optimizer.zero_grad()
             losses["loss"].backward()
@@ -261,44 +255,33 @@ class Trainer:
 
                 self.log_time(batch_idx, duration, losses["loss"].cpu().data)
                 self.log("train", inputs, outputs, losses)
-                self.val(r)
+                self.val()
 
             self.step += 1
             
         self.model_lr_scheduler.step()
 
-    def process_batch(self, inputs,r):
+    def process_batch(self, inputs):
         """Pass a minibatch through the network and generate images and losses
         """
         for key, ipt in inputs.items():
             inputs[key] = ipt.to(self.device)
         
-        #DepthNet Prediction 0
-        features = self.models["encoder"](inputs["color", 0, 0])
-        
-        #DepthNet Prediction -1
-        #features2 = self.models["encoder"](inputs["color_aug", -1, 0])
+        #DepthNet Prediction
+        features = self.models["encoder"](inputs["color_aug", 0, 0])
         #features = self.models["encoder"](inputs["color", 0, 0])
         outputs = self.models["depth"](features)
-        #outputs["f1"] = features[0][:,r,:, :]
         #print("Shape of feaures depth encoder")
-        #Getting the features for (Feature Similarity Objective)
-        #print(features[0].shape)
-        #outputs["f1"] = features
-        #print(outputs.keys())
-        #print(r)
-        #print(f1)
-        #print(f2)
+        #print(features[1].shape)
     
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
             #outputs.update(self.predict_lighting(inputs, features, outputs))
-        self.generate_images_pred(inputs, outputs,r)
+        self.generate_images_pred(inputs, outputs)
 
         losses = self.compute_losses(inputs, outputs)
 
         return outputs, losses
-
 
     def predict_poses(self, inputs, features, disps):
         """Predict poses between input frames for monocular sequences.
@@ -390,7 +373,25 @@ class Trainer:
                     
         return outputs
 
-    def generate_images_pred(self, inputs, outputs,r):
+    def predict_lighting(self, inputs, features, disps):
+        """Predict poses between input frames for monocular sequences.
+        """
+        outputs = {}
+        pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
+        for f_i in self.opt.frame_ids[1:]:
+            inputs_all = [pose_feats[f_i], pose_feats[0]]
+    
+            # Input for Lighting
+            pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+            outputs_lighting = self.models["lighting"](pose_inputs[0])
+
+            for scale in self.opt.scales:
+                outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+                outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
+                        
+        return outputs
+
+    def generate_images_pred(self, inputs, outputs):
         """Generate the warped (reprojected) color images for a minibatch.
         Generated images are saved into the `outputs` dictionary.
         """
@@ -447,18 +448,11 @@ class Trainer:
                                 outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
                     #torch.clamp(outputs["ref_"+str(scale)+"_"+str(f_i)], min=0.0, max=1.0)
-                    outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                    outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = torch.clamp(outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)], min=0.0, max=1.0)
                     #wandb.log({"CH_{}_{}".format(frame_id, scale): wandb.Image(outputs["ch_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
-        # Feature similairty 
-        #self.models["encoder"].eval()
-        #outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
-        #self.models["encoder"].train()
-        
-        
-        #f1 = outputs["f1"][0][:,r,:, :]
-        #f2 = target[0][:,r,:, :]
+                
                 
     def compute_reprojection_loss(self, pred, target):
 
@@ -473,11 +467,6 @@ class Trainer:
 
         return reprojection_loss
 
-    def  compute_feature_similarity_loss(self, pred, target):
-        
-        fs_loss = self.ssim(pred, target).mean(1, True)
-        return fs_loss
-
     def compute_losses(self, inputs, outputs):
 
         losses = {}
@@ -488,7 +477,7 @@ class Trainer:
             
             loss = 0
             loss_reprojection = 0
-            feature_similarity_loss = 0
+            loss_transform = 0
             loss_cvt = 0
             
             if self.opt.v1_multiscale:
@@ -508,41 +497,29 @@ class Trainer:
                 #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 #Cambios                
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(-1)+"_"+str(0)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                
+                    self.compute_reprojection_loss(outputs["refinedCB_"+str(-1)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
 
-            """occu_mask_backward_n = F.interpolate(
-                             outputs["omaskb_"+str(0)+"_"+str(-1)].detach(), [128, 160], mode="bilinear", align_corners=False)
-            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum()
-            occu_mask_backward_n = F.interpolate(
-                             outputs["omaskb_"+str(0)+"_"+str(1)].detach(), [128, 160], mode="bilinear", align_corners=False)"""
-            #feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum() 
-
-            #loss += 0.01 * feature_similarity_loss / 2.0
-
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
 
-        
-       
-
         total_loss /= self.num_scales
-        losses["loss"] = total_loss 
+        losses["loss"] = total_loss
         return losses
     
-    def val(self,r):
+    def val(self):
         """Validate the model on a single minibatch
         """
         self.set_eval()
         try:
-            #inputs = self.val_iter.next()process_batch
+            #inputs = self.val_iter.next()
             inputs = next(self.val_iter)
         except StopIteration:
             self.val_iter = iter(self.val_loader)
@@ -550,13 +527,13 @@ class Trainer:
             #inputs = self.val_iter.next()
 
         with torch.no_grad():
-            outputs, losses = self.process_batch_val(inputs,r)
+            outputs, losses = self.process_batch_val(inputs)
             self.log("val", inputs, outputs, losses)
             del inputs, outputs, losses
 
         self.set_train()
 
-    def process_batch_val(self, inputs,r):
+    def process_batch_val(self, inputs):
         """Pass a minibatch through the network and generate images and losses
         """
         for key, ipt in inputs.items():
@@ -565,7 +542,7 @@ class Trainer:
         if self.opt.pose_model_type == "shared":
             # If we are using a shared encoder for both depth and pose (as advocated
             # in monodepthv1), then all images are fed separately through the depth encoder.
-            all_color_aug = torch.cat([inputs[("color", i, 0)] for i in self.opt.frame_ids])
+            all_color_aug = torch.cat([inputs[("color_aug", i, 0)] for i in self.opt.frame_ids])
             all_features = self.models["encoder"](all_color_aug)
             all_features = [torch.split(f, self.opt.batch_size) for f in all_features]
 
@@ -587,7 +564,7 @@ class Trainer:
             outputs.update(self.predict_poses(inputs, features, outputs))
             #outputs.update(self.predict_lighting(inputs, features, outputs))
 
-        self.generate_images_pred(inputs, outputs,r)
+        self.generate_images_pred(inputs, outputs)
         losses = self.compute_losses_val(inputs, outputs)
 
         return outputs, losses
