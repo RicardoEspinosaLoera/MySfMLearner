@@ -445,7 +445,7 @@ class Trainer:
         #Feature similairty 
         self.models["encoder"].eval()
         #model = self.models["encoder"].detach()
-        outputs["f2"] = model(outputs["color_"+str(-1)+"_"+str(0)].detach())[0][:,r,:, :]
+        outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)].detach())[0][:,r,:, :]
         self.models["encoder"].train()
         """
         weights_path = 'depth_weights_temp.pth'
