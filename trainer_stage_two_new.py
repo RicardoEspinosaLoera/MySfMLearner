@@ -272,8 +272,9 @@ class Trainer:
         
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color_aug", 0, 0])
-        outputs["f1"] = features[0][:,r,:, :]
+        
         outputs = self.models["depth"](features)
+        outputs["f1"] = features[0][:,r,:, :]
         #print("Shape of feaures depth encoder")
         #print(features[1].shape)
     
