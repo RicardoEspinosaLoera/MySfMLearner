@@ -10,7 +10,8 @@ import torch.nn as nn
 # generate random integer values
 from random import seed
 from random import randint
-
+import copy
+ 
 from utils import *
 from layers import *
 from torch.utils.data import DataLoader
@@ -272,7 +273,7 @@ class Trainer:
         
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color", 0, 0])
-        
+        self.models["acual_encoder_depth"]=copy.deepcopy(self.models["encoder"])
         outputs = self.models["depth"](features)
         outputs["f1"] = features[0][:,r,:, :]
         #print("Shape of feaures depth encoder")
@@ -440,7 +441,7 @@ class Trainer:
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         #Feature similairty 
         #self.models["encoder"].eval()
-        #outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        outputs["f2"] = self.models["acual_encoder_depth"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
         #self.models["encoder"].train()    
                 
     def compute_reprojection_loss(self, pred, target):
