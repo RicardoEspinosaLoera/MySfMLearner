@@ -443,10 +443,10 @@ class Trainer:
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         #Feature similairty 
-        #self.models["encoder"].eval()
-        model = self.models["encoder"].detach()
+        self.models["encoder"].eval()
+        #model = self.models["encoder"].detach()
         outputs["f2"] = model(outputs["color_"+str(-1)+"_"+str(0)].detach())[0][:,r,:, :]
-        #self.models["encoder"].train()
+        self.models["encoder"].train()
         """
         weights_path = 'depth_weights_temp.pth'
         model_prev = networks.ResnetEncoder(
@@ -514,8 +514,9 @@ class Trainer:
             loss += loss_reprojection / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-
-            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum() 
+            a = outputs["f1"].detach()
+            b = outputs["f2"].detach()
+            feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
 
             loss += 0.01 * feature_similarity_loss / 2.0
 
