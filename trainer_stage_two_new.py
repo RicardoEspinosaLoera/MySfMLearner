@@ -448,6 +448,7 @@ class Trainer:
         model_prev = networks.ResnetEncoder(
             self.opt.num_layers, self.opt.weights_init == "pretrained")
         model_prev.load_state_dict(torch.load('depth_weights_temp.pth'))
+        model_prev.to(self.device)
         outputs["f2"] = model_prev(outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
         #self.models["encoder"].train()    
                 
