@@ -233,15 +233,15 @@ class Trainer:
         """Run a single epoch of training and validation
         """
         # self.model_lr_scheduler.step()
-
-        print("Training")
+        r = randint(0, 63)
+        print("Training - " + str(r))
         self.set_train()
 
         for batch_idx, inputs in enumerate(self.train_loader):
             
             before_op_time = time.time()
 
-            outputs, losses = self.process_batch(inputs)
+            outputs, losses = self.process_batch(inputs,r)
 
             self.model_optimizer.zero_grad()
             losses["loss"].backward()
@@ -261,7 +261,7 @@ class Trainer:
             
         self.model_lr_scheduler.step()
 
-    def process_batch(self, inputs):
+    def process_batch(self, inputs,r):
         """Pass a minibatch through the network and generate images and losses
         """
         for key, ipt in inputs.items():
@@ -269,7 +269,7 @@ class Trainer:
         
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color_aug", 0, 0])
-        #features = self.models["encoder"](inputs["color", 0, 0])
+        outputs["f1"] = features[0][:,r,:, :]
         outputs = self.models["depth"](features)
         #print("Shape of feaures depth encoder")
         #print(features[1].shape)
@@ -277,7 +277,7 @@ class Trainer:
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
             #outputs.update(self.predict_lighting(inputs, features, outputs))
-        self.generate_images_pred(inputs, outputs)
+        self.generate_images_pred(inputs, outputs,r)
 
         losses = self.compute_losses(inputs, outputs)
 
@@ -391,7 +391,7 @@ class Trainer:
                         
         return outputs
 
-    def generate_images_pred(self, inputs, outputs):
+    def generate_images_pred(self, inputs, outputs,r):
         """Generate the warped (reprojected) color images for a minibatch.
         Generated images are saved into the `outputs` dictionary.
         """
@@ -452,7 +452,10 @@ class Trainer:
                     #wandb.log({"CH_{}_{}".format(frame_id, scale): wandb.Image(outputs["ch_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
-                
+        #Feature similairty 
+        self.models["encoder"].eval()
+        outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        self.models["encoder"].train()    
                 
     def compute_reprojection_loss(self, pred, target):
 
@@ -506,6 +509,10 @@ class Trainer:
             loss += loss_reprojection / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
+
+            #feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum() 
+
+            #loss += 0.01 * feature_similarity_loss / 2.0
 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
