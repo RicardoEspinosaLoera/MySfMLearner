@@ -283,7 +283,7 @@ class Trainer:
             #outputs.update(self.predict_lighting(inputs, features, outputs))
         self.generate_images_pred(inputs, outputs,r)
 
-        losses = self.compute_losses(inputs, outputs)
+        losses = self.compute_losses(inputs, outputs,r)
 
         return outputs, losses
 
@@ -576,7 +576,7 @@ class Trainer:
             #outputs.update(self.predict_lighting(inputs, features, outputs))
 
         self.generate_images_pred(inputs, outputs,r)
-        losses = self.compute_losses_val(inputs, outputs,r)
+        losses = self.compute_losses_val(inputs, outputs)
 
         return outputs, losses
     """
