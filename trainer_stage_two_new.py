@@ -265,6 +265,7 @@ class Trainer:
             
         self.model_lr_scheduler.step()
 
+
     def process_batch(self, inputs,r):
         """Pass a minibatch through the network and generate images and losses
         """
@@ -273,7 +274,9 @@ class Trainer:
         
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color", 0, 0])
-        self.models["acual_encoder_depth"]=copy.deepcopy(self.models["encoder"])
+        #self.models["acual_encoder_depth"]=copy.deepcopy(self.models["encoder"])
+        weights_path = 'depth_weights_temp.pt'
+        torch.save(self.models["encoder"].state_dict(), weights_path)
         outputs = self.models["depth"](features)
         outputs["f1"] = features[0][:,r,:, :]
         #print("Shape of feaures depth encoder")
@@ -441,7 +444,9 @@ class Trainer:
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         #Feature similairty 
         #self.models["encoder"].eval()
-        outputs["f2"] = self.models["acual_encoder_depth"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        weights_path = 'depth_weights_temp.pt'
+        model_prev = torch.load(weights_path)
+        outputs["f2"] = model_prev(outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
         #self.models["encoder"].train()    
                 
     def compute_reprojection_loss(self, pred, target):
