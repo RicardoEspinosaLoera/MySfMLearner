@@ -274,7 +274,7 @@ class Trainer:
         features = self.models["encoder"](inputs["color_aug", 0, 0])
         
         outputs = self.models["depth"](features)
-        outputs["f1"] = features[0][:,r,:, :]
+        #outputs["f1"] = features[0][:,r,:, :]
         #print("Shape of feaures depth encoder")
         #print(features[1].shape)
     
@@ -377,24 +377,6 @@ class Trainer:
                     
         return outputs
 
-    def predict_lighting(self, inputs, features, disps):
-        """Predict poses between input frames for monocular sequences.
-        """
-        outputs = {}
-        pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
-        for f_i in self.opt.frame_ids[1:]:
-            inputs_all = [pose_feats[f_i], pose_feats[0]]
-    
-            # Input for Lighting
-            pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-            outputs_lighting = self.models["lighting"](pose_inputs[0])
-
-            for scale in self.opt.scales:
-                outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
-                outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        
-        return outputs
-
     def generate_images_pred(self, inputs, outputs,r):
         """Generate the warped (reprojected) color images for a minibatch.
         Generated images are saved into the `outputs` dictionary.
@@ -457,9 +439,9 @@ class Trainer:
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         #Feature similairty 
-        self.models["encoder"].eval()
-        outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
-        self.models["encoder"].train()    
+        #self.models["encoder"].eval()
+        #outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        #self.models["encoder"].train()    
                 
     def compute_reprojection_loss(self, pred, target):
 
