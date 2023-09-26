@@ -452,6 +452,7 @@ class Trainer:
         # Feature similairty 
         self.models["encoder"].eval()
         outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        self.models["encoder"].train()
         
         
         #f1 = outputs["f1"][0][:,r,:, :]
