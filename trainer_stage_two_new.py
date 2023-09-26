@@ -271,7 +271,7 @@ class Trainer:
             inputs[key] = ipt.to(self.device)
         
         #DepthNet Prediction
-        features = self.models["encoder"](inputs["color_aug", 0, 0])
+        features = self.models["encoder"](inputs["color", 0, 0])
         
         outputs = self.models["depth"](features)
         outputs["f1"] = features[0][:,r,:, :]
@@ -439,9 +439,9 @@ class Trainer:
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         #Feature similairty 
-        self.models["encoder"].eval()
-        outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
-        self.models["encoder"].train()    
+        #self.models["encoder"].eval()
+        #outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        #self.models["encoder"].train()    
                 
     def compute_reprojection_loss(self, pred, target):
 
@@ -500,9 +500,9 @@ class Trainer:
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
 
-            #feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum() 
+            feature_similarity_loss += (self.compute_feature_similarity_loss(outputs["f1"],outputs["f2"])).sum() 
 
-            #loss += 0.01 * feature_similarity_loss / 2.0
+            loss += 0.01 * feature_similarity_loss / 2.0
 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
