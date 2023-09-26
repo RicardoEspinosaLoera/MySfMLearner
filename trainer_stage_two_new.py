@@ -278,7 +278,7 @@ class Trainer:
         #features2 = self.models["encoder"](inputs["color_aug", -1, 0])
         #features = self.models["encoder"](inputs["color", 0, 0])
         outputs = self.models["depth"](features)
-        outputs["f1"] = features[0][:,r,:, :]
+        #outputs["f1"] = features[0][:,r,:, :]
         #print("Shape of feaures depth encoder")
         #Getting the features for (Feature Similarity Objective)
         #print(features[0].shape)
@@ -450,9 +450,9 @@ class Trainer:
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
         # Feature similairty 
-        self.models["encoder"].eval()
-        outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
-        self.models["encoder"].train()
+        #self.models["encoder"].eval()
+        #outputs["f2"] = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)])[0][:,r,:, :]
+        #self.models["encoder"].train()
         
         
         #f1 = outputs["f1"][0][:,r,:, :]
