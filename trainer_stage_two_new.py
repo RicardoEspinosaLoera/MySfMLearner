@@ -78,6 +78,10 @@ class Trainer:
         self.models["transform"].to(self.device)
         self.parameters_to_train += list(self.models["transform"].parameters())
 
+        self.models["lighting"] = networks.LightingDecoder(self.models["encoder"].num_ch_enc, self.opt.scales)
+        self.models["lighting"].to(self.device)
+        self.parameters_to_train += list(self.models["lighting"].parameters())
+        
         if self.use_pose_net:
 
             if self.opt.pose_model_type == "separate_resnet":
@@ -105,9 +109,7 @@ class Trainer:
             self.models["pose"].to(self.device)
             self.parameters_to_train += list(self.models["pose"].parameters())
 
-            self.models["lighting"] = networks.LightingDecoder(self.models["pose_encoder"].num_ch_enc, self.opt.scales)
-            self.models["lighting"].to(self.device)
-            self.parameters_to_train += list(self.models["lighting"].parameters())
+            
 
         if self.opt.predictive_mask:
             assert self.opt.disable_automasking, \
