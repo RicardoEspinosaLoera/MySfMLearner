@@ -274,7 +274,7 @@ class Trainer:
         features = self.models["encoder"](inputs["color_aug", 0, 0])
         
         outputs = self.models["depth"](features)
-        #outputs["f1"] = features[0][:,r,:, :]
+        outputs["f1"] = features[0][:,r,:, :]
         #print("Shape of feaures depth encoder")
         #print(features[1].shape)
     
