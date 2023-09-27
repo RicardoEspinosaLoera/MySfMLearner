@@ -273,7 +273,7 @@ class Trainer:
             inputs[key] = ipt.to(self.device)
         
         #DepthNet Prediction
-        features = self.models["encoder"](inputs["color", 0, 0])
+        features = self.models["encoder"](inputs["color_aug", 0, 0])
         #self.models["acual_encoder_depth"]=copy.deepcopy(self.models["encoder"])
         #weights_path = 'depth_weights_temp.pth'
         #torch.save(self.models["encoder"].state_dict(), weights_path)
@@ -300,7 +300,7 @@ class Trainer:
                 pose_feats = {f_i: features[f_i] for f_i in self.opt.frame_ids}
             else:
                 #pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
-                pose_feats = {f_i: inputs["color", f_i, 0] for f_i in self.opt.frame_ids}
+                pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
             
             
             for f_i in self.opt.frame_ids[1:]:
