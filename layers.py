@@ -246,7 +246,7 @@ def get_feature_similarity_loss(source,warped):
     ldepth = r / r1
 
 
-    return grad_disp_x.mean() + grad_disp_y.mean()
+    return ldepth
 
 
 def get_smooth_bright(transform, target, pred, occu_mask):
