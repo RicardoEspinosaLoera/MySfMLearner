@@ -527,7 +527,7 @@ class Trainer:
             b = outputs["f2"].detach()
             feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
 
-            depth_similarity_loss += get_feature_similarity_loss(outputs["depth_"+str(scale)].detach(),outputs["pdepth_"+str(0)].detach())
+            depth_similarity_loss += get_feature_similarity_loss(outputs["depth_"+str(0)].detach(),outputs["pdepth_"+str(0)].detach())
 
             loss += 0.1 * feature_similarity_loss 
             loss += 0.1 * depth_similarity_loss 
