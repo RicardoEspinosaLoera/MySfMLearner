@@ -243,7 +243,7 @@ def get_feature_similarity_loss(source,warped):
     ldepth = 0
     r = torch.abs(source[:, :, :, :] - warped[:, :, :, :])
     r1 = source[:, :, :, :] + warped[:, :, :, :]
-    ldepth = r / r1
+    ldepth = r.mean() / r1.mean()
     print(ldepth.shape)
 
     return ldepth
