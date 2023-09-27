@@ -238,6 +238,16 @@ def get_smooth_loss(disp, img):
 
     return grad_disp_x.mean() + grad_disp_y.mean()
 
+def get_feature_similarity_loss(source,warped):
+    
+    ldepth = 0
+    r = torch.abs(source[:, :, :, :] - warped[:, :, :, :])
+    r1 = source[:, :, :-1, :] + warped[:, :, 1:, :]
+    ldepth = r / r1
+
+
+    return grad_disp_x.mean() + grad_disp_y.mean()
+
 
 def get_smooth_bright(transform, target, pred, occu_mask):
     
