@@ -451,7 +451,7 @@ class Trainer:
         outputs["f2"] = features[0][:,r,:, :].detach()
         predicted_disp = self.models["depth"](features)
         _, predicted_depth = disp_to_depth(predicted_disp["disp_"+str(0)].detach(), self.opt.min_depth, self.opt.max_depth)
-        outputs["pdepth_"+str(scale)] = predicted_depth
+        outputs["pdepth_"+str(0)] = predicted_depth
         #outputs["predicted_depth"] = predicted_depth.detach()
         self.models["encoder"].train()
         self.models["depth"].train()
@@ -495,6 +495,7 @@ class Trainer:
             loss_transform = 0
             loss_cvt = 0
             feature_similarity_loss = 0
+            depth_similarity_loss = 0
             
             if self.opt.v1_multiscale:
                 source_scale = scale
@@ -526,8 +527,10 @@ class Trainer:
             b = outputs["f2"].detach()
             feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
 
-            loss += 0.1 * feature_similarity_loss / 2.0
+            depth_similarity_loss += get_feature_similarity_loss(outputs["depth_"+str(scale)].detach(),outputs["pdepth_"+str(0)].detach())
 
+            loss += 0.1 * feature_similarity_loss 
+            loss += 0.1 * depth_similarity_loss 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
 
