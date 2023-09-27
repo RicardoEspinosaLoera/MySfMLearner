@@ -441,15 +441,16 @@ class Trainer:
                     #wandb.log({"CH_{}_{}".format(frame_id, scale): wandb.Image(outputs["ch_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"BH_{}_{}".format(frame_id, scale): wandb.Image(outputs["bh_"+str(scale)+"_"+str(frame_id)].data)},step=self.step)
                     #wandb.log({"refinedCB_{}_{}".format(frame_id, scale): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)].data)},step=self.step)
-        #Feature similairty 
+        
+        #Feature similairty and depth consistency loss
         
         self.models["encoder"].eval()
         self.models["depth"].eval()
         #model = self.models["encoder"].detach()
         features = self.models["encoder"](outputs["refinedCB_"+str(-1)+"_"+str(0)].detach())
         outputs["f2"] = features[0][:,r,:, :].detach()
-        predicted_disp = self.models["depth"](features)
-        _, predicted_depth = disp_to_depth(predicted_disp["disp_"+str(0)], self.opt.min_depth, self.opt.max_depth)
+        predicted_disp = self.models["depth"](features).detach()
+        _, predicted_depth = disp_to_depth(predicted_disp["disp_"+str(0)].detach(), self.opt.min_depth, self.opt.max_depth)
         outputs["pdepth_"+str(scale)] = predicted_depth
         #outputs["predicted_depth"] = predicted_depth.detach()
         self.models["encoder"].train()
