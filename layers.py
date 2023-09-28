@@ -281,7 +281,7 @@ def get_ilumination_invariant_features(img):
     K7_[:] = K7
     K8_[:] = K8
 
-    M1 = F.conv2d(img_gray, K1, padding=0, stride=(1, 1, 1))
+    M1 = F.conv2d(img_gray, K1_, padding=0, stride=(1, 1, 1))
     M2 = F.conv2d(img_gray, K2_, padding=0, stride=(1, 1, 1))
     M3 = F.conv2d(img_gray, K3_, padding=0, stride=(1, 1, 1))
     M4 = F.conv2d(img_gray, K4_, padding=0, stride=(1, 1, 1))
