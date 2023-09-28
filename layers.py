@@ -281,7 +281,6 @@ def get_ilumination_invariant_features(img):
     K8_[:] = K8"""
 
     torch.zeros(12,256,320,8)
-    for i in range(12):
 
     M1 = F.conv2d(img_gray[0], K1_, padding=0, stride=(1, 1, 1))
     print(M1.shape)
