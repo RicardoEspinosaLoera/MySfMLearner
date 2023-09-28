@@ -486,8 +486,7 @@ class Trainer:
 
         losses = {}
         total_loss = 0
-        il = get_ilumination_invariant_features(outputs["color_"+str(frame_id)+"_"+str(scale)])
-        print(il.shape)
+        
         #outputs = outputs.reverse()
         for scale in self.opt.scales:
             
@@ -509,7 +508,8 @@ class Trainer:
             for frame_id in self.opt.frame_ids[1:]:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
-
+                il = get_ilumination_invariant_features(outputs["color_"+str(frame_id)+"_"+str(scale)])
+                print(il.shape)
                 #Original
                 #loss_reprojection += (
                 #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
