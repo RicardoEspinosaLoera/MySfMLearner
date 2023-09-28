@@ -255,9 +255,9 @@ def get_ilumination_invariant_features(img):
     img_gray = transforms.functional.rgb_to_grayscale(img,1)
     #print(img_gray)
 
-    K1 = torch.Tensor([[[[-1, 0, 1]], [[-2, 0, 2]], [[-1, 0, 1]]]])
-    K2 = torch.Tensor([[[[0, 1, 2]], [[-1, 0, 1]], [[-2, -1, 0]]]])
-    K3 = torch.Tensor([[[[1, 2, 1]], [[0, 0, 0]], [[-1, -2, -1]]]])
+    K1 = torch.Tensor([-1, 0, 1],[-2, 0, 2], [-1, 0, 1])
+    K2 = torch.Tensor([0, 1, 2], [-1, 0, 1], [-2, -1, 0])
+    K3 = torch.Tensor([1, 2, 1], [0, 0, 0], [-1, -2, -1])
     K4 = torch.Tensor([[[[2, 1, 0]], [[1, 0, -1]], [[0, -1, -2]]]])
     K5 = torch.Tensor([[[[1, 0,-1]], [[2, 0, -2]], [[1, 0, -1]]]])
     K6 = torch.Tensor([[[[0,-1,-2]], [[1, 0, -1]], [[2, 1, 0]]]])
