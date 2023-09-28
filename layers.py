@@ -251,8 +251,9 @@ def get_feature_similarity_loss(source,warped):
     return ldepth
 
 def get_ilumination_invariant_features(img):
-
     img_gray = transform = transforms.Grayscale()
+
+    print(img_gray.shape)
 
     K1 = torch.Tensor([[[[-1, 0, 1]], [[-2, 0, 2]], [[-1, 0, 1]]]])
     K2 = torch.Tensor([[[[0, 1, 2]], [[-1, 0, 1]], [[-2, -1, 0]]]])
