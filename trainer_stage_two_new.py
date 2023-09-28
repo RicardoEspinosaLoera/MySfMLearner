@@ -486,7 +486,8 @@ class Trainer:
 
         losses = {}
         total_loss = 0
-
+        il = get_ilumination_invariant_features(outputs["color_"+str(frame_id)+"_"+str(scale)])
+        print(il.shape)
         #outputs = outputs.reverse()
         for scale in self.opt.scales:
             

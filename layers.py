@@ -7,6 +7,8 @@ import math
 import cv2
 import torch.nn as nn
 import torch.nn.functional as F
+import torchvision
+import torchvision.transforms as transforms
 
 from warnings import warn
 
@@ -247,6 +249,32 @@ def get_feature_similarity_loss(source,warped):
     #print(ldepth.shape)
 
     return ldepth
+
+def get_ilumination_invariant_features(img):
+
+    img_gray = transform = transforms.Grayscale()
+
+    K1 = torch.Tensor([[[[-1, 0, 1]], [[-2, 0, 2]], [[-1, 0, 1]]]])
+    K2 = torch.Tensor([[[[0, 1, 2]], [[-1, 0, 1]], [[-2, -1, 0]]]])
+    K3 = torch.Tensor([[[[1, 2, 1]], [[0, 0, 0]], [[-1, -2, -1]]]])
+    K4 = torch.Tensor([[[[2, 1, 0]], [[1, 0, -1]], [[0, -1, -2]]]])
+    K5 = torch.Tensor([[[[1, 0,-1]], [[2, 0, -2]], [[1, 0, -1]]]])
+    K6 = torch.Tensor([[[[0,-1,-2]], [[1, 0, -1]], [[2, 1, 0]]]])
+    K7 = torch.Tensor([[[[-1, -2, -1]], [[0, 0, 0]], [[1, 2, 1]]]])
+    K8 = torch.Tensor([[[[-2, -1, 0]], [[-1, 0, 1]], [[0, 1, 2]]]])
+
+    M1 = F.conv2d(img_gray, k1, padding=0)
+    M2 = F.conv2d(img_gray, k2, padding=0)
+    M3 = F.conv2d(img_gray, k3, padding=0)
+    M4 = F.conv2d(img_gray, k4, padding=0)
+    M5 = F.conv2d(img_gray, k5, padding=0)
+    M6 = F.conv2d(img_gray, k6, padding=0)
+    M7 = F.conv2d(img_gray, k7, padding=0)
+    M8 = F.conv2d(img_gray, k8, padding=0)
+
+    t = torch.stack((M1,M2,M3,M4,M5,M6,M7,M8), dim = 0)
+
+    return t
 
 
 def get_smooth_bright(transform, target, pred, occu_mask):
