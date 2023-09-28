@@ -263,6 +263,7 @@ def get_ilumination_invariant_features(img):
         K6 = torch.Tensor([[0,-1,-2], [1, 0, -1], [2, 1, 0]])
         K7 = torch.Tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
         K8 = torch.Tensor([[-2, -1, 0], [-1, 0, 1], [0, 1, 2]])
+        print(K1.shape)
 
         M1 = F.conv2d(img_gray[i], K1, padding=0)
         M2 = F.conv2d(img_gray[i], K2, padding=0)
