@@ -447,7 +447,7 @@ class Trainer:
         self.models["encoder"].eval()
         self.models["depth"].eval()
         #model = self.models["encoder"].detach()
-        features = self.models["encoder"](outputs["refinedCB_"+str(-1)+"_"+str(0)].detach())
+        features = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)].detach())
         outputs["f2"] = features[0][:,r,:, :].detach()
         predicted_disp = self.models["depth"](features)
         _, predicted_depth = disp_to_depth(predicted_disp["disp_"+str(0)].detach(), self.opt.min_depth, self.opt.max_depth)
