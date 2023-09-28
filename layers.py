@@ -251,29 +251,43 @@ def get_feature_similarity_loss(source,warped):
     return ldepth
 
 def get_ilumination_invariant_features(img):
-    #img_gray = transforms.Grayscale(img).ToTensor()
-    img_gray = transforms.functional.rgb_to_grayscale(img,1)
-    #print(img_gray)
-    for i in range(12):
-        K1 = torch.Tensor([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]])
-        K2 = torch.Tensor([[0, 1, 2], [-1, 0, 1], [-2, -1, 0]])
-        K3 = torch.Tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-        K4 = torch.Tensor([[2, 1, 0], [1, 0, -1], [0, -1, -2]])
-        K5 = torch.Tensor([[1, 0,-1], [2, 0, -2], [1, 0, -1]])
-        K6 = torch.Tensor([[0,-1,-2], [1, 0, -1], [2, 1, 0]])
-        K7 = torch.Tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
-        K8 = torch.Tensor([[-2, -1, 0], [-1, 0, 1], [0, 1, 2]])
-        print(K1.shape)
-        print(img_gray[i].shape)
+    #ENDOVIS dataset
+    img_gray = transforms.functional.rgb_to_grayscale(img,1).reshape(12,256,320)
+    K1 = torch.Tensor([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]])
+    K2 = torch.Tensor([[0, 1, 2], [-1, 0, 1], [-2, -1, 0]])
+    K3 = torch.Tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
+    K4 = torch.Tensor([[2, 1, 0], [1, 0, -1], [0, -1, -2]])
+    K5 = torch.Tensor([[1, 0,-1], [2, 0, -2], [1, 0, -1]])
+    K6 = torch.Tensor([[0,-1,-2], [1, 0, -1], [2, 1, 0]])
+    K7 = torch.Tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
+    K8 = torch.Tensor([[-2, -1, 0], [-1, 0, 1], [0, 1, 2]])
 
-        M1 = F.conv2d(img_gray[i], K1, padding=0)
-        M2 = F.conv2d(img_gray[i], K2, padding=0)
-        M3 = F.conv2d(img_gray[i], K3, padding=0)
-        M4 = F.conv2d(img_gray[i], K4, padding=0)
-        M5 = F.conv2d(img_gray[i], K5, padding=0)
-        M6 = F.conv2d(img_gray[i], K6, padding=0)
-        M7 = F.conv2d(img_gray[i], K7, padding=0)
-        M8 = F.conv2d(img_gray[i], K8, padding=0)
+    K1_ = torch.zeros(12,3,3)
+    K2_ = torch.zeros(12,3,3)
+    K3_ = torch.zeros(12,3,3)
+    K4_ = torch.zeros(12,3,3)
+    K5_ = torch.zeros(12,3,3)
+    K6_ = torch.zeros(12,3,3)
+    K7_ = torch.zeros(12,3,3)
+    K8_ = torch.zeros(12,3,3)
+
+    k1_[:] = K1
+    k2_[:] = K2
+    k3_[:] = K3
+    k4_[:] = K4
+    k5_[:] = K5
+    k6_[:] = K6
+    k7_[:] = K7
+    k8_[:] = K8
+
+    M1 = F.conv2d(img_gray[i], k1_, padding=0)
+    M2 = F.conv2d(img_gray[i], k2_, padding=0)
+    M3 = F.conv2d(img_gray[i], k3_, padding=0)
+    M4 = F.conv2d(img_gray[i], k4_, padding=0)
+    M5 = F.conv2d(img_gray[i], k5_, padding=0)
+    M6 = F.conv2d(img_gray[i], k6_, padding=0)
+    M7 = F.conv2d(img_gray[i], k7_, padding=0)
+    M8 = F.conv2d(img_gray[i], k8_, padding=0)
 
     t = torch.stack((M1,M2,M3,M4,M5,M6,M7,M8), dim = 0)
 
