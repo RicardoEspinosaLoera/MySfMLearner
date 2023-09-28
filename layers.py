@@ -252,7 +252,7 @@ def get_feature_similarity_loss(source,warped):
 
 def get_ilumination_invariant_features(img):
     #ENDOVIS dataset
-    img_gray = transforms.functional.rgb_to_grayscale(img,1).reshape(12,256,320)
+    img_gray = transforms.functional.rgb_to_grayscale(img,1)
     K1 = torch.Tensor([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]])
     K2 = torch.Tensor([[0, 1, 2], [-1, 0, 1], [-2, -1, 0]])
     K3 = torch.Tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
