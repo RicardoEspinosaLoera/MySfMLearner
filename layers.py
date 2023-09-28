@@ -280,14 +280,14 @@ def get_ilumination_invariant_features(img):
     K7_[:] = K7
     K8_[:] = K8
 
-    M1 = F.conv2d(img_gray, K1_, padding=0)
-    M2 = F.conv2d(img_gray, K2_, padding=0)
-    M3 = F.conv2d(img_gray, K3_, padding=0)
-    M4 = F.conv2d(img_gray, K4_, padding=0)
-    M5 = F.conv2d(img_gray, K5_, padding=0)
-    M6 = F.conv2d(img_gray, K6_, padding=0)
-    M7 = F.conv2d(img_gray, K7_, padding=0)
-    M8 = F.conv2d(img_gray, K8_, padding=0)
+    M1 = F.conv2d(img_gray, K1_, padding=0, stride=[1, 1,1,1])
+    M2 = F.conv2d(img_gray, K2_, padding=0, stride=[1, 1,1,1])
+    M3 = F.conv2d(img_gray, K3_, padding=0, stride=[1, 1,1,1])
+    M4 = F.conv2d(img_gray, K4_, padding=0, stride=[1, 1,1,1])
+    M5 = F.conv2d(img_gray, K5_, padding=0, stride=[1, 1,1,1])
+    M6 = F.conv2d(img_gray, K6_, padding=0, stride=[1, 1,1,1])
+    M7 = F.conv2d(img_gray, K7_, padding=0, stride=[1, 1,1,1])
+    M8 = F.conv2d(img_gray, K8_, padding=0, stride=[1, 1,1,1])
 
     t = torch.stack((M1,M2,M3,M4,M5,M6,M7,M8), dim = 0)
 
