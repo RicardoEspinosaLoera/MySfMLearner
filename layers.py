@@ -272,7 +272,7 @@ def get_ilumination_invariant_features(img):
     K8_ = torch.zeros(12,3,3)
 
     K1_[:] = K1
-    k2_[:] = K2
+    K2_[:] = K2
     K3_[:] = K3
     K4_[:] = K4
     K5_[:] = K5
