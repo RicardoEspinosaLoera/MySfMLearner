@@ -251,7 +251,7 @@ def get_feature_similarity_loss(source,warped):
     return ldepth
 
 def get_ilumination_invariant_features(img):
-    img_gray = transforms.Grayscale()
+    img_gray = transforms.Grayscale(img)
 
     print(img_gray.shape)
 
