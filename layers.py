@@ -263,14 +263,14 @@ def get_ilumination_invariant_features(img):
     K7 = torch.Tensor([[[[-1, -2, -1]], [[0, 0, 0]], [[1, 2, 1]]]])
     K8 = torch.Tensor([[[[-2, -1, 0]], [[-1, 0, 1]], [[0, 1, 2]]]])
 
-    M1 = F.conv2d(img_gray, k1, padding=0)
-    M2 = F.conv2d(img_gray, k2, padding=0)
-    M3 = F.conv2d(img_gray, k3, padding=0)
-    M4 = F.conv2d(img_gray, k4, padding=0)
-    M5 = F.conv2d(img_gray, k5, padding=0)
-    M6 = F.conv2d(img_gray, k6, padding=0)
-    M7 = F.conv2d(img_gray, k7, padding=0)
-    M8 = F.conv2d(img_gray, k8, padding=0)
+    M1 = F.conv2d(img_gray, K1, padding=0)
+    M2 = F.conv2d(img_gray, K2, padding=0)
+    M3 = F.conv2d(img_gray, K3, padding=0)
+    M4 = F.conv2d(img_gray, K4, padding=0)
+    M5 = F.conv2d(img_gray, K5, padding=0)
+    M6 = F.conv2d(img_gray, K6, padding=0)
+    M7 = F.conv2d(img_gray, K7, padding=0)
+    M8 = F.conv2d(img_gray, K8, padding=0)
 
     t = torch.stack((M1,M2,M3,M4,M5,M6,M7,M8), dim = 0)
 
