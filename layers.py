@@ -253,6 +253,7 @@ def get_feature_similarity_loss(source,warped):
 def get_ilumination_invariant_features(img):
     #ENDOVIS dataset
     img_gray = transforms.functional.rgb_to_grayscale(img,1)
+    print(img_gray.shape)
     K1 = torch.Tensor([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]])
     K2 = torch.Tensor([[0, 1, 2], [-1, 0, 1], [-2, -1, 0]])
     K3 = torch.Tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
@@ -261,15 +262,15 @@ def get_ilumination_invariant_features(img):
     K6 = torch.Tensor([[0,-1,-2], [1, 0, -1], [2, 1, 0]])
     K7 = torch.Tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
     K8 = torch.Tensor([[-2, -1, 0], [-1, 0, 1], [0, 1, 2]])
-    """
-    K1_ = torch.zeros(12,3,3)
-    K2_ = torch.zeros(12,3,3)
-    K3_ = torch.zeros(12,3,3)
-    K4_ = torch.zeros(12,3,3)
-    K5_ = torch.zeros(12,3,3)
-    K6_ = torch.zeros(12,3,3)
-    K7_ = torch.zeros(12,3,3)
-    K8_ = torch.zeros(12,3,3)
+    
+    K1_ = torch.zeros(12,1,3,3)
+    K2_ = torch.zeros(12,1,3,3)
+    K3_ = torch.zeros(12,1,3,3)
+    K4_ = torch.zeros(12,1,3,3)
+    K5_ = torch.zeros(12,1,3,3)
+    K6_ = torch.zeros(12,1,3,3)
+    K7_ = torch.zeros(12,1,3,3)
+    K8_ = torch.zeros(12,1,3,3)
 
     K1_[:] = K1
     K2_[:] = K2
@@ -278,12 +279,9 @@ def get_ilumination_invariant_features(img):
     K5_[:] = K5
     K6_[:] = K6
     K7_[:] = K7
-    K8_[:] = K8"""
+    K8_[:] = K8
 
-    torch.zeros(12,256,320,8)
-
-    M1 = F.conv2d(img_gray[0][0], K1, padding=0, stride=(1, 1, 1))
-    print(M1.shape)
+    M1 = F.conv2d(img_gray, K1, padding=0, stride=(1, 1, 1))
     M2 = F.conv2d(img_gray, K2_, padding=0, stride=(1, 1, 1))
     M3 = F.conv2d(img_gray, K3_, padding=0, stride=(1, 1, 1))
     M4 = F.conv2d(img_gray, K4_, padding=0, stride=(1, 1, 1))
