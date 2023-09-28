@@ -282,7 +282,7 @@ def get_ilumination_invariant_features(img):
 
     torch.zeros(12,256,320,8)
 
-    M1 = F.conv2d(img_gray[0], K1_, padding=0, stride=(1, 1, 1))
+    M1 = F.conv2d(img_gray[0], K1, padding=0, stride=(1, 1, 1))
     print(M1.shape)
     M2 = F.conv2d(img_gray, K2_, padding=0, stride=(1, 1, 1))
     M3 = F.conv2d(img_gray, K3_, padding=0, stride=(1, 1, 1))
