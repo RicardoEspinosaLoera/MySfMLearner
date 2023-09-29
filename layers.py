@@ -291,6 +291,8 @@ def get_ilumination_invariant_features(img):
     M7 = F.conv2d(img_gray, K7.view(1, 1, 3, 3), padding=0)
     M8 = F.conv2d(img_gray, K8.view(1, 1, 3, 3), padding=0)
 
+    print(M1.shape)
+
     t = torch.stack((M1,M2,M3,M4,M5,M6,M7,M8), dim = 0)
 
     return t
