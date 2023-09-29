@@ -240,7 +240,7 @@ def get_smooth_loss(disp, img):
 
     return grad_disp_x.mean() + grad_disp_y.mean()
 
-def get_feature_similarity_loss(source,warped):
+def get_depth_loss(source,warped):
     
     ldepth = 0
     r = torch.abs(source[:, :, :, :] - warped[:, :, :, :])
@@ -249,6 +249,7 @@ def get_feature_similarity_loss(source,warped):
     #print(ldepth.shape)
 
     return ldepth
+
 
 def get_ilumination_invariant_features(img):
     #ENDOVIS dataset
@@ -263,24 +264,6 @@ def get_ilumination_invariant_features(img):
     K6 = torch.Tensor([[0,-1,-2], [1, 0, -1], [2, 1, 0]]).to(device=img_gray.device)
     K7 = torch.Tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]]).to(device=img_gray.device)
     K8 = torch.Tensor([[-2, -1, 0], [-1, 0, 1], [0, 1, 2]]).to(device=img_gray.device)
-    """
-    K1_ = torch.zeros(12,1,3,3)
-    K2_ = torch.zeros(12,1,3,3)
-    K3_ = torch.zeros(12,1,3,3)
-    K4_ = torch.zeros(12,1,3,3)
-    K5_ = torch.zeros(12,1,3,3)
-    K6_ = torch.zeros(12,1,3,3)
-    K7_ = torch.zeros(12,1,3,3)
-    K8_ = torch.zeros(12,1,3,3)
-
-    K1_[:] = K1
-    K2_[:] = K2
-    K3_[:] = K3
-    K4_[:] = K4
-    K5_[:] = K5
-    K6_[:] = K6
-    K7_[:] = K7
-    K8_[:] = K8"""
 
     M1 = F.conv2d(img_gray, K1.view(1, 1, 3, 3), padding=0)
     M2 = F.conv2d(img_gray, K2.view(1, 1, 3, 3), padding=0)
@@ -290,8 +273,6 @@ def get_ilumination_invariant_features(img):
     M6 = F.conv2d(img_gray, K6.view(1, 1, 3, 3), padding=0)
     M7 = F.conv2d(img_gray, K7.view(1, 1, 3, 3), padding=0)
     M8 = F.conv2d(img_gray, K8.view(1, 1, 3, 3), padding=0)
-
-    print(M1.shape)
 
     t = torch.cat((M1,M2,M3,M4,M5,M6,M7,M8), dim = 1)
 

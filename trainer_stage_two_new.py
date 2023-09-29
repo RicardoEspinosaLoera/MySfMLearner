@@ -482,6 +482,18 @@ class Trainer:
         fs_loss = self.ssim(pred, target).mean(1, True)
         return fs_loss
 
+    def get_ilumination_invariant_loss(self, pred, target):
+        features_p = get_ilumination_invariant_features(pred)
+        features_t = get_ilumination_invariant_features(target)
+
+        abs_diff = torch.abs(features_t - features_p)
+        l1_loss = abs_diff.mean(1, True)
+
+        ssim_loss = self.ssim(features_p, features_t).mean(1, True)
+        ii_loss = 0.85 * ssim_loss + 0.15 * l1_loss
+
+    
+
     def compute_losses(self, inputs, outputs):
 
         losses = {}
@@ -507,15 +519,18 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 
-                occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
-                il = get_ilumination_invariant_features(outputs["color_"+str(frame_id)+"_"+str(scale)])
-                print(il.shape)
+                #occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
+                #il = get_ilumination_invariant_features(outputs["color_"+str(frame_id)+"_"+str(scale)])
+                #print(il.shape)
                 #Original
                 #loss_reprojection += (
                 #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                #Cambios                
+                #Cambios   
+                """             
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
+                loss_reprojection += (
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)])).sum()
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
@@ -524,14 +539,14 @@ class Trainer:
             loss += loss_reprojection / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            a = outputs["f1"].detach()
-            b = outputs["f2"].detach()
-            feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
+            #a = outputs["f1"].detach()
+            #b = outputs["f2"].detach()
+            #feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
 
-            depth_similarity_loss += get_feature_similarity_loss(outputs["depth_"+str(0)].detach(),outputs["pdepth_"+str(0)].detach())
+            #depth_similarity_loss += get_depth_loss(outputs["depth_"+str(0)].detach(),outputs["pdepth_"+str(0)].detach())
 
-            loss += 0.1 * feature_similarity_loss 
-            loss += 0.1 * depth_similarity_loss 
+            #loss += 0.1 * feature_similarity_loss 
+            #loss += 0.1 * depth_similarity_loss 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
 
