@@ -253,7 +253,8 @@ def get_depth_loss(source,warped):
 
 def get_ilumination_invariant_features(img):
     #ENDOVIS dataset
-    img_gray = transforms.functional.rgb_to_grayscale(img,1)
+    if(img,shape[1] != 1):
+        img_gray = transforms.functional.rgb_to_grayscale(img,1)
     #print(img_gray.shape)
     kernel = torch.tensor([[1, 2, 1],[0, 0, 0],[-1, -2, -1]]).to(device=img_gray.device)
     K1 = torch.Tensor([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]]).to(device=img_gray.device)

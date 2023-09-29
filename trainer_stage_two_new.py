@@ -446,27 +446,17 @@ class Trainer:
                 """
         
         #Feature similairty and depth consistency loss
-        
+        """
         self.models["encoder"].eval()
         self.models["depth"].eval()
-        #model = self.models["encoder"].detach()
         features = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)].detach())
         outputs["f2"] = features[0][:,r,:, :].detach()
         predicted_disp = self.models["depth"](features)
         _, predicted_depth = disp_to_depth(predicted_disp["disp_"+str(0)].detach(), self.opt.min_depth, self.opt.max_depth)
         outputs["pdepth_"+str(0)] = predicted_depth
-        #outputs["predicted_depth"] = predicted_depth.detach()
         self.models["encoder"].train()
         self.models["depth"].train()
         """
-        weights_path = 'depth_weights_temp.pth'
-        model_prev = networks.ResnetEncoder(
-            self.opt.num_layers, self.opt.weights_init == "pretrained")
-        model_prev.load_state_dict(torch.load('depth_weights_temp.pth'))
-        model_prev.to(self.device)
-        outputs["f2"] = model_prev(outputs["color_"+str(0)+"_"+str(0)])[0][:,r,:, :]
-        """
-        #self.models["encoder"].train()    
                 
     def compute_reprojection_loss(self, pred, target):
 
