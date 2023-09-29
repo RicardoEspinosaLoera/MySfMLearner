@@ -250,6 +250,11 @@ def get_depth_loss(source,warped):
 
     return ldepth
 
+def get_feature_oclution_mask(img):
+    kernel = torch.tensor([[1, 1, 1],[1, 1, 1],[1, 1, 1]]).to(device=img_gray.device)
+    o = F.conv2d(img_gray, K1.view(1, 1, 3, 3), padding=0)
+    t = torch.cat((o,o,o,o,o,o,o,o), dim = 1)
+    return t
 
 def get_ilumination_invariant_features(img):
     #ENDOVIS dataset
