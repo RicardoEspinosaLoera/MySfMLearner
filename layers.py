@@ -251,7 +251,7 @@ def get_depth_loss(source,warped):
     return ldepth
 
 def get_feature_oclution_mask(img):
-    kernel = torch.tensor([[1, 1, 1],[1, 1, 1],[1, 1, 1]]).to(torch.device("cuda"))
+    kernel = torch.tensor([[1, 1, 1],[1, 1, 1],[1, 1, 1]]).to(device=img_gray.device)
     o = F.conv2d(img, kernel.view(1, 1, 3, 3), padding=0)
     t = torch.cat((o,o,o,o,o,o,o,o), dim = 1)
     return t
@@ -263,7 +263,7 @@ def get_ilumination_invariant_features(img):
     else: 
         img_gray = img
     #print(img_gray.shape)
-    kernel = torch.tensor([[1, 2, 1],[0, 0, 0],[-1, -2, -1]]).to(device=img_gray.device)
+    #kernel = torch.tensor([[1, 2, 1],[0, 0, 0],[-1, -2, -1]]).to(device=img_gray.device)
     K1 = torch.Tensor([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]]).to(device=img_gray.device)
     K2 = torch.Tensor([[0, 1, 2], [-1, 0, 1], [-2, -1, 0]]).to(device=img_gray.device)
     K3 = torch.Tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]]).to(device=img_gray.device)
