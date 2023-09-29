@@ -514,6 +514,7 @@ class Trainer:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 occu_mask_backward_ = get_ilumination_invariant_features(occu_mask_backward)
+                print(occu_mask_backward_)
                 #il = get_ilumination_invariant_features(outputs["color_"+str(frame_id)+"_"+str(scale)])
                 #print(il.shape)
                 #Original
