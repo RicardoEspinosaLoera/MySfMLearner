@@ -483,6 +483,7 @@ class Trainer:
 
         ssim_loss = self.ssim(features_p, features_t).mean(1, True)
         ii_loss = 0.85 * ssim_loss + 0.15 * l1_loss
+        print(ii_loss.shape)
         return ii_loss
     
 
@@ -523,7 +524,7 @@ class Trainer:
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
                 loss_reprojection += (
-                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].detach()*occu_mask_backward, inputs[("color",0,0)].detach()*occu_mask_backward)).sum() / occu_mask_backward.sum()
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)])).sum() / occu_mask_backward.sum()
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
