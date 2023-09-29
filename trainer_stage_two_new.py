@@ -478,7 +478,6 @@ class Trainer:
     def get_ilumination_invariant_loss(self, pred, target):
         features_p = get_ilumination_invariant_features(pred)
         features_t = get_ilumination_invariant_features(target)
-        print(features_t.shape)
         abs_diff = torch.abs(features_t - features_p)
         l1_loss = abs_diff.mean(1, True)
 
