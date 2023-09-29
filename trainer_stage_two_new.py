@@ -524,7 +524,7 @@ class Trainer:
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
                 loss_reprojection += (
-                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].detach()*occu_mask_backward, inputs[("color",0,0)].detach()*occu_mask_backward)).sum() / occu_mask_backward_.sum()
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].detach()*occu_mask_backward, inputs[("color",0,0)].detach()*occu_mask_backward)).sum() / occu_mask_backward.sum()
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
