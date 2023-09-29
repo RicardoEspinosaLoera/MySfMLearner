@@ -293,7 +293,7 @@ def get_ilumination_invariant_features(img):
 
     print(M1.shape)
 
-    t = torch.stack((M1,M2,M3,M4,M5,M6,M7,M8), dim = 0)
+    t = torch.cat((M1,M2,M3,M4,M5,M6,M7,M8), dim = 1)
 
     return t
 
