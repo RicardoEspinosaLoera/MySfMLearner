@@ -254,15 +254,15 @@ def get_ilumination_invariant_features(img):
     #ENDOVIS dataset
     img_gray = transforms.functional.rgb_to_grayscale(img,1)
     print(img_gray.shape)
-    K1 = torch.Tensor([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]])
-    K2 = torch.Tensor([[0, 1, 2], [-1, 0, 1], [-2, -1, 0]])
-    K3 = torch.Tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-    K4 = torch.Tensor([[2, 1, 0], [1, 0, -1], [0, -1, -2]])
-    K5 = torch.Tensor([[1, 0,-1], [2, 0, -2], [1, 0, -1]])
-    K6 = torch.Tensor([[0,-1,-2], [1, 0, -1], [2, 1, 0]])
-    K7 = torch.Tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
-    K8 = torch.Tensor([[-2, -1, 0], [-1, 0, 1], [0, 1, 2]])
-    
+    K1 = torch.Tensor([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]], dtype=torch.float32)
+    K2 = torch.Tensor([[0, 1, 2], [-1, 0, 1], [-2, -1, 0]], dtype=torch.float32)
+    K3 = torch.Tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]], dtype=torch.float32)
+    K4 = torch.Tensor([[2, 1, 0], [1, 0, -1], [0, -1, -2]], dtype=torch.float32)
+    K5 = torch.Tensor([[1, 0,-1], [2, 0, -2], [1, 0, -1]], dtype=torch.float32)
+    K6 = torch.Tensor([[0,-1,-2], [1, 0, -1], [2, 1, 0]], dtype=torch.float32)
+    K7 = torch.Tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=torch.float32)
+    K8 = torch.Tensor([[-2, -1, 0], [-1, 0, 1], [0, 1, 2]], dtype=torch.float32)
+    """
     K1_ = torch.zeros(12,1,3,3)
     K2_ = torch.zeros(12,1,3,3)
     K3_ = torch.zeros(12,1,3,3)
@@ -279,16 +279,16 @@ def get_ilumination_invariant_features(img):
     K5_[:] = K5
     K6_[:] = K6
     K7_[:] = K7
-    K8_[:] = K8
+    K8_[:] = K8"""
 
-    M1 = F.conv2d(img_gray, K1_, padding=0, stride=(1, 1, 1,1))
-    M2 = F.conv2d(img_gray, K2_, padding=0, stride=(1, 1, 1))
-    M3 = F.conv2d(img_gray, K3_, padding=0, stride=(1, 1, 1))
-    M4 = F.conv2d(img_gray, K4_, padding=0, stride=(1, 1, 1))
-    M5 = F.conv2d(img_gray, K5_, padding=0, stride=(1, 1, 1))
-    M6 = F.conv2d(img_gray, K6_, padding=0, stride=(1, 1, 1))
-    M7 = F.conv2d(img_gray, K7_, padding=0, stride=(1, 1, 1))
-    M8 = F.conv2d(img_gray, K8_, padding=0, stride=(1, 1, 1))
+    M1 = F.conv2d(img_gray, K1.view(1, 1, 3, 3), padding=0)
+    M2 = F.conv2d(img_gray, K2.view(1, 1, 3, 3), padding=0)
+    M3 = F.conv2d(img_gray, K3.view(1, 1, 3, 3), padding=0)
+    M4 = F.conv2d(img_gray, K4.view(1, 1, 3, 3), padding=0)
+    M5 = F.conv2d(img_gray, K5.view(1, 1, 3, 3), padding=0)
+    M6 = F.conv2d(img_gray, K6.view(1, 1, 3, 3), padding=0)
+    M7 = F.conv2d(img_gray, K7.view(1, 1, 3, 3), padding=0)
+    M8 = F.conv2d(img_gray, K8.view(1, 1, 3, 3), padding=0)
 
     t = torch.stack((M1,M2,M3,M4,M5,M6,M7,M8), dim = 0)
 
