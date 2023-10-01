@@ -603,6 +603,58 @@ def get_texu_mask(non_rigid, rigid):
    
     return texu_mask
 
+def brightnes_equator(source,target):
+	def image_stats(image):
+	  # compute the mean and standard deviation of each channel
+
+	  l = image[:,0,:,:]
+	  a = image[:,1,:,:]
+	  b = image[:,2,:,:]
+
+	  (lMean, lStd) = (torch.mean(torch.squeeze(l)), torch.std(torch.squeeze(l)))
+
+	
+	  (aMean, aStd) = (torch.mean(torch.squeeze(a)), torch.std(torch.squeeze(a)))
+
+	  (bMean, bStd) = (torch.mean(torch.squeeze(b)), torch.std(torch.squeeze(b)))
+
+	  # return the color statistics
+	  return (lMean, lStd, aMean, aStd, bMean, bStd)
+
+	def color_transfer(source, target):
+	  # convert the images from the RGB to L*ab* color space, being
+	  # sure to utilizing the floating point data type (note: OpenCV
+	  # expects floats to be 32-bit, so use that instead of 64-bit)
+
+	  # compute color statistics for the source and target images
+	  (lMeanSrc, lStdSrc, aMeanSrc, aStdSrc, bMeanSrc, bStdSrc) = image_stats(source)
+	  (lMeanTar, lStdTar, aMeanTar, aStdTar, bMeanTar, bStdTar) = image_stats(target)
+
+	  # subtract the means from the target image
+	  l = target[:,0,:,:]
+	  a = target[:,1,:,:]
+	  b = target[:,2,:,:]
+
+	  l = l - lMeanTar
+	  #print("after l",torch.isnan(l))
+	  a = a - aMeanTar
+	  b = b - bMeanTar
+	  # scale by the standard deviations
+	  l = (lStdTar / lStdSrc) * l    
+	  a = (aStdTar / aStdSrc) * a
+	  b = (bStdTar / bStdSrc) * b
+	  # add in the source mean
+	  l = l + lMeanSrc
+	  a = a + aMeanSrc
+	  b = b + bMeanSrc
+	  transfer = torch.cat((l.unsqueeze(1),a.unsqueeze(1),b.unsqueeze(1)),1)
+	  #print(torch.isnan(transfer))
+	  return transfer
+
+	# return the color transferred image
+	transfered_image = color_transfer(target,source)
+	return transfered_image
+
 
 def get_corresponding_map(data):
     """
