@@ -520,7 +520,7 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            loss += 0.15 * loss_ilumination_invariant / 2.0
+            loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
             #a = outputs["f1"].detach()
