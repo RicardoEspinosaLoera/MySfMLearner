@@ -433,17 +433,17 @@ class Trainer:
                 #outputs["refined_"+str(frame_id)+"_"+str(scale)] = brightnes_equator(outputs["color_"+str(frame_id)+"_"+str(scale)],inputs[("color", frame_id, source_scale)])  
         
         #Feature similairty and depth consistency loss
-        """
+        
         self.models["encoder"].eval()
         self.models["depth"].eval()
         features = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)].detach())
-        outputs["f2"] = features[0][:,r,:, :].detach()
+        #outputs["f2"] = features[0][:,r,:, :].detach()
         predicted_disp = self.models["depth"](features)
         _, predicted_depth = disp_to_depth(predicted_disp["disp_"+str(0)].detach(), self.opt.min_depth, self.opt.max_depth)
         outputs["pdepth_"+str(0)] = predicted_depth
         self.models["encoder"].train()
         self.models["depth"].train()
-        """
+        
                 
     def compute_reprojection_loss(self, pred, target):
 
@@ -520,17 +520,17 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            loss += 0.25 * loss_ilumination_invariant / 2.0
+            loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
             #a = outputs["f1"].detach()
             #b = outputs["f2"].detach()
             #feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
 
-            #depth_similarity_loss += get_depth_loss(outputs["depth_"+str(0)].detach(),outputs["pdepth_"+str(0)].detach())
+            depth_similarity_loss += get_depth_loss(outputs["depth_"+str(0)].detach(),outputs["pdepth_"+str(0)].detach())
 
             #loss += 0.1 * feature_similarity_loss 
-            #loss += 0.1 * depth_similarity_loss 
+            loss += 0.1 * depth_similarity_loss 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
 
