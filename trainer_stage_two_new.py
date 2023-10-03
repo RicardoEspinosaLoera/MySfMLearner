@@ -433,7 +433,7 @@ class Trainer:
                 #outputs["refined_"+str(frame_id)+"_"+str(scale)] = brightnes_equator(outputs["color_"+str(frame_id)+"_"+str(scale)],inputs[("color", frame_id, source_scale)])  
         
         #Feature similairty and depth consistency loss
-        
+        """
         self.models["encoder"].eval()
         self.models["depth"].eval()
         features = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)].detach())
@@ -442,7 +442,7 @@ class Trainer:
         _, predicted_depth = disp_to_depth(predicted_disp["disp_"+str(0)].detach(), self.opt.min_depth, self.opt.max_depth)
         outputs["pdepth_"+str(0)] = predicted_depth
         self.models["encoder"].train()
-        self.models["depth"].train()
+        self.models["depth"].train()"""
         
                 
     def compute_reprojection_loss(self, pred, target):
@@ -511,7 +511,7 @@ class Trainer:
                 #Cambios   
                             
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 loss_ilumination_invariant += (
                     self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
 
@@ -527,10 +527,10 @@ class Trainer:
             #b = outputs["f2"].detach()
             #feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
 
-            depth_similarity_loss += get_depth_loss(outputs["depth_"+str(0)].detach(),outputs["pdepth_"+str(0)].detach())
+            #depth_similarity_loss += get_depth_loss(outputs["depth_"+str(0)].detach(),outputs["pdepth_"+str(0)].detach())
 
             #loss += 0.1 * feature_similarity_loss 
-            loss += 0.1 * depth_similarity_loss 
+            #loss += 0.1 * depth_similarity_loss 
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
 
