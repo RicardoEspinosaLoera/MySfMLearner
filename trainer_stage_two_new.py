@@ -478,22 +478,22 @@ class Trainer:
     
     #def get_motion_flow_loss(self, flow):
     def get_motion_flow_loss(self,motion_map):
-    """A regularizer that encourages sparsity.
-    This regularizer penalizes nonzero values. Close to zero it behaves like an L1
-    regularizer, and far away from zero its strength decreases. The scale that
-    distinguishes "close" from "far" is the mean value of the absolute of
-    `motion_map`.
-    Args:
-        motion_map: A torch.Tensor of shape [B, C, H, W]
-    Returns:
-        A scalar torch.Tensor, the regularizer to be added to the training loss.
-    """
-    tensor_abs = torch.abs(motion_map)
-    mean = torch.mean(tensor_abs, dim=(2, 3), keepdim=True).detach()
-    # We used L0.5 norm here because it's more sparsity encouraging than L1.
-    # The coefficients are designed in a way that the norm asymptotes to L1 in
-    # the small value limit.
-    return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
+        """A regularizer that encourages sparsity.
+        This regularizer penalizes nonzero values. Close to zero it behaves like an L1
+        regularizer, and far away from zero its strength decreases. The scale that
+        distinguishes "close" from "far" is the mean value of the absolute of
+        `motion_map`.
+        Args:
+            motion_map: A torch.Tensor of shape [B, C, H, W]
+        Returns:
+            A scalar torch.Tensor, the regularizer to be added to the training loss.
+        """
+        tensor_abs = torch.abs(motion_map)
+        mean = torch.mean(tensor_abs, dim=(2, 3), keepdim=True).detach()
+        # We used L0.5 norm here because it's more sparsity encouraging than L1.
+        # The coefficients are designed in a way that the norm asymptotes to L1 in
+        # the small value limit.
+        return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
 
     
 
