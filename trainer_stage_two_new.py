@@ -352,7 +352,7 @@ class Trainer:
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
 
                     # Input motion flow
-                    outputs["mf_"+str(scale)+"_"+str(f_i)] = self.models["motion_flow"](pose_inputs)
+                    outputs["mf_"+str(scale)+"_"+str(f_i)] = self.models["motion_flow"](pose_inputs[0])
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
