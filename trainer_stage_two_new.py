@@ -82,6 +82,10 @@ class Trainer:
         self.models["lighting"].to(self.device)
         self.parameters_to_train += list(self.models["lighting"].parameters())
 
+        self.models["motion_flow"] = networks.ResidualFLowDecoder(self.models["encoder"].num_ch_enc, self.opt.scales)
+        self.models["motion_flow"].to(self.device)
+        self.parameters_to_train += list(self.models["motion_flow"].parameters())
+
         if self.use_pose_net:
 
             if self.opt.pose_model_type == "separate_resnet":
@@ -345,11 +349,10 @@ class Trainer:
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
-                    #print(len(pose_inputs))
-                    #pose_inputs = torch.stack(pose_inputs).to(device)
-                    #if f_i < 0: 
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
-                    #print(outputs_lighting["lighting",0].shape)
+
+                    # Input motion flow
+                    outputs["mf_"+str(scale)+"_"+str(f_i)] = self.models["motion_flow"](pose_inputs[0])
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
@@ -473,6 +476,26 @@ class Trainer:
         #print(ii_loss.shape)
         return ssim_loss
     
+    #def get_motion_flow_loss(self, flow):
+    def get_motion_flow_loss(self,motion_map):
+    """A regularizer that encourages sparsity.
+    This regularizer penalizes nonzero values. Close to zero it behaves like an L1
+    regularizer, and far away from zero its strength decreases. The scale that
+    distinguishes "close" from "far" is the mean value of the absolute of
+    `motion_map`.
+    Args:
+        motion_map: A torch.Tensor of shape [B, C, H, W]
+    Returns:
+        A scalar torch.Tensor, the regularizer to be added to the training loss.
+    """
+    tensor_abs = torch.abs(motion_map)
+    mean = torch.mean(tensor_abs, dim=(2, 3), keepdim=True).detach()
+    # We used L0.5 norm here because it's more sparsity encouraging than L1.
+    # The coefficients are designed in a way that the norm asymptotes to L1 in
+    # the small value limit.
+    return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
+
+    
 
     def compute_losses(self, inputs, outputs):
 
@@ -489,6 +512,7 @@ class Trainer:
             loss_cvt = 0
             feature_similarity_loss = 0
             depth_similarity_loss = 0
+            loss_motion_flow = 0
             
             if self.opt.v1_multiscale:
                 source_scale = scale
@@ -514,6 +538,10 @@ class Trainer:
                     self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 loss_ilumination_invariant += (
                     self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
+                loss_motion_flow = += (
+                    self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
+                )
+            
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
@@ -523,6 +551,7 @@ class Trainer:
             loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
+            loss += 1e-4 * loss_motion_flow / (2 ** scale)
             #a = outputs["f1"].detach()
             #b = outputs["f2"].detach()
             #feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
