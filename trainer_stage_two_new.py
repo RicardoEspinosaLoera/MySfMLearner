@@ -352,7 +352,7 @@ class Trainer:
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
 
                     # Input motion flow
-                    outputs["mf_"+str(scale)+"_"+str(f_i)] = self.models["motion_flow"](pose_inputs[0])
+                    outputs_mf = self.models["motion_flow"](pose_inputs[0])
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
@@ -366,7 +366,7 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("flow", scale)]
+                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)] 
                     
                    
                     
