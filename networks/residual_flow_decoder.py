@@ -44,7 +44,7 @@ class ResidualFLowDecoder(nn.Module):
             self.convs[("rf_conv", s)] = Conv3x3(self.num_ch_dec[s], self.num_output_channels)
 
         self.decoder = nn.ModuleList(list(self.convs.values()))
-        #self.sigmoid = nn.Sigmoid()
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, input_features):
         self.outputs = {}
