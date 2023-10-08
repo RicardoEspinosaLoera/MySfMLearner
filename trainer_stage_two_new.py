@@ -689,6 +689,7 @@ class Trainer:
                     wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
                     wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                
                 f = outputs["mf_"+str(s)][j].data
                 flow = self.flow2rgb_raw(f,32)
                 flow = torch.from_numpy(flow)
