@@ -415,8 +415,9 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
-                print(outputs["mf_"+str(scale)].shape)
+                #print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
+                outputs["mf_"+str(scale)] = outputs["mf_"+str(scale)].reshape(12,256,128,2)
+                self.opt.height, self.opt.width
                 #outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mf_"+str(scale)]
 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
@@ -684,7 +685,7 @@ class Trainer:
                     wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
                     wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
-                    wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["mf_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
+                wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["mf_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     
  
                 wandb.log({mode+"_disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
