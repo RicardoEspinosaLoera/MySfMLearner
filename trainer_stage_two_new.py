@@ -367,6 +367,7 @@ class Trainer:
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         outputs["mf_"+str(scale)] =  disp = F.interpolate(
                     outputs_mf[("flow", scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                        print(outputs["mf_"+str(scale)].shape)
 
                     
                    
