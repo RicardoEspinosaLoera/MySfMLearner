@@ -416,7 +416,8 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-                #print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
+                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
+                print(outputs["mf_"+str(scale)].shape)
                 #outputs["mf_"+str(scale)] = outputs["mf_"+str(scale)].reshape(12,256,128,2)
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mf_"+str(scale)]
 
