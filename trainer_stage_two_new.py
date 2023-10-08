@@ -430,10 +430,10 @@ class Trainer:
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
 
-                flow = F.interpolate(
+                outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 
-                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)], flow)
+                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["mfh_"+str(scale)+"_"+str(frame_id)])
                 
                 #Lighting compensation - Funciona
                 #if frame_id < 0:
