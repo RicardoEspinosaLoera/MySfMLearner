@@ -560,7 +560,7 @@ class Trainer:
             loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            loss += 1e-4 * loss_motion_flow / (2 ** scale)
+            loss += 1e-4 * (loss_motion_flow / 2.0) / (2 ** scale)
             #a = outputs["f1"].detach()
             #b = outputs["f2"].detach()
             #feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
