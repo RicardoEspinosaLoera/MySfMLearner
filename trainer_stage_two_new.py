@@ -415,16 +415,15 @@ class Trainer:
                     depth, inputs[("inv_K", source_scale)])
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
-                #flow = self.project_3d[source_scale](
-                #     outputs["mf_"+str(scale)], inputs[("K", source_scale)], T)
-                projected_translation = torch.einsum('bij,bhwj->bihw',  inputs[("K", source_scale)],
-                                      outputs["mf_"+str(scale)])
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
+    
                 #outputs["mf_"+str(scale)] = outputs["mf_"+str(scale)].reshape(12,256,128,2)
-                #flow = F.interpolate(
-                #    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False).permute(0, 2, 3, 1)
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow
+                flow = F.interpolate(
+                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False).permute(0, 2, 3, 1)
+                flow_cam = self.project_3d[source_scale](
+                    flow, inputs[("K", source_scale)], T)
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow_cam
                 #print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
                 #print(flow.shape)
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
