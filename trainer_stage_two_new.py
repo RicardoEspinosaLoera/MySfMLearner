@@ -415,9 +415,10 @@ class Trainer:
                     depth, inputs[("inv_K", source_scale)])
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
-                flow = self.project_3d[source_scale](
-                     outputs["mf_"+str(scale)], inputs[("K", source_scale)], T)
-
+                #flow = self.project_3d[source_scale](
+                #     outputs["mf_"+str(scale)], inputs[("K", source_scale)], T)
+                projected_translation = torch.einsum('bij,bhwj->bihw',  inputs[("K", source_scale)],
+                                      outputs["mf_"+str(scale)])
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
                 #outputs["mf_"+str(scale)] = outputs["mf_"+str(scale)].reshape(12,256,128,2)
