@@ -698,7 +698,7 @@ class Trainer:
                 wandb.log({mode+"_disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
                                 
                     
-    def flow2rgb_raw(selg,flow_map, max_value):
+    def flow2rgb_raw(self,flow_map, max_value):
         flow_map_np = flow_map.detach().cpu().numpy()
         _, h, w = flow_map_np.shape
         flow_map_np[:,(flow_map_np[0] == 0) & (flow_map_np[1] == 0)] = float('nan')
