@@ -430,7 +430,7 @@ class Trainer:
                     padding_mode="border",align_corners=True)
                 #Flow
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = (flow * outputs[("occu_mask_backward", 0, f_i)].detach() + outputs["color_"+str(frame_id)+"_"+str(scale)])
-                outputs[("color_", scale, f_i)] = torch.clamp(outputs[("color_", scale, f_i)], min=0.0, max=1.0)
+                outputs[("color_", scale, frame_id)] = torch.clamp(outputs[("color_", scale, f_i)], min=0.0, max=1.0)
                 #Lighting compensation - Funciona
                 #if frame_id < 0:
                 
