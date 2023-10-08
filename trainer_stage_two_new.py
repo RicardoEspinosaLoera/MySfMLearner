@@ -671,7 +671,7 @@ class Trainer:
             " | loss: {:.5f} | time elapsed: {} | time left: {}"
         print(print_string.format(self.epoch, batch_idx, samples_per_sec, loss,
                                   sec_to_hm_str(time_sofar), sec_to_hm_str(training_time_left)))
-                                  
+
     def flow2rgb_raw(self,flow_map, max_value):
         flow_map_np = flow_map.detach().cpu().numpy()
         _, h, w = flow_map_np.shape
@@ -704,13 +704,11 @@ class Trainer:
 
                     wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                 
-                f = outputs["mf_"+str(s)][j].data
+                f = outputs["mf_"+str(s)][j]
                 flow = self.flow2rgb_raw(f,32)
                 flow = torch.from_numpy(flow)
                 wandb.log({mode+"_Motion_Flow_{}_{}".format(s, j): wandb.Image(flow)},step=self.step)
-                    
- 
-                wandb.log({mode+"_disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
+                wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
                                 
                     
 
