@@ -689,7 +689,7 @@ class Trainer:
                     wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
                     wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
-                wandb.log({mode+"_Motion_Flow_{}_{}_{}".format( s, j): wandb.Image(outputs["mf_"+str(s)][j].data)},step=self.step)
+                wandb.log({mode+"_Motion_Flow_{}_{}".format(s, j): wandb.Image(outputs["mf_"+str(s)][j].data)},step=self.step)
                     
  
                 wandb.log({mode+"_disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
