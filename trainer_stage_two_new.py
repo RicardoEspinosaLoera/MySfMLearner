@@ -365,7 +365,9 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        outputs["mf_"+str(scale)] = outputs_mf[("flow", scale)].view(12,256,128,2)
+                        outputs["mf_"+str(scale)] =  disp = F.interpolate(
+                    outputs_mf[("flow", scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+
                     
                    
                     
