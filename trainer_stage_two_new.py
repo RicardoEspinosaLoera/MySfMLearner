@@ -421,16 +421,14 @@ class Trainer:
                 #outputs["mf_"+str(scale)] = outputs["mf_"+str(scale)].reshape(12,256,128,2)
                 flow = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False).permute(0, 2, 3, 1)
-                #outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow
                 #print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
                 #print(flow.shape)
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
-                #Flow
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = flow + outputs["color_"+str(frame_id)+"_"+str(scale)]
-                outputs[("color_", scale, frame_id)] = torch.clamp(outputs[("color_", scale, frame_id)], min=0.0, max=1.0)
+                
                 #Lighting compensation - Funciona
                 #if frame_id < 0:
                 
