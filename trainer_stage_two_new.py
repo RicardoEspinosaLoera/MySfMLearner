@@ -419,8 +419,8 @@ class Trainer:
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
                 #outputs["mf_"+str(scale)] = outputs["mf_"+str(scale)].reshape(12,256,128,2)
-                #flow = F.interpolate(
-                #    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False).permute(0, 2, 3, 1)
+                flow = F.interpolate(
+                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False).permute(0, 2, 3, 1)
                 #outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow
                 #print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
                 #print(flow.shape)
@@ -429,7 +429,7 @@ class Trainer:
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                 #Flow
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = (outputs["mf_"+str(scale)] * outputs[("occu_mask_backward", 0, f_i)].detach() + outputs["color_"+str(frame_id)+"_"+str(scale)])
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = (flow * outputs[("occu_mask_backward", 0, f_i)].detach() + outputs["color_"+str(frame_id)+"_"+str(scale)])
                 outputs[("color_", scale, f_i)] = torch.clamp(outputs[("color_", scale, f_i)], min=0.0, max=1.0)
                 #Lighting compensation - Funciona
                 #if frame_id < 0:
