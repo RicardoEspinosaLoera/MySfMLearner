@@ -353,7 +353,6 @@ class Trainer:
 
                     # Input motion flow
                     outputs_mf = self.models["motion_flow"](pose_inputs[0])
-                    print(outputs_mf.shape)
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
                     outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
