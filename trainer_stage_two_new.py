@@ -417,8 +417,7 @@ class Trainer:
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
                 #print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
                 outputs["mf_"+str(scale)] = outputs["mf_"+str(scale)].reshape(12,256,128,2)
-                self.opt.height, self.opt.width
-                #outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mf_"+str(scale)]
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mf_"+str(scale)]
 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
