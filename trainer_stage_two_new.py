@@ -421,9 +421,7 @@ class Trainer:
                 #outputs["mf_"+str(scale)] = outputs["mf_"+str(scale)].reshape(12,256,128,2)
                 flow = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False).permute(0, 2, 3, 1)
-                flow_cam = self.project_3d[source_scale](
-                    flow, inputs[("K", source_scale)], T)
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow_cam
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow
                 #print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
                 #print(flow.shape)
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
@@ -691,7 +689,10 @@ class Trainer:
                     wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["bh_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
                     wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
-                wandb.log({mode+"_Motion_Flow_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["mf_"+str(s)][j]))},step=self.step)
+                f = outputs["mf_"+str(s)][j].data
+                flow = self.flow2rgb_raw(f,32)
+                flow = torch.from_numpy(flow)
+                wandb.log({mode+"_Motion_Flow_{}_{}".format(s, j): wandb.Image(normalize_image(flow))},step=self.step)
                     
  
                 wandb.log({mode+"_disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
