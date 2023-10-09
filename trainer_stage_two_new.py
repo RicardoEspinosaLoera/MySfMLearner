@@ -425,12 +425,8 @@ class Trainer:
                 for i in range(len(shape)):
                     new_locs[:, i, ...] = 2*(new_locs[:, i, ...]/(shape[i]-1) - 0.5)
 
-                if len(shape) == 2:
-                    new_locs = new_locs.permute(0, 2, 3, 1)
-                    new_locs = new_locs[..., [1, 0]]
-                elif len(shape) == 3:
-                    new_locs = new_locs.permute(0, 2, 3, 4, 1)
-                    new_locs = new_locs[..., [2, 1, 0]]
+                new_locs = new_locs.permute(0, 2, 3, 1)
+                new_locs = new_locs[..., [1, 0]]
 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)], new_locs, mode=self.mode, padding_mode="border",align_corners=True)
