@@ -398,7 +398,6 @@ class Trainer:
                     T = inputs["stereo_T"]
                 else:
                     T = outputs["cam_T_cam_0_"+str(frame_id)]
-                #print("generate_images_pred"+str(frame_id))
                 #   from the authors of https://arxiv.org/abs/1712.00175
                 if self.opt.pose_model_type == "posecnn":
 
@@ -418,10 +417,6 @@ class Trainer:
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
     
-                
-                #outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow
-                #print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
-                #print(flow.shape)
                 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
