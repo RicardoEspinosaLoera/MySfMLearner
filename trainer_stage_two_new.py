@@ -428,7 +428,7 @@ class Trainer:
                 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    outputs["sampleF_"+str(frame_id)+"_"+str(scale)],
+                    outputs["sampleF_"+str(frame_id)+"_"+str(scale)].permute(0, 2, 3, 1),
                     padding_mode="border",align_corners=True)
                 
                 
