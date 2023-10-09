@@ -419,7 +419,7 @@ class Trainer:
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
                 flow = outputs["mf_"+str(scale)]
 
-                new_locs = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0,2,3,1) + flow
+                new_locs = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0,3,1,2) + flow
                 shape = flow.shape[2:]
                 for i in range(len(shape)):
                     new_locs[:, i, ...] = 2*(new_locs[:, i, ...]/(shape[i]-1) - 0.5)
