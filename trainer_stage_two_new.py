@@ -416,8 +416,14 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-    
+
+                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
+
+                outputs["mfh_"+str(scale)] = F.interpolate(
+                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 
+                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
+
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
@@ -427,6 +433,9 @@ class Trainer:
 
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+
+                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
+                print(outputs["mfh_"+str(frame_id)+"_"+str(scale)].shape)
 
                 outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
                 
@@ -543,7 +552,7 @@ class Trainer:
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 loss_ilumination_invariant += (
-                    self.get_ilumination_invariant_loss(outputs["colorR_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
             loss_motion_flow += (
                 self.get_motion_flow_loss(outputs["mf_"+str(scale)])
             )
@@ -554,7 +563,7 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            loss += 0.20 * loss_ilumination_invariant / 2.0
+            loss += 0.30 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
             loss += 1e-4 * (loss_motion_flow / 2.0) / (2 ** scale)
