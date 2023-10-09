@@ -418,16 +418,10 @@ class Trainer:
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
                 flow = outputs["mf_"+str(scale)]
-                new_locs = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow.permute(0, 2, 3, 1)
-                shape = flow.shape[2:]
-
-                # Need to normalize grid values to [-1, 1] for resampler
-                for i in range(len(shape)):
-                    new_locs[:, i, ...] = 2*(new_locs[:, i, ...]/(shape[i]-1) - 0.5)
-
-                new_locs = new_locs.permute(0, 2, 3, 1)
-                new_locs = new_locs[..., [1, 0]]
-
+                
+                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
+                print(flow.shape)
+    
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)], new_locs, mode="bilinear", padding_mode="border",align_corners=True)
                 print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
