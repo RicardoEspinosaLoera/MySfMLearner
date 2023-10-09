@@ -416,14 +416,8 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-
-                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
-
-                outputs["mfh_"+str(scale)] = F.interpolate(
-                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                print(outputs["sample_"+str(frame_id)+"_"+str(scale)])
                 
-                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
-
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
@@ -433,10 +427,7 @@ class Trainer:
 
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-
-                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
-                print(outputs["mfh_"+str(frame_id)+"_"+str(scale)].shape)
-
+                print(outputs["mfh_"+str(scale)])
                 outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
                 
                 #Lighting compensation
