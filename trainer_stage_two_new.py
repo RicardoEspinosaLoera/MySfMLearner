@@ -421,7 +421,7 @@ class Trainer:
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
 
                 new_locs = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0,3,1,2) + outputs["mfh_"+str(scale)]
-                shape = flow.shape[2:]
+                shape = outputs["mfh_"+str(scale)].shape[2:]
                 for i in range(len(shape)):
                     new_locs[:, i, ...] = 2*(new_locs[:, i, ...]/(shape[i]-1) - 0.5)
                 new_locs = new_locs.permute(0, 2, 3, 1)
