@@ -430,7 +430,7 @@ class Trainer:
     
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)], new_locs, mode="bilinear", padding_mode="border",align_corners=True)
-                print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
+                #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
                 #outputs["mf_"+str(scale)] = outputs["mf_"+str(scale)].reshape(12,256,128,2)
                 #flow = F.interpolate(
                 #    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False).permute(0, 2, 3, 1)
