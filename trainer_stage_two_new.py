@@ -429,7 +429,7 @@ class Trainer:
                 new_locs = new_locs[..., [1, 0]]
 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
-                    inputs[("color", frame_id, source_scale)], new_locs, mode=self.mode, padding_mode="border",align_corners=True)
+                    inputs[("color", frame_id, source_scale)], new_locs, mode="bilinear", padding_mode="border",align_corners=True)
     
                 #outputs["mf_"+str(scale)] = outputs["mf_"+str(scale)].reshape(12,256,128,2)
                 #flow = F.interpolate(
