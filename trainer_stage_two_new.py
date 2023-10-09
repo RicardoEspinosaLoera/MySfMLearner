@@ -418,7 +418,7 @@ class Trainer:
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
                 flow = outputs["mf_"+str(scale)]
-                new_locs = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow
+                new_locs = outputs["sample_"+str(frame_id)+"_"+str(scale)] + flow.permute(0, 2, 3, 1)
                 shape = flow.shape[2:]
 
                 # Need to normalize grid values to [-1, 1] for resampler

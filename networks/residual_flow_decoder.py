@@ -58,7 +58,7 @@ class ResidualFLowDecoder(nn.Module):
             x = torch.cat(x, 1)
             x = self.convs[("upconv", i, 1)](x)
             if i in self.scales:
-                self.outputs[("flow", i)] = self.convs[("rf_conv", i)](x)
+                self.outputs[("flow", i)] = self.sigmoid(self.convs[("rf_conv", i)](x))
 
         return self.outputs
 """
