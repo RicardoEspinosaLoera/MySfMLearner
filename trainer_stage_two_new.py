@@ -416,19 +416,21 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0, 3, 1, 2).shape)
-                
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
-                    inputs[("color", frame_id, source_scale)],
-                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
-                    padding_mode="border",align_corners=True)
-                
                 #Motion flow
 
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                print(outputs["mfh_"+str(scale)].shape)
-                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
+                #print(outputs["mfh_"+str(scale)].shape)
+                #outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
+
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0, 3, 1, 2)
+                outputs["sampleF_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)]
+                
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
+                    inputs[("color", frame_id, source_scale)],
+                    outputs["sampleF_"+str(frame_id)+"_"+str(scale)],
+                    padding_mode="border",align_corners=True)
+                
                 
                 #Lighting compensation
                 
