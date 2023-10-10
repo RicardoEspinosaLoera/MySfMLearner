@@ -431,8 +431,9 @@ class Trainer:
                 
                 #pix_coords = self.sum_mf(pix_coords,outputs["mfh_"+str(scale)])
                 flow = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
-                print(pix_coords.shape)
-                print(flow.shape)
+                #print(pix_coords.shape)
+                #print(flow.shape)
+                pix_coords = pix_coords + flow
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
     
