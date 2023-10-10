@@ -450,7 +450,7 @@ class Trainer:
                     grid,
                     padding_mode="border",align_corners=True)
                     
-                print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
+                #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
                 
                 #Motion flow
 
