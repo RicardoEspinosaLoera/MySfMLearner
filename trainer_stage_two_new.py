@@ -449,7 +449,7 @@ class Trainer:
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     grid,
-                    padding_mode="border",align_corners=True)
+                    padding_mode="border",align_corners=True).permute(0, 3, 1, 2)
                 
                 #Motion flow
 
