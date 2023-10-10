@@ -374,6 +374,11 @@ class Trainer:
                     
         return outputs
 
+    def sum_mf(self, pix_coords, mf):
+        pix_coords = pix_coords[...,[0]] + mf[:,0,:,:]
+        pix_coords = pix_coords[...,[1]] + mf[:,0,:,:]
+        return pix_coords
+
     def generate_images_pred(self, inputs, outputs,r):
         """Generate the warped (reprojected) color images for a minibatch.
         Generated images are saved into the `outputs` dictionary.
@@ -415,9 +420,12 @@ class Trainer:
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
                 
-                print(pix_coords)
-
+                outputs["mfh_"+str(scale)] = F.interpolate(
+                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                pix_coords = self.sum_mf(pix_coords,outputs["mfh_"+str(scale)])
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
+
+    
                 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
@@ -426,12 +434,12 @@ class Trainer:
                 
                 #Motion flow
 
-                outputs["mfh_"+str(scale)] = F.interpolate(
-                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                #outputs["mfh_"+str(scale)] = F.interpolate(
+                #    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
 
-                print(outputs["mfh_"+str(scale)].shape)
+                #print(outputs["mfh_"+str(scale)].shape)
 
-                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(inputs[("color", frame_id, source_scale)],outputs["mfh_"+str(scale)]) +  outputs["color_"+str(frame_id)+"_"+str(scale)]
+                #outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(inputs[("color", frame_id, source_scale)],outputs["mfh_"+str(scale)]) +  outputs["color_"+str(frame_id)+"_"+str(scale)]
                 
                 #Lighting compensation
                 
@@ -440,7 +448,7 @@ class Trainer:
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["colorR_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
                 
                 
         
