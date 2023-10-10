@@ -505,6 +505,7 @@ class SpatialTransformerMotionFlow(nn.Module):
             :param src: the source image
             :param flow: the output from the U-Net
         """
+        print(self.grid.shape)
         new_locs = self.grid + rigidflow + motionflow
         shape = flow.shape[2:]
 
