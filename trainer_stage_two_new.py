@@ -429,20 +429,20 @@ class Trainer:
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                print(outputs["mfh_"+str(scale)].shape)
-                print(inputs[("K", source_scale)].shape)
+                #print(outputs["mfh_"+str(scale)].shape)
+                #print(inputs[("K", source_scale)].shape)
                 #outputs["mfh_"+str(scale)] = torch.matmul(outputs["mfh_"+str(scale)],inputs[("K", source_scale)])
                 #projected_translation = torch.einsum('bij,bhwj->bihw', intrinsic_mat, translation)
                 #projected_translation = torch.einsum('bij,bhwj->bihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
                 #projected_translation = torch.einsum('bij,abhw->aihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
-                projected_translation = torch.einsum('bijk,abijk->abijk',inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
+                #projected_translation = torch.einsum('bijk,abijk->abijk',inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
 
 
 
                 #print(outputs["mfh_"+str(scale)].shape)
-                #coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
-                #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
-                #combined_flow = (coordinates + R_u_transposed).permute(0, 3, 1, 2)
+                coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
+                R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
+                combined_flow = (coordinates + R_u_transposed).permute(0, 3, 1, 2)
                 #print(combined_flow.shape)
                 #grid = self.spatial_transform_flow(outputs["sample_"+str(frame_id)+"_"+str(scale)])
                 #grid2 = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
@@ -457,7 +457,7 @@ class Trainer:
                                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
+                    combined_flow,
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
