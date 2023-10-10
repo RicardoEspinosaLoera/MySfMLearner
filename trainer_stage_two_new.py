@@ -174,7 +174,7 @@ class Trainer:
         self.spatial_transform = SpatialTransformer((self.opt.height, self.opt.width))
         self.spatial_transform.to(self.device)
 
-        self.spatial_transform_flow = SpatialTransformerFlow((self.opt.height, self.opt.width))
+        self.spatial_transform_flow = SpatialTransformerMotionFlow((self.opt.height, self.opt.width))
         self.spatial_transform_flow.to(self.device)
 
         self.get_occu_mask_backward = get_occu_mask_backward((self.opt.height, self.opt.width))
