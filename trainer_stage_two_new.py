@@ -429,7 +429,7 @@ class Trainer:
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-
+                """
                 coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0, 3, 1, 2)
                 updated_coordinates = coordinates + outputs["mfh_"+str(scale)]
                 
@@ -444,10 +444,10 @@ class Trainer:
                 
                 #print(grid.shape)
                 grid = grid[..., [1, 0]]
-
+                """
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    grid,
+                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
