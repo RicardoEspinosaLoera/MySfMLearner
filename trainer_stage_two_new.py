@@ -427,7 +427,7 @@ class Trainer:
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
 
-                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
+                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(inputs[("color", frame_id, source_scale)],outputs["mfh_"+str(scale)]) +  outputs["color_"+str(frame_id)+"_"+str(scale)]
                 
                 #Lighting compensation
                 
