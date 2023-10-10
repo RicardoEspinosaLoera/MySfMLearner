@@ -174,9 +174,6 @@ class Trainer:
         self.spatial_transform = SpatialTransformer((self.opt.height, self.opt.width))
         self.spatial_transform.to(self.device)
 
-        self.spatial_transform_flow = SpatialTransformerMotionFlow((self.opt.height, self.opt.width))
-        self.spatial_transform_flow.to(self.device)
-
         self.get_occu_mask_backward = get_occu_mask_backward((self.opt.height, self.opt.width))
         self.get_occu_mask_backward.to(self.device)
 
@@ -418,30 +415,19 @@ class Trainer:
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
 
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords.permute(0, 3, 1, 2)
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
+                
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
+                    inputs[("color", frame_id, source_scale)],
+                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
+                    padding_mode="border",align_corners=True)
                 
                 #Motion flow
 
                 outputs["mfh_"+str(scale)] = F.interpolate(
-                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)#.permute(0, 3, 1, 2)
-                #print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
-                #print(outputs["mfh_"+str(scale)].shape)
+                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
 
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform_flow(inputs[("color", frame_id, source_scale)],outputs["sample_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
-                #print(outputs["mfh_"+str(scale)].shape)
-                #outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
-                """
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0, 3, 1, 2)
-                outputs["sampleF_"+str(frame_id)+"_"+str(scale)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)]
-                
-                outputs["sampleF_"+str(frame_id)+"_"+str(scale)] = outputs["sampleF_"+str(frame_id)+"_"+str(scale)].permute(0, 2, 3, 1)
-                outputs["sampleF_"+str(frame_id)+"_"+str(scale)] = outputs["sampleF_"+str(frame_id)+"_"+str(scale)][..., [1, 0]]
-
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
-                    inputs[("color", frame_id, source_scale)],
-                    outputs["sampleF_"+str(frame_id)+"_"+str(scale)],
-                    padding_mode="border", align_corners=True)"""
-                
+                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
                 
                 #Lighting compensation
                 
@@ -450,7 +436,7 @@ class Trainer:
                 outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["colorR_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
                 
                 
         
