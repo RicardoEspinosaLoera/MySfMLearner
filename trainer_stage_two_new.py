@@ -429,25 +429,21 @@ class Trainer:
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                """
+                
                 coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0, 3, 1, 2)
                 updated_coordinates = coordinates + outputs["mfh_"+str(scale)]
                 
                 updated_coordinates = updated_coordinates.permute(0, 2, 3, 1)
                 grid = updated_coordinates
 
-                shape = inputs[("color", frame_id, source_scale)].shape[2:]
-
-                # Need to normalize grid values to [-1, 1] for resampler
-                for i in range(len(shape)):
-                    grid[:, i, ...] = 2*(grid[:, i, ...]/(shape[i]-1) - 0.5)                
+                #shape = inputs[("color", frame_id, source_scale)].shape[2:]
                 
                 #print(grid.shape)
                 grid = grid[..., [1, 0]]
-                """
+                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
+                    grid,
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
