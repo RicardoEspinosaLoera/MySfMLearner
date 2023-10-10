@@ -418,7 +418,7 @@ class Trainer:
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
 
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords.permute(0, 2, 3, 1)
                 
                 #Motion flow
 
