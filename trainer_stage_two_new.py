@@ -443,8 +443,8 @@ class Trainer:
                 x_grid, y_grid = torch.meshgrid(x_grid, y_grid)
                 x_grid = x_grid.unsqueeze(0).unsqueeze(0)
                 y_grid = y_grid.unsqueeze(0).unsqueeze(0)
-                grid[:, :, :, 0] = x_grid
-                grid[:, :, :, 1] = y_grid
+                grid[:, :, :, 0] = y_grid
+                grid[:, :, :, 1] = x_grid
                 
                 #grid = F.interpolate(updated_coordinates,[self.opt.height, self.opt.width], mode='bilinear', align_corners=False)  
                 
