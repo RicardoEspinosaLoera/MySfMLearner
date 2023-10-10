@@ -425,22 +425,18 @@ class Trainer:
                     depth, inputs[("inv_K", source_scale)])
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
-                print(pix_coords.shape)
+                #print(pix_coords.shape)
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                print(outputs["mfh_"+str(scale)].shape)
-                coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0, 3, 1, 2)
-                updated_coordinates = coordinates + outputs["mfh_"+str(scale)]
-                
-                updated_coordinates = updated_coordinates.permute(0, 2, 3, 1)
-                grid = updated_coordinates
-
+                #print(outputs["mfh_"+str(scale)].shape)
+                coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
+                R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
+                grid = coordinates + R_u_transposed
                 #shape = inputs[("color", frame_id, source_scale)].shape[2:]
                 
                 #print(grid.shape)
-                grid = grid[..., [1, 0]]
-                
+                               
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     grid,
