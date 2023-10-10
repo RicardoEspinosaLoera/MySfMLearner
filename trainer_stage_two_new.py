@@ -431,7 +431,10 @@ class Trainer:
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 print(outputs["mfh_"+str(scale)].shape)
                 print(inputs[("K", source_scale)].shape)
-                outputs["mfh_"+str(scale)] = torch.matmul(outputs["mfh_"+str(scale)],inputs[("K", source_scale)])
+                #outputs["mfh_"+str(scale)] = torch.matmul(outputs["mfh_"+str(scale)],inputs[("K", source_scale)])
+                #projected_translation = torch.einsum('bij,bhwj->bihw', intrinsic_mat, translation)
+                projected_translation = torch.einsum('bij,bhwj->bihw', intrinsic_mat, translation)
+
 
                 #print(outputs["mfh_"+str(scale)].shape)
                 #coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
