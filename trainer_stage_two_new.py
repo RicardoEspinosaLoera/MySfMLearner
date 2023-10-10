@@ -432,7 +432,8 @@ class Trainer:
                 #print(outputs["mfh_"+str(scale)].shape)
                 coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
                 R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
-                combined_flow = coordinates + R_u_transposed
+                combined_flow = (coordinates + R_u_transposed)
+                print(combined_flow.shape)
                 grid = self.spatial_transform_flow(combined_flow)
                 # Add motion flow to rigid flow element-wise
 
