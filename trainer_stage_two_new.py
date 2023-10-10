@@ -434,7 +434,7 @@ class Trainer:
                 updated_coordinates = coordinates + outputs["mfh_"+str(scale)]
 
                 updated_coordinates = updated_coordinates.permute(0, 2, 3, 1)
-
+                grid = updated_coordinates
                 h, w = inputs[("color", frame_id, source_scale)].shape[2], inputs[("color", frame_id, source_scale)].shape[3]
                 x_grid = torch.linspace(-1, 1, w)
                 y_grid = torch.linspace(-1, 1, h)
