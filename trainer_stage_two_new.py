@@ -459,7 +459,7 @@ class Trainer:
 
                 #print(outputs["mfh_"+str(scale)].shape)
 
-                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["sample_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
+                #outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["sample_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
                 
                 #Lighting compensation
                 
