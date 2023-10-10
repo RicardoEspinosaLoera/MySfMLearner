@@ -442,8 +442,7 @@ class Trainer:
                 for i in range(len(shape)):
                     grid[:, i, ...] = 2*(grid[:, i, ...]/(shape[i]-1) - 0.5)                
                 
-                print(grid.shape)
-                grid = grid.permute(0, 2, 3, 1)
+                #print(grid.shape)
                 grid = grid[..., [1, 0]]
 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
