@@ -500,14 +500,14 @@ class SpatialTransformerMotionFlow(nn.Module):
         self.register_buffer('grid', grid)
         self.mode = mode
 
-    def forward(self, motionflow):
+    def forward(self,combined_flow):
         """
         Push the src and flow through the spatial transform block
             :param src: the source image
             :param flow: the output from the U-Net
         """
         #print(self.grid.shape)
-        new_locs = self.grid + motionflow
+        new_locs = self.grid + combined_flow
         shape = motionflow.shape[2:]
 
         # Need to normalize grid values to [-1, 1] for resampler
