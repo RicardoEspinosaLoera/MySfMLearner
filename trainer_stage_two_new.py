@@ -430,9 +430,11 @@ class Trainer:
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 
                 #pix_coords = self.sum_mf(pix_coords,outputs["mfh_"+str(scale)])
-                flow = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
+                #flow = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
                 #print(pix_coords.shape)
                 #print(flow.shape)
+                flow = torch.einsum('bij,bhwj->bihw', inputs[("K", source_scale)],
+                                      outputs["mfh_"+str(scale)])
                 pix_coords = pix_coords + flow
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
