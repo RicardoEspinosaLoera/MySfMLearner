@@ -433,6 +433,7 @@ class Trainer:
                 coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
                 R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 combined_flow = coordinates + R_u_transposed
+                print(combined_flow.shape)
                 # Add motion flow to rigid flow element-wise
                 batch_size, _, height, width = coordinates.shape
                 x_grid = torch.linspace(-1, 1, width)
@@ -441,7 +442,7 @@ class Trainer:
                 x_grid = x_grid.unsqueeze(0).unsqueeze(0)
                 y_grid = y_grid.unsqueeze(0).unsqueeze(0)
                 grid = torch.cat((x_grid, y_grid), dim=1)
-                
+                print(grid.shape)
                 #shape = inputs[("color", frame_id, source_scale)].shape[2:]
                 
                 #print(grid.shape)
