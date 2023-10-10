@@ -419,7 +419,7 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-                outputs["mfh_"+str(scale)] = 
+                
                 #Motion flow
 
                 outputs["mfh_"+str(scale)] = F.interpolate(
