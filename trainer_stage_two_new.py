@@ -425,11 +425,11 @@ class Trainer:
                     depth, inputs[("inv_K", source_scale)])
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
-
+                print(pix_coords.shape)
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                
+                print(outputs["mfh_"+str(scale)].shape)
                 coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0, 3, 1, 2)
                 updated_coordinates = coordinates + outputs["mfh_"+str(scale)]
                 
