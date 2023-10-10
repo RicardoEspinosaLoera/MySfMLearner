@@ -429,7 +429,10 @@ class Trainer:
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                outputs["mfh_"+str(scale)] = outputs["mfh_"+str(scale)] * inputs[("K", source_scale)]
+                print(outputs["mfh_"+str(scale)].shape)
+                print(inputs[("K", source_scale)].shape)
+                outputs["mfh_"+str(scale)] = torch.matmul(outputs["mfh_"+str(scale)],inputs[("K", source_scale)])
+
                 #print(outputs["mfh_"+str(scale)].shape)
                 #coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
