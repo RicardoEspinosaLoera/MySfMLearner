@@ -429,14 +429,15 @@ class Trainer:
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                outputs["mfh_"+str(scale)] = outputs["mfh_"+str(scale)] * inputs[("K", source_scale)]
                 #print(outputs["mfh_"+str(scale)].shape)
                 #coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 #combined_flow = (coordinates + R_u_transposed).permute(0, 3, 1, 2)
                 #print(combined_flow.shape)
-                grid = self.spatial_transform_flow(outputs["sample_"+str(frame_id)+"_"+str(scale)])
-                grid2 = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
-                grid = grid + grid2
+                #grid = self.spatial_transform_flow(outputs["sample_"+str(frame_id)+"_"+str(scale)])
+                #grid2 = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
+                #grid = grid + grid2
                 # Add motion flow to rigid flow element-wise
 
                 #combined_flow = rigid_flow + motion_flow
@@ -447,7 +448,7 @@ class Trainer:
                                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    grid,
+                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
