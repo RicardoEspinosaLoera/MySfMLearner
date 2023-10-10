@@ -442,6 +442,7 @@ class Trainer:
                 for i in range(len(shape)):
                     grid[:, i, ...] = 2*(grid[:, i, ...]/(shape[i]-1) - 0.5)                
                 
+                print(grid.shape)
                 grid = grid.permute(0, 2, 3, 1)
                 grid = grid[..., [1, 0]]
 
