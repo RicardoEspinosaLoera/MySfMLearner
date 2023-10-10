@@ -423,7 +423,7 @@ class Trainer:
                 #Motion flow
 
                 outputs["mfh_"+str(scale)] = F.interpolate(
-                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False).permute(0, 2, 3, 1)
+                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False).permute(0, 3, 1, 2)
                 #print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
                 #print(outputs["mfh_"+str(scale)].shape)
 
