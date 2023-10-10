@@ -433,8 +433,9 @@ class Trainer:
                 #flow = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
                 #print(pix_coords.shape)
                 #print(flow.shape)
-                flow = torch.einsum('bij,bhwj->bihw', inputs[("K", source_scale)],
-                                      outputs["mfh_"+str(scale)])
+                flow = self.project_3d[source_scale](
+                    outputs["mfh_"+str(scale)], inputs[("K", source_scale)], T)
+                
                 pix_coords = pix_coords + flow
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
