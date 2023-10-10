@@ -424,6 +424,8 @@ class Trainer:
 
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False).permute(0, 2, 3, 1)
+                print(outputs["sample_"+str(frame_id)+"_"+str(scale)].shape)
+                print(outputs["mfh_"+str(scale)].shape)
 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform_flow(inputs[("color", frame_id, source_scale)],outputs["sample_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
                 #print(outputs["mfh_"+str(scale)].shape)
