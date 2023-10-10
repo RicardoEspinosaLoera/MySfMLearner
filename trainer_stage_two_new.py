@@ -434,8 +434,15 @@ class Trainer:
                 updated_coordinates = coordinates + outputs["mfh_"+str(scale)]
 
                 updated_coordinates = updated_coordinates.permute(0, 2, 3, 1)
+
+                h, w = inputs[("color", frame_id, source_scale)].shape[2], inputs[("color", frame_id, source_scale)].shape[3]
+                x_grid = torch.linspace(-1, 1, w)
+                y_grid = torch.linspace(-1, 1, h)
+                x_grid, y_grid = torch.meshgrid(x_grid, y_grid)
+                grid[:, :, :, 0] = 2 * x_grid - 1
+                grid[:, :, :, 1] = 2 * y_grid - 1
                 
-                grid = F.interpolate(updated_coordinates,[self.opt.height, self.opt.width], mode='bilinear', align_corners=False)  
+                #grid = F.interpolate(updated_coordinates,[self.opt.height, self.opt.width], mode='bilinear', align_corners=False)  
                 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
