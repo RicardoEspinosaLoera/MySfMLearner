@@ -414,6 +414,8 @@ class Trainer:
                     depth, inputs[("inv_K", source_scale)])
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
+                
+                print(pix_coords.shape)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
                 
@@ -427,6 +429,8 @@ class Trainer:
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
 
+                print(outputs["mfh_"+str(scale)])
+                
                 outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(inputs[("color", frame_id, source_scale)],outputs["mfh_"+str(scale)]) +  outputs["color_"+str(frame_id)+"_"+str(scale)]
                 
                 #Lighting compensation
