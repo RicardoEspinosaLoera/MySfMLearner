@@ -436,12 +436,15 @@ class Trainer:
                 updated_coordinates = updated_coordinates.permute(0, 2, 3, 1)
                 grid = updated_coordinates
 
+                # Create a meshgrid to match the shape expected by F.grid_sample
                 h, w = inputs[("color", frame_id, source_scale)].shape[2], inputs[("color", frame_id, source_scale)].shape[3]
                 x_grid = torch.linspace(-1, 1, w)
                 y_grid = torch.linspace(-1, 1, h)
                 x_grid, y_grid = torch.meshgrid(x_grid, y_grid)
-                grid[:, :, :, 0] = 2 * x_grid - 1
-                grid[:, :, :, 1] = 2 * y_grid - 1
+                x_grid = x_grid.unsqueeze(0).unsqueeze(0)
+                y_grid = y_grid.unsqueeze(0).unsqueeze(0)
+                grid[:, :, :, 0] = x_grid
+                grid[:, :, :, 1] = y_grid
                 
                 #grid = F.interpolate(updated_coordinates,[self.opt.height, self.opt.width], mode='bilinear', align_corners=False)  
                 
