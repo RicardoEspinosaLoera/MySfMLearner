@@ -434,6 +434,7 @@ class Trainer:
                 #outputs["mfh_"+str(scale)] = torch.matmul(outputs["mfh_"+str(scale)],inputs[("K", source_scale)])
                 #projected_translation = torch.einsum('bij,bhwj->bihw', intrinsic_mat, translation)
                 projected_translation = torch.einsum('bij,bhwj->bihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
+                projected_translation = torch.einsum('bij,abhw->aihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
 
 
                 #print(outputs["mfh_"+str(scale)].shape)
