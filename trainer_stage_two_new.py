@@ -432,12 +432,9 @@ class Trainer:
 
                 coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0, 3, 1, 2)
                 updated_coordinates = coordinates + outputs["mfh_"+str(scale)]
-
-                updated_coordinates = F.interpolate(updated_coordinates, [self.opt.height, self.opt.width], mode='bilinear', align_corners=False)
                 
                 updated_coordinates = updated_coordinates.permute(0, 2, 3, 1)
                 grid = updated_coordinates
-                shape = outputs["mfh_"+str(scale)].shape[2:]
 
                 h, w = inputs[("color", frame_id, source_scale)].shape[2], inputs[("color", frame_id, source_scale)].shape[3]
                 x_grid = torch.linspace(-1, 1, w)
