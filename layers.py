@@ -480,46 +480,46 @@ class SpatialTransformer(nn.Module):
 
         return F.grid_sample(src, new_locs, mode=self.mode, padding_mode="border",align_corners=True)
 
-    class SpatialTransformerMotionFlow(nn.Module):
+class SpatialTransformerMotionFlow(nn.Module):
 
-    def __init__(self, size, mode='bilinear'):
-        """
-        Instiantiate the block
-            :param size: size of input to the spatial transformer block
-            :param mode: method of interpolation for grid_sampler
-        """
-        super(SpatialTransformerMotionFlow, self).__init__()
+def __init__(self, size, mode='bilinear'):
+    """
+    Instiantiate the block
+        :param size: size of input to the spatial transformer block
+        :param mode: method of interpolation for grid_sampler
+    """
+    super(SpatialTransformerMotionFlow, self).__init__()
 
-        # Create sampling grid
-        vectors = [torch.arange(0, s) for s in size]
-        grids = torch.meshgrid(vectors)
-        grid = torch.stack(grids) # y, x, z
-        grid = torch.unsqueeze(grid, 0)  # add batch
-        grid = grid.type(torch.FloatTensor)
-        self.register_buffer('grid', grid)
-        self.mode = mode
+    # Create sampling grid
+    vectors = [torch.arange(0, s) for s in size]
+    grids = torch.meshgrid(vectors)
+    grid = torch.stack(grids) # y, x, z
+    grid = torch.unsqueeze(grid, 0)  # add batch
+    grid = grid.type(torch.FloatTensor)
+    self.register_buffer('grid', grid)
+    self.mode = mode
 
-    def forward(self, src, rigidflow, motionflow):
-        """
-        Push the src and flow through the spatial transform block
-            :param src: the source image
-            :param flow: the output from the U-Net
-        """
-        new_locs = self.grid + rigidflow + motionflow
-        shape = flow.shape[2:]
+def forward(self, src, rigidflow, motionflow):
+    """
+    Push the src and flow through the spatial transform block
+        :param src: the source image
+        :param flow: the output from the U-Net
+    """
+    new_locs = self.grid + rigidflow + motionflow
+    shape = flow.shape[2:]
 
-        # Need to normalize grid values to [-1, 1] for resampler
-        for i in range(len(shape)):
-            new_locs[:, i, ...] = 2*(new_locs[:, i, ...]/(shape[i]-1) - 0.5)
+    # Need to normalize grid values to [-1, 1] for resampler
+    for i in range(len(shape)):
+        new_locs[:, i, ...] = 2*(new_locs[:, i, ...]/(shape[i]-1) - 0.5)
 
-        if len(shape) == 2:
-            new_locs = new_locs.permute(0, 2, 3, 1)
-            new_locs = new_locs[..., [1, 0]]
-        elif len(shape) == 3:
-            new_locs = new_locs.permute(0, 2, 3, 4, 1)
-            new_locs = new_locs[..., [2, 1, 0]]
+    if len(shape) == 2:
+        new_locs = new_locs.permute(0, 2, 3, 1)
+        new_locs = new_locs[..., [1, 0]]
+    elif len(shape) == 3:
+        new_locs = new_locs.permute(0, 2, 3, 4, 1)
+        new_locs = new_locs[..., [2, 1, 0]]
 
-        return F.grid_sample(src, new_locs, mode=self.mode, padding_mode="border",align_corners=True)
+    return F.grid_sample(src, new_locs, mode=self.mode, padding_mode="border",align_corners=True)
 
 
 class optical_flow(nn.Module):
