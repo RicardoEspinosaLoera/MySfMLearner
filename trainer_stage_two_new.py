@@ -174,6 +174,9 @@ class Trainer:
         self.spatial_transform = SpatialTransformer((self.opt.height, self.opt.width))
         self.spatial_transform.to(self.device)
 
+        self.spatial_transform_flow = SpatialTransformerMotionFlow((self.opt.height, self.opt.width))
+        self.spatial_transform_flow.to(self.device)
+
         self.get_occu_mask_backward = get_occu_mask_backward((self.opt.height, self.opt.width))
         self.get_occu_mask_backward.to(self.device)
 
@@ -425,7 +428,10 @@ class Trainer:
                 
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                pix_coords = self.sum_mf(pix_coords,outputs["mfh_"+str(scale)])
+                
+                #pix_coords = self.sum_mf(pix_coords,outputs["mfh_"+str(scale)])
+                flow = self.SpatialTransformerMotionFlow(outputs["mfh_"+str(scale)])
+                print(flow.shape)
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
     
