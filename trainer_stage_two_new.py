@@ -415,7 +415,7 @@ class Trainer:
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
                 
-                print(pix_coords.shape)
+                print(pix_coords)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
                 
