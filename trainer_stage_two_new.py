@@ -434,7 +434,9 @@ class Trainer:
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 #combined_flow = (coordinates + R_u_transposed).permute(0, 3, 1, 2)
                 #print(combined_flow.shape)
-                #grid = self.spatial_transform_flow(combined_flow)
+                grid = self.spatial_transform_flow(outputs["sample_"+str(frame_id)+"_"+str(scale)])
+                grid2 = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
+                grid = grid + grid2
                 # Add motion flow to rigid flow element-wise
 
                 #combined_flow = rigid_flow + motion_flow
@@ -445,7 +447,7 @@ class Trainer:
                                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
+                    grid,
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
@@ -457,7 +459,7 @@ class Trainer:
 
                 #print(outputs["mfh_"+str(scale)].shape)
 
-                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(inputs[("color", frame_id, source_scale)],outputs["mfh_"+str(scale)])
+                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["sample_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
                 
                 #Lighting compensation
                 
