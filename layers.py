@@ -508,7 +508,7 @@ class SpatialTransformerMotionFlow(nn.Module):
         """
         #print(self.grid.shape)
         new_locs = self.grid + combined_flow
-        shape = motionflow.shape[2:]
+        shape = combined_flow.shape[2:]
 
         # Need to normalize grid values to [-1, 1] for resampler
         for i in range(len(shape)):
