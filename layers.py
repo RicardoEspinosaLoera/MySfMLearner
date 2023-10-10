@@ -506,7 +506,7 @@ class SpatialTransformerMotionFlow(nn.Module):
             :param flow: the output from the U-Net
         """
         print(self.grid.shape)
-        new_locs = self.grid + rigidflow + motionflow
+        new_locs = self.grid + rigidflow 
         shape = flow.shape[2:]
 
         # Need to normalize grid values to [-1, 1] for resampler
