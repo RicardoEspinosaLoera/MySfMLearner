@@ -425,25 +425,21 @@ class Trainer:
                     depth, inputs[("inv_K", source_scale)])
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
-                
+
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)] = F.interpolate(
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                
-                #pix_coords = self.sum_mf(pix_coords,outputs["mfh_"+str(scale)])
-                #flow = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
-                #print(pix_coords.shape)
-                #print(flow.shape)
-                flow = self.project_3d[source_scale](
-                    outputs["mfh_"+str(scale)], inputs[("K", source_scale)], T)
-                
-                pix_coords = pix_coords + flow
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
 
-    
+                coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)].permute(0, 3, 1, 2)
+                updated_coordinates = coordinates + outputs["mfh_"+str(scale)]
+
+                updated_coordinates = updated_coordinates.permute(0, 2, 3, 1)
+                
+                grid = F.interpolate(updated_coordinates,[self.opt.height, self.opt.width], mode='bilinear', align_corners=False)  
                 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
+                    grid,
                     padding_mode="border",align_corners=True)
                 
                 #Motion flow
