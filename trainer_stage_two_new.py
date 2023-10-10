@@ -375,6 +375,8 @@ class Trainer:
         return outputs
 
     def sum_mf(self, pix_coords, mf):
+        print(pix_coords.shape)
+        print(mf.shape)
         pix_coords = pix_coords[...,[0]] + mf[:,0,:,:]
         pix_coords = pix_coords[...,[1]] + mf[:,0,:,:]
         return pix_coords
