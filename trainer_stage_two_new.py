@@ -441,8 +441,9 @@ class Trainer:
 
                 #print(outputs["mfh_"+str(scale)].shape)
                 coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
-                R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
-                combined_flow = coordinates + R_u_transposed
+                combined_flow = sum_mf(coordinates,outputs["mfh_"+str(scale)])
+                #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
+                #combined_flow = coordinates + R_u_transposed
                 #print(combined_flow.shape)
                 #grid = self.spatial_transform_flow(outputs["sample_"+str(frame_id)+"_"+str(scale)])
                 #grid2 = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
@@ -583,8 +584,8 @@ class Trainer:
                             
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                #loss_ilumination_invariant += (
-                #    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
+                loss_ilumination_invariant += (
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
             loss_motion_flow += (
                 self.get_motion_flow_loss(outputs["mf_"+str(scale)])
             )
@@ -595,7 +596,7 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            #loss += 0.30 * loss_ilumination_invariant / 2.0
+            loss += 0.30 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
             loss += 1e-4 * (loss_motion_flow / 2.0) / (2 ** scale)
