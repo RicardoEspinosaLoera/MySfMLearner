@@ -356,6 +356,7 @@ class Trainer:
 
                     # Input motion flow
                     outputs_mf = self.models["motion_flow"](pose_inputs[0])
+
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
                     outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
@@ -436,7 +437,7 @@ class Trainer:
                 #projected_translation = torch.einsum('bij,abhw->aihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
                 #projected_translation = torch.einsum('bijk,abijk->abijk',inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
 
-                combined_flow = self.sum_mf(outputs["sample_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)+"_"+str(frame_id)])
+                outputs["cf_"+str(scale)+"_"+str(frame_id)] = self.sum_mf(outputs["sample_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)+"_"+str(frame_id)])
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 #combined_flow = coordinates + R_u_transposed
                 #print(combined_flow.shape)
@@ -453,7 +454,7 @@ class Trainer:
                                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    combined_flow,
+                    outputs["cf_"+str(scale)+"_"+str(frame_id)],
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
@@ -594,7 +595,7 @@ class Trainer:
             #loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            loss += 1e-4 * (loss_motion_flow / 2.0) / (2 ** scale)
+            loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
             #a = outputs["f1"].detach()
             #b = outputs["f2"].detach()
             #feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
