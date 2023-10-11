@@ -421,7 +421,7 @@ class Trainer:
                 #print(pix_coords.shape)
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                    outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", ,align_corners=True)
+                    outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear",align_corners=True)
 
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
                 #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
