@@ -378,14 +378,6 @@ class Trainer:
                     
         return outputs
 
-    def sum_mf(self, pix_coords, mf):
-        #print(pix_coords.shape)
-        #print(mf.shape)
-        #torch.Size([12, 256, 320, 2])
-        #torch.Size([12, 2, 256, 320])
-        pix_coords_new = pix_coords + mf.permute(0,2,3,1)
-        return pix_coords_new
-
     def generate_images_pred(self, inputs, outputs,r):
         """Generate the warped (reprojected) color images for a minibatch.
         Generated images are saved into the `outputs` dictionary.
@@ -438,7 +430,7 @@ class Trainer:
                 #projected_translation = torch.einsum('bij,abhw->aihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
                 #projected_translation = torch.einsum('bijk,abijk->abijk',inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
 
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = self.sum_mf(outputs["sample_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)+"_"+str(frame_id)])
+                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 #combined_flow = coordinates + R_u_transposed
                 #print(combined_flow.shape)
