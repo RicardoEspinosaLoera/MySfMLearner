@@ -368,7 +368,7 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        outputs["mf_"+str(scale)] = outputs_mf[("flow", scale)]
+                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #print(outputs["mf_"+str(scale)].shape)
 
@@ -427,8 +427,8 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
                 #print(pix_coords.shape)
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
-                outputs["mfh_"+str(scale)] = F.interpolate(
-                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                outputs["mfh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
+                    outputs["mf_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 #print(outputs["mfh_"+str(scale)].shape)
                 #print(inputs[("K", source_scale)].shape)
                 #outputs["mfh_"+str(scale)] = torch.matmul(outputs["mfh_"+str(scale)],inputs[("K", source_scale)])
@@ -441,7 +441,7 @@ class Trainer:
 
                 #print(outputs["mfh_"+str(scale)].shape)
                 coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
-                combined_flow = self.sum_mf(coordinates,outputs["mfh_"+str(scale)])
+                combined_flow = self.sum_mf(coordinates,outputs["mfh_"+str(scale)+"_"+str(f_i)])
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 #combined_flow = coordinates + R_u_transposed
                 #print(combined_flow.shape)
