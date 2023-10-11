@@ -432,7 +432,7 @@ class Trainer:
                                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    outputs["sample_"+str(scale)+"_"+str(frame_id)],
+                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
