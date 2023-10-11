@@ -430,7 +430,7 @@ class Trainer:
                 #projected_translation = torch.einsum('bij,abhw->aihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
                 #projected_translation = torch.einsum('bijk,abijk->abijk',inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
 
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)].detach() + outputs["mfh_"+str(scale)+"_"+str(frame_id)].detach().permute(0,2,3,1)
+                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)].detach().permute(0,2,3,1)
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 #combined_flow = coordinates + R_u_transposed
                 #print(combined_flow.shape)
