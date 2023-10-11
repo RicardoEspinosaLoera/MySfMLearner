@@ -378,8 +378,8 @@ class Trainer:
         return outputs
 
     def sum_mf(self, pix_coords, mf):
-        #print(pix_coords.shape)
-        #print(mf.shape)
+        print(pix_coords.shape)
+        print(mf.shape)
         pix_coords_new = pix_coords
         pix_coords_new = pix_coords_new[:,:,:,0] + mf[:,0,:,:]
         pix_coords_new = pix_coords_new[:,:,:,1] + mf[:,1,:,:]
@@ -437,11 +437,7 @@ class Trainer:
                 #projected_translation = torch.einsum('bij,abhw->aihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
                 #projected_translation = torch.einsum('bijk,abijk->abijk',inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
 
-
-
-                #print(outputs["mfh_"+str(scale)].shape)
-                coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
-                combined_flow = self.sum_mf(coordinates,outputs["mfh_"+str(scale)+"_"+str(frame_id)])
+                combined_flow = self.sum_mf(outputs["sample_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)+"_"+str(frame_id)])
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 #combined_flow = coordinates + R_u_transposed
                 #print(combined_flow.shape)
