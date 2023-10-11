@@ -419,7 +419,7 @@ class Trainer:
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
                 #print(pix_coords.shape)
-                outputs["sample_"+str(scale)+"_"+str(frame_id)] = pix_coords               
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                     outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 #print(outputs["mfh_"+str(scale)].shape)
@@ -430,7 +430,7 @@ class Trainer:
                 #projected_translation = torch.einsum('bij,abhw->aihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
                 #projected_translation = torch.einsum('bijk,abijk->abijk',inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
 
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(scale)+"_"+str(frame_id)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
+                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 #combined_flow = coordinates + R_u_transposed
                 #print(combined_flow.shape)
