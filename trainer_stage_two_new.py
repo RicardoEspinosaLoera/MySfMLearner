@@ -441,7 +441,7 @@ class Trainer:
 
                 #print(outputs["mfh_"+str(scale)].shape)
                 coordinates = outputs["sample_"+str(frame_id)+"_"+str(scale)]
-                combined_flow = sum_mf(coordinates,outputs["mfh_"+str(scale)])
+                combined_flow = self.sum_mf(coordinates,outputs["mfh_"+str(scale)])
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 #combined_flow = coordinates + R_u_transposed
                 #print(combined_flow.shape)
