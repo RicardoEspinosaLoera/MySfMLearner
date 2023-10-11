@@ -378,12 +378,12 @@ class Trainer:
         return outputs
 
     def sum_mf(self, pix_coords, mf):
-        print(pix_coords.shape)
-        print(mf.shape)
-        pix_coords_new = pix_coords
-        print(pix_coords_new.shape)
-        pix_coords_new = pix_coords[:,:,:,0] + mf[:,0,:,:]
-        pix_coords_new = pix_coords[:,:,:,1] + mf[:,1,:,:]
+        #print(pix_coords.shape)
+        #print(mf.shape)
+        pix_coords_new = pix_coords + mf.permute(0,2,3,1)
+        #print(pix_coords_new.shape)
+        #pix_coords_new = pix_coords[:,:,:,0] + mf[:,0,:,:]
+        #pix_coords_new = pix_coords[:,:,:,1] + mf[:,1,:,:]
         return pix_coords_new
 
     def generate_images_pred(self, inputs, outputs,r):
