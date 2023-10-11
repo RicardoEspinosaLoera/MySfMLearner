@@ -434,7 +434,7 @@ class Trainer:
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)] = (outputs["mfh_"+str(scale)+"_"+str(frame_id)] - 0.5) * 2
 
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
+                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
                 #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
                 #combined_flow = coordinates + R_u_transposed
                 #print(combined_flow.shape)
