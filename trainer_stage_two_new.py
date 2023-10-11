@@ -421,36 +421,18 @@ class Trainer:
                 #print(pix_coords.shape)
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                    outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                #print(outputs["mfh_"+str(scale)].shape)
-                #print(inputs[("K", source_scale)].shape)
-                #outputs["mfh_"+str(scale)] = torch.matmul(outputs["mfh_"+str(scale)],inputs[("K", source_scale)])
-                #projected_translation = torch.einsum('bij,bhwj->bihw', intrinsic_mat, translation)
-                #projected_translation = torch.einsum('bij,bhwj->bihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
-                #projected_translation = torch.einsum('bij,abhw->aihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
-                #projected_translation = torch.einsum('bijk,abijk->abijk',inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
+                    outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners)
+
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
                 #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
                 #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
 
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
-                #R_u_transposed = outputs["mfh_"+str(scale)].permute(0, 2, 3, 1)
-                #combined_flow = coordinates + R_u_transposed
-                #print(combined_flow.shape)
-                #grid = self.spatial_transform_flow(outputs["sample_"+str(frame_id)+"_"+str(scale)])
-                #grid2 = self.spatial_transform_flow(outputs["mfh_"+str(scale)])
-                #grid = grid + grid2
-                # Add motion flow to rigid flow element-wise
-
-                #combined_flow = rigid_flow + motion_flow
+                #outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
                 
-                #shape = inputs[("color", frame_id, source_scale)].shape[2:]
-                
-                #print(grid.shape)
                                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    outputs["cf_"+str(scale)+"_"+str(frame_id)],
+                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
