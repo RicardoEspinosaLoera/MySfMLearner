@@ -381,8 +381,9 @@ class Trainer:
         print(pix_coords.shape)
         print(mf.shape)
         pix_coords_new = pix_coords
-        pix_coords_new = pix_coords_new[:,:,:,0] + mf[:,0,:,:]
-        pix_coords_new = pix_coords_new[:,:,:,1] + mf[:,1,:,:]
+        print(pix_coords_new.shape)
+        pix_coords_new = pix_coords[:,:,:,0] + mf[:,0,:,:]
+        pix_coords_new = pix_coords[:,:,:,1] + mf[:,1,:,:]
         return pix_coords_new
 
     def generate_images_pred(self, inputs, outputs,r):
