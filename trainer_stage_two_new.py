@@ -421,7 +421,7 @@ class Trainer:
                 #print(pix_coords.shape)
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                    outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners)
+                    outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", ,align_corners=True)
 
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
                 #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
@@ -432,7 +432,7 @@ class Trainer:
                                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
+                    outputs["cf_"+str(scale)+"_"+str(frame_id)],
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
