@@ -430,8 +430,8 @@ class Trainer:
                 #projected_translation = torch.einsum('bij,abhw->aihw', inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
                 #projected_translation = torch.einsum('bijk,abijk->abijk',inputs[("K", source_scale)], outputs["mfh_"+str(scale)])
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
-                outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.width - 1
-                outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.height - 1
+                outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
+                outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)] = (outputs["mfh_"+str(scale)+"_"+str(frame_id)] - 0.5) * 2
 
                 outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
