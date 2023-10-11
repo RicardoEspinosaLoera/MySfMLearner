@@ -381,7 +381,9 @@ class Trainer:
     def sum_mf(self, pix_coords, mf):
         print(pix_coords.shape)
         print(mf.shape)
-        pix_coords_new = pix_coords + mf.permute
+        pix_coords_new = pix_coords
+        pix_coords_new = pix_coords_new[:,:,:,0] + mf.permute[:,0,:,:]
+        pix_coords_new = pix_coords_new[:,:,:,1] + mf.permute[:,1,:,:]
         #print(pix_coords_new.shape)
         return pix_coords_new
 
