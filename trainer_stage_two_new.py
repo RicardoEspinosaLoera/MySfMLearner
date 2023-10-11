@@ -427,7 +427,10 @@ class Trainer:
                 #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
                 #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
 
-                #outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
+                if frame_id < 0:
+                    outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
+                else:
+                    outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] - outputs["mfh_"+str(scale)+"_"+str(frame_id)]
                 
                                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
