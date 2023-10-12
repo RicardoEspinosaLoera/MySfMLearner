@@ -262,7 +262,7 @@ class Trainer:
 
                 self.log_time(batch_idx, duration, losses["loss"].cpu().data)
                 self.log("train", inputs, outputs, losses)
-                self.val(r)
+                self.val()
 
             self.step += 1
             
