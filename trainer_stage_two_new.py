@@ -248,7 +248,7 @@ class Trainer:
             
             before_op_time = time.time()
 
-            outputs, losses = self.process_batch(inputs,r)
+            outputs, losses = self.process_batch(inputs)
 
             self.model_optimizer.zero_grad()
             losses["loss"].backward()
@@ -269,7 +269,7 @@ class Trainer:
         self.model_lr_scheduler.step()
 
 
-    def process_batch(self, inputs,r):
+    def process_batch(self, inputs):
         """Pass a minibatch through the network and generate images and losses
         """
         for key, ipt in inputs.items():
@@ -281,14 +281,14 @@ class Trainer:
         #weights_path = 'depth_weights_temp.pth'
         #torch.save(self.models["encoder"].state_dict(), weights_path)
         outputs = self.models["depth"](features)
-        outputs["f1"] = features[0][:,r,:, :].detach()
+        #outputs["f1"] = features[0][:,r,:, :].detach()
         #print("Shape of feaures depth encoder")
         #print(features[1].shape)
     
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
             #outputs.update(self.predict_lighting(inputs, features, outputs))
-        self.generate_images_pred(inputs, outputs,r)
+        self.generate_images_pred(inputs, outputs)
 
         losses = self.compute_losses(inputs, outputs)
 
@@ -374,7 +374,7 @@ class Trainer:
                     
         return outputs
 
-    def generate_images_pred(self, inputs, outputs,r):
+    def generate_images_pred(self, inputs, outputs):
         """Generate the warped (reprojected) color images for a minibatch.
         Generated images are saved into the `outputs` dictionary.
         """
@@ -588,7 +588,7 @@ class Trainer:
         losses["loss"] = total_loss
         return losses
     
-    def val(self,r):
+    def val(self):
         """Validate the model on a single minibatch
         """
         self.set_eval()
@@ -601,13 +601,13 @@ class Trainer:
             #inputs = self.val_iter.next()
 
         with torch.no_grad():
-            outputs, losses = self.process_batch_val(inputs,r)
+            outputs, losses = self.process_batch_val(inputs)
             self.log("val", inputs, outputs, losses)
             del inputs, outputs, losses
 
         self.set_train()
 
-    def process_batch_val(self, inputs,r):
+    def process_batch_val(self, inputs):
         """Pass a minibatch through the network and generate images and losses
         """
         for key, ipt in inputs.items():
@@ -638,7 +638,7 @@ class Trainer:
             outputs.update(self.predict_poses(inputs, features, outputs))
             #outputs.update(self.predict_lighting(inputs, features, outputs))
 
-        self.generate_images_pred(inputs, outputs,r)
+        self.generate_images_pred(inputs, outputs)
         losses = self.compute_losses_val(inputs, outputs)
 
         return outputs, losses
