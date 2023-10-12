@@ -8,9 +8,6 @@ import numpy as np
 import torch.optim as optim
 import torch.nn as nn
 # generate random integer values
-from random import seed
-from random import randint
-import copy
  
 from utils import *
 from layers import *
@@ -244,8 +241,7 @@ class Trainer:
         """Run a single epoch of training and validation
         """
         # self.model_lr_scheduler.step()
-        r = randint(0, 63)
-        print("Training - " + str(r))
+        print("Training")
         self.set_train()
 
         for batch_idx, inputs in enumerate(self.train_loader):
@@ -561,8 +557,8 @@ class Trainer:
                             
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                #loss_ilumination_invariant += (
-                #    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
+                loss_ilumination_invariant += (
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
                 loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
                 )
@@ -573,7 +569,7 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            #loss += 0.20 * loss_ilumination_invariant / 2.0
+            loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
             loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
