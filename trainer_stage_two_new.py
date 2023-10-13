@@ -219,6 +219,9 @@ class Trainer:
         self.models["transform"].train()
         self.models["pose_encoder"].train()
         self.models["pose"].train()
+        self.models["lighting"].train()
+        self.models["motion_flow"].train()
+        self.models["ii_encoder"].train()
 
     def set_eval(self):
         """Convert all models to testing/evaluation mode
@@ -229,6 +232,9 @@ class Trainer:
         self.models["transform"].eval()
         self.models["pose_encoder"].eval()
         self.models["pose"].eval()
+        self.models["lighting"].eval()
+        self.models["motion_flow"].eval()
+        self.models["ii_encoder"].eval()
 
     def train(self):
         """Run the entire training pipeline
@@ -308,13 +314,10 @@ class Trainer:
             for f_i in self.opt.frame_ids[1:]:
                 #print("Entro"+str(f_i))
                 if f_i != "s":
-                    inputs_all_ = [pose_feats[f_i], pose_feats[0]]
-                    inputs_all_reverse_ = [pose_feats[0], pose_feats[f_i]]
-                    if f_i < 0:
-                        inputs_all = [pose_feats[f_i], pose_feats[0]]
-                    else:
-                        inputs_all = [pose_feats[0], pose_feats[f_i]]
+                    inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
                     
+                                      
 
                     # OF Prediction normal and reversed
                     position_inputs = self.models["position_encoder"](torch.cat(inputs_all_, 1))
@@ -356,7 +359,8 @@ class Trainer:
                     # Input motion flow
                     # inputs_all = [pose_feats[f_i], pose_feats[0]]
                     iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features(pose_feats[0])] 
-                    outputs_mf = self.models["motion_flow"](pose_inputs[0])
+                    motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
+                    outputs_mf = self.models["motion_flow"](motion_inputs)
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
