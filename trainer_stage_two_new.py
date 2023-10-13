@@ -60,7 +60,7 @@ class Trainer:
             self.opt.num_layers, self.opt.weights_init == "pretrained", num_input_images=2)  # 18
         self.models["position_encoder"].to(self.device)
 
-        self.models["ii_encoder"] = networks.ResnetEncoder(
+        self.models["ii_encoder"] = networks.ResnetEncoderIIL(
             self.opt.num_layers, self.opt.weights_init == "pretrained", num_input_images=2)  # 18
         self.models["ii_encoder"].to(self.device)
 
@@ -358,9 +358,9 @@ class Trainer:
 
                     # Input motion flow
                     # inputs_all = [pose_feats[f_i], pose_feats[0]]
-                    #iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features(pose_feats[0])] 
+                    iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features(pose_feats[0])] 
                     #print(iif_all[0].shape)
-                    #motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
+                    motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     outputs_mf = self.models["motion_flow"](pose_inputs[0])
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
