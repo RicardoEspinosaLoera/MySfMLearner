@@ -60,6 +60,10 @@ class Trainer:
             self.opt.num_layers, self.opt.weights_init == "pretrained", num_input_images=2)  # 18
         self.models["position_encoder"].to(self.device)
 
+        self.models["ii_encoder"] = networks.ResnetEncoder(
+            self.opt.num_layers, self.opt.weights_init == "pretrained", num_input_images=2)  # 18
+        self.models["ii_encoder"].to(self.device)
+
         self.models["position"] = networks.PositionDecoder(
             self.models["position_encoder"].num_ch_enc, self.opt.scales)
 
@@ -299,18 +303,22 @@ class Trainer:
             else:
                 #pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
                 pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
-            
+
             
             for f_i in self.opt.frame_ids[1:]:
                 #print("Entro"+str(f_i))
                 if f_i != "s":
-
-                    inputs_all = [pose_feats[f_i], pose_feats[0]]
-                    inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
+                    inputs_all_ = [pose_feats[f_i], pose_feats[0]]
+                    inputs_all_reverse_ = [pose_feats[0], pose_feats[f_i]]
+                    if f_i < 0:
+                        inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    else:
+                        inputs_all = [pose_feats[0], pose_feats[f_i]]
+                    
 
                     # OF Prediction normal and reversed
-                    position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
-                    position_inputs_reverse = self.models["position_encoder"](torch.cat(inputs_all_reverse, 1))
+                    position_inputs = self.models["position_encoder"](torch.cat(inputs_all_, 1))
+                    position_inputs_reverse = self.models["position_encoder"](torch.cat(inputs_all_reverse_, 1))
                     outputs_0 = self.models["position"](position_inputs)
                     outputs_1 = self.models["position"](position_inputs_reverse)
 
@@ -346,6 +354,8 @@ class Trainer:
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
 
                     # Input motion flow
+                    # inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features(pose_feats[0])] 
                     outputs_mf = self.models["motion_flow"](pose_inputs[0])
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
