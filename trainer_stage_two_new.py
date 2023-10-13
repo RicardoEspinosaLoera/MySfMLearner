@@ -362,9 +362,9 @@ class Trainer:
 
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     print(len(motion_inputs[0]))
-                    print(motion_inputs[0][1].shape)
-                    print(motion_inputs[0][2].shape)
-                    print(motion_inputs[0][3].shape)
+                    #print(motion_inputs[0][1].shape)
+                    #print(motion_inputs[0][2].shape)
+                    #print(motion_inputs[0][3].shape)
 
 
                     outputs_mf = self.models["motion_flow"](motion_inputs[0])
