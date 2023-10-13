@@ -359,7 +359,7 @@ class Trainer:
                     # Input motion flow
                     # inputs_all = [pose_feats[f_i], pose_feats[0]]
                     iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features(pose_feats[0])] 
-
+                    print(iif_all[0].shape)
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     print(len(motion_inputs[0]))
                     print(len(iif_all[0]))
