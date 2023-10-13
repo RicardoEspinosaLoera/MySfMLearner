@@ -374,7 +374,6 @@ class Trainer:
                     print(motion_inputs[0][2].shape)
                     print(motion_inputs[0][3].shape)
                     print(motion_inputs[0][4].shape)
-                    print(iif_all[0])
                     #print(motion_inputs[0][1].shape)
                     #print(motion_inputs[0][2].shape)
                     #print(motion_inputs[0][3].shape)
