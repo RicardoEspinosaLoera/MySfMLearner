@@ -277,17 +277,12 @@ class Trainer:
         
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color_aug", 0, 0])
-        #self.models["acual_encoder_depth"]=copy.deepcopy(self.models["encoder"])
-        #weights_path = 'depth_weights_temp.pth'
-        #torch.save(self.models["encoder"].state_dict(), weights_path)
+
         outputs = self.models["depth"](features)
-        #outputs["f1"] = features[0][:,r,:, :].detach()
-        #print("Shape of feaures depth encoder")
-        #print(features[1].shape)
-    
+
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
-            #outputs.update(self.predict_lighting(inputs, features, outputs))
+
         self.generate_images_pred(inputs, outputs)
 
         losses = self.compute_losses(inputs, outputs)
@@ -546,19 +541,13 @@ class Trainer:
             for frame_id in self.opt.frame_ids[1:]:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
-                occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
-                #occu_mask_backward_ = get_ilumination_invariant_features(occu_mask_backward)
-                #il = get_ilumination_invariant_features(outputs["color_"+str(frame_id)+"_"+str(scale)])
-                #print(il.shape)
-                #Original
-                #loss_reprojection += (
-                #    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                #Cambios   
+                #occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
+                
                             
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                loss_ilumination_invariant += (
-                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
+                """loss_ilumination_invariant += (
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
                 loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
                 )
@@ -569,18 +558,11 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            loss += 0.20 * loss_ilumination_invariant / 2.0
+            #loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
             loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
-            #a = outputs["f1"].detach()
-            #b = outputs["f2"].detach()
-            #feature_similarity_loss += (self.compute_feature_similarity_loss(a,b)).sum() 
-
-            #depth_similarity_loss += get_depth_loss(outputs["depth_"+str(0)].detach(),outputs["pdepth_"+str(0)].detach())
-
-            #loss += 0.1 * feature_similarity_loss 
-            #loss += 0.1 * depth_similarity_loss 
+            
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
 
@@ -705,7 +687,7 @@ class Trainer:
                     f = outputs["mf_"+str(s)+"_"+str(frame_id)][j].data
                     flow = self.flow2rgb(f,32)
                     flow = torch.from_numpy(flow)
-                    wandb.log({mode+"_Motion_Flow_{}_{}".format(s, j): wandb.Image(flow)},step=self.step)
+                    wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)
                 wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
                                 
                     
