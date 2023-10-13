@@ -50,13 +50,14 @@ class ResidualFLowDecoder(nn.Module):
         self.outputs = {}
         # decoder
         x = input_features[-1]
-        print(x.shape)
+        
         for i in range(4, -1, -1):
             x = self.convs[("upconv", i, 0)](x)
             x = [upsample(x)]
             if self.use_skips and i > 0:
                 x += [input_features[i - 1]]
-            x = torch.cat(x, 8)
+            print(x.shape)
+            x = torch.cat(x, 1)
             x = self.convs[("upconv", i, 1)](x)
             if i in self.scales:
                 self.outputs[("flow", i)] = self.convs[("rf_conv", i)](x)
