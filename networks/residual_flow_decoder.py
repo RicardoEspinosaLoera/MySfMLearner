@@ -56,7 +56,6 @@ class ResidualFLowDecoder(nn.Module):
             x = [upsample(x)]
             if self.use_skips and i > 0:
                 x += [input_features[i - 1]]
-            print(x.shape)
             x = torch.cat(x, 1)
             x = self.convs[("upconv", i, 1)](x)
             if i in self.scales:
