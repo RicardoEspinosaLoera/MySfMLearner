@@ -361,7 +361,7 @@ class Trainer:
                     iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features(pose_feats[0])] 
                     #print(iif_all[0].shape)
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
-                    outputs_mf = self.models["motion_flow"](motion_inputs)
+                    outputs_mf = self.models["motion_flow"](motion_inputs[0])
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
