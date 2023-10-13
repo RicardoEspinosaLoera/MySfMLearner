@@ -50,7 +50,6 @@ class ResidualFLowDecoder(nn.Module):
         self.outputs = {}
         # decoder
         x = input_features[-1]
-        
         for i in range(4, -1, -1):
             x = self.convs[("upconv", i, 0)](x)
             x = [upsample(x)]

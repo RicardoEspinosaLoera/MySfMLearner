@@ -358,7 +358,13 @@ class Trainer:
 
                     # Input motion flow
                     # inputs_all = [pose_feats[f_i], pose_feats[0]]
-                    iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features(pose_feats[0])] 
+                    print(pose_feats[f_i])
+                    pose_feats_ = pose_feats
+                    pose_feats_[f_i] = F.interpolate(
+                            pose_feats_[f_i], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
+                    pose_feats_[0] = F.interpolate(
+                            pose_feats_[0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
+                    iif_all = [get_ilumination_invariant_features(pose_feats_[f_i]),get_ilumination_invariant_features(pose_feats_[0])] 
                     print(iif_all[0].shape)
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     print(motion_inputs[0][0].shape)
