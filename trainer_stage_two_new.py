@@ -361,12 +361,12 @@ class Trainer:
                     iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features(pose_feats[0])] 
                     print(iif_all[0].shape)
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
-                    print(len(motion_inputs[0][0].shape))
-                    print(len(motion_inputs[0][1].shape))
-                    print(len(motion_inputs[0][2].shape))
-                    print(len(motion_inputs[0][3].shape))
-                    print(len(motion_inputs[0][4].shape))
-                    print(len(iif_all[0]))
+                    print(motion_inputs[0][0].shape)
+                    print(motion_inputs[0][1].shape)
+                    print(motion_inputs[0][2].shape)
+                    print(motion_inputs[0][3].shape)
+                    print(motion_inputs[0][4].shape)
+                    print(iif_all[0])
                     #print(motion_inputs[0][1].shape)
                     #print(motion_inputs[0][2].shape)
                     #print(motion_inputs[0][3].shape)
