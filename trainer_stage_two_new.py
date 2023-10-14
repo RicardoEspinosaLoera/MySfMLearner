@@ -366,8 +366,8 @@ class Trainer:
 
                     print(len(motion_inputs))
                     print(len(pose_inputs))
-                    print(pose_inputs[0])
-                    print(motion_inputs[0])
+                    print(pose_inputs[0][0].shape)
+                    print(motion_inputs[0][0].shape)
                     axisangle, translation = self.models["pose"](pose_inputs)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
