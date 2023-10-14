@@ -362,12 +362,12 @@ class Trainer:
                     iif_all = [get_ilumination_invariant_features(a),get_ilumination_invariant_features(b)] 
     
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
-                    outputs_mf = self.models["motion_flow"](motion_inputs[0])
+                    #outputs_mf = self.models["motion_flow"](motion_inputs[0])
 
-                    #input_combined = pose_inputs
-                    #input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
-                    #axisangle, translation = self.models["pose"](input_combined)
-                    axisangle, translation = self.models["pose"](pose_inputs)
+                    input_combined = pose_inputs
+                    input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
+                    axisangle, translation = self.models["pose"](input_combined)
+                    #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
@@ -386,7 +386,7 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #print(outputs["mf_"+str(scale)].shape)
 
@@ -440,19 +440,17 @@ class Trainer:
                 #outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                     #outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear",align_corners=True)
 
-                outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
-                #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
-                #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
+                #outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
 
-                #if frame_id < 0:
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
-                #else:
-                #    outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] - outputs["mfh_"+str(scale)+"_"+str(frame_id)]
+
+
+                #outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
+
                 
                                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
-                    outputs["cf_"+str(scale)+"_"+str(frame_id)],
+                    outputs["sample_"+str(scale)+"_"+str(frame_id)],
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
@@ -567,16 +565,16 @@ class Trainer:
             for frame_id in self.opt.frame_ids[1:]:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
-                occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
+                #occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
                 
                             
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                loss_ilumination_invariant += (
-                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
-                loss_motion_flow += (
+                """loss_ilumination_invariant += (
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
+                """loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
-                )
+                )"""
             
 
             mean_disp = disp.mean(2, True).mean(3, True)
@@ -584,10 +582,10 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            loss += 0.10 * loss_ilumination_invariant / 2.0
+            #loss += 0.10 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
+            "loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
