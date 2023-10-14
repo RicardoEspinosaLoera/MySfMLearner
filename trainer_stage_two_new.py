@@ -366,7 +366,7 @@ class Trainer:
 
                     #print(len(motion_inputs))
                     #print(len(pose_inputs))
-                    axisangle, translation = self.models["pose_"](torch.cat(pose_inputs,motion_inputs))
+                    axisangle, translation = self.models["pose"](torch.cat(pose_inputs,motion_inputs))
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
