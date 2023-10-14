@@ -567,7 +567,7 @@ class Trainer:
             for frame_id in self.opt.frame_ids[1:]:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
-                #occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
+                occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
                 
                             
                 loss_reprojection += (
