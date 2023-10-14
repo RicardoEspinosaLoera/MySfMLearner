@@ -364,9 +364,11 @@ class Trainer:
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     outputs_mf = self.models["motion_flow"](motion_inputs[0])
 
-                    #print(len(motion_inputs))
-                    #print(len(pose_inputs))
-                    axisangle, translation = self.models["pose"](list(zip(pose_inputs, motion_inputs)))
+                    print(len(motion_inputs))
+                    print(len(pose_inputs))
+                    print(pose_inputs[0])
+                    print(motion_inputs[0])
+                    axisangle, translation = self.models["pose"](pose_inputs)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
