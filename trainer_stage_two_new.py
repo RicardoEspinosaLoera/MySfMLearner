@@ -364,7 +364,7 @@ class Trainer:
                     outputs_mf = self.models["motion_flow"](motion_inputs[0])
 
                     # Input for PoseNet
-                    #pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+                    pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
                     axisangle, translation = self.models["pose_ii"](motion_inputs)
 
                     # Input for Lighting
