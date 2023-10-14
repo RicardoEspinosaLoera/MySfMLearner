@@ -103,7 +103,7 @@ class Trainer:
                     num_frames_to_predict_for=2)
 
                 self.models["pose_ii"] = networks.PoseDecoderIIL(
-                    self.models["pose_encoder"].num_ch_enc,
+                    8,
                     num_input_features=1,
                     num_frames_to_predict_for=2)
 
