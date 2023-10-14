@@ -368,10 +368,8 @@ class Trainer:
                     print(len(pose_inputs[0]))
                     print(pose_inputs[0][0].shape)
                     print(motion_inputs[0][0].shape)
-                    input_combined = [[]]
-                    for i,idx in enumerate(pose_inputs[0][0]):
-                        input_combined[0].append(zip(pose_inputs[0][idx], motion_inputs[0][idx]))
-
+                    input_combined = pose_inputs
+                    input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
                     axisangle, translation = self.models["pose"](input_combined)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
