@@ -116,6 +116,7 @@ class Trainer:
                     self.num_input_frames if self.opt.pose_model_input == "all" else 2)
 
             self.models["pose"].to(self.device)
+            self.models["pose_ii"].to(self.device)
             self.parameters_to_train += list(self.models["pose"].parameters())
 
         if self.opt.predictive_mask:
