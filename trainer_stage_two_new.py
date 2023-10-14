@@ -66,7 +66,6 @@ class Trainer:
 
         self.models["position"] = networks.PositionDecoder(
             self.models["position_encoder"].num_ch_enc, self.opt.scales)
-
         self.models["position"].to(self.device)
 
         self.models["transform_encoder"] = networks.ResnetEncoder(
@@ -99,6 +98,11 @@ class Trainer:
                 self.parameters_to_train += list(self.models["pose_encoder"].parameters())
 
                 self.models["pose"] = networks.PoseDecoder(
+                    self.models["pose_encoder"].num_ch_enc,
+                    num_input_features=1,
+                    num_frames_to_predict_for=2)
+
+                self.models["pose_ii"] = networks.PoseDecoderIIL(
                     self.models["pose_encoder"].num_ch_enc,
                     num_input_features=1,
                     num_frames_to_predict_for=2)
@@ -222,6 +226,7 @@ class Trainer:
         self.models["lighting"].train()
         self.models["motion_flow"].train()
         self.models["ii_encoder"].train()
+        self.models["pose_ii"].train()
 
     def set_eval(self):
         """Convert all models to testing/evaluation mode
@@ -235,6 +240,7 @@ class Trainer:
         self.models["lighting"].eval()
         self.models["motion_flow"].eval()
         self.models["ii_encoder"].eval()
+        self.models["pose_ii"].eval()
 
     def train(self):
         """Run the entire training pipeline
@@ -344,18 +350,6 @@ class Trainer:
                     #transform_inputs = self.models["transform_encoder"](torch.cat(transform_input, 1))
                     #outputs_2 = self.models["transform"](transform_inputs)
 
-                    # Input for PoseNet
-                    pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-                    #print(len(pose_inputs))
-                    #input_lighting = pose_inputs[0][2]
-                    #input_lighting = self.models["pose_encoder"](torch.cat(inputs_all, 1)).lastlayer
-                    #wandb.log({"inputs_pose_{}_{}".format(f_i, scale): wandb.Image(inputs_all[f_i])},step=self.step)
-                    #wandb.log({"inputs_pose_{}_{}".format(f_i, scale): wandb.Image(inputs_all[0])},step=self.step)
-                    axisangle, translation = self.models["pose"](pose_inputs)
-
-                    # Input for Lighting
-                    outputs_lighting = self.models["lighting"](pose_inputs[0])
-
                     # Input motion flow
                     a = F.interpolate(
                             pose_feats[f_i], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
@@ -367,6 +361,15 @@ class Trainer:
     
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     outputs_mf = self.models["motion_flow"](motion_inputs[0])
+
+                    # Input for PoseNet
+                    #pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+                    axisangle, translation = self.models["pose_ii"](motion_inputs)
+
+                    # Input for Lighting
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])
+
+                    
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation

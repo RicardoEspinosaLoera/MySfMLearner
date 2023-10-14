@@ -7,4 +7,4 @@ from .appearance_flow_decoder import TransformDecoder
 from .optical_flow_decoder import PositionDecoder
 from .lighting_change_decoder import LightingDecoder
 from .residual_flow_decoder import ResidualFLowDecoder
-from .residual_flow_decoder import ResidualFLowDecoder
+from .pose_decoder_iil import PoseDecoderIIL
