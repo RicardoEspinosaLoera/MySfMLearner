@@ -387,7 +387,7 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #print(outputs["mf_"+str(scale)].shape)
 
@@ -710,10 +710,10 @@ class Trainer:
 
                     wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                 
-                    f = outputs["mf_"+str(s)+"_"+str(frame_id)][j].data
+                    """f = outputs["mf_"+str(s)+"_"+str(frame_id)][j].data
                     flow = self.flow2rgb(f,32)
                     flow = torch.from_numpy(flow)
-                    wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)
+                    wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)"""
                 wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
                                 
                     
