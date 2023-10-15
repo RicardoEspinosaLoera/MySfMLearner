@@ -371,6 +371,7 @@ class Trainer:
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
+                    # lighting with IIF
                     input_combined_light = pose_inputs
                     input_combined_light[:][:] = zip(input_combined_light[:][:], motion_inputs[:][:])
                     outputs_lighting = self.models["lighting"](input_combined_light[0])
