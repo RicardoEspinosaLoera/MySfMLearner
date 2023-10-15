@@ -567,13 +567,13 @@ class Trainer:
             for frame_id in self.opt.frame_ids[1:]:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
-                occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
+                #occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
                 
                             
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                loss_ilumination_invariant += (
-                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
+                """loss_ilumination_invariant += (
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
                 """loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
                 )"""
@@ -584,7 +584,7 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            loss += 0.50 * loss_ilumination_invariant / 2.0
+            #loss += 0.10 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
             #loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
