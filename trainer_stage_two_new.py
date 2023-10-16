@@ -292,16 +292,16 @@ class Trainer:
             inputs[key] = ipt.to(self.device)
         
         #DepthNet Prediction
-        #a = F.interpolate(inputs["color_aug", 0, 0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
+        a = F.interpolate(inputs["color_aug", 0, 0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
         features = self.models["encoder"](inputs["color_aug", 0, 0])
-        #dept_iif = get_ilumination_invariant_features(a)
+        dept_iif = get_ilumination_invariant_features(a)
 
-        #iif = self.models["ii_encoder_depth"](dept_iif)
+        iif = self.models["ii_encoder_depth"](dept_iif)
 
-        #input_combined = features
-        #input_combined[:][:] = zip(features[:][:], iif[:][:])
-        #outputs = self.models["depth"](input_combined)
-        outputs = self.models["depth"](features)
+        input_combined = features
+        input_combined[:][:] = zip(features[:][:], iif[:][:])
+        outputs = self.models["depth"](input_combined)
+        #outputs = self.models["depth"](features)
 
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
