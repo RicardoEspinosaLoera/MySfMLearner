@@ -73,7 +73,7 @@ class ResnetEncoderIIL(nn.Module):
         if num_input_images > 1:
             self.encoder = resnet_multiimage_input(num_layers, pretrained, num_input_images)
         else:
-            self.encoder = resnets[num_layers]
+            self.encoder = resnet_multiimage_input(num_layers, pretrained, num_input_images)
 
         if num_layers > 34:
             self.num_ch_enc[1:] *= 4
