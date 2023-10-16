@@ -292,14 +292,16 @@ class Trainer:
             inputs[key] = ipt.to(self.device)
         
         #DepthNet Prediction
-        a = F.interpolate(inputs["color_aug", 0, 0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
+        #a = F.interpolate(inputs["color_aug", 0, 0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
         features = self.models["encoder"](inputs["color_aug", 0, 0])
-        dept_iif = get_ilumination_invariant_features(a)
-        iif = self.models["ii_encoder_depth"](dept_iif)
+        #dept_iif = get_ilumination_invariant_features(a)
 
-        input_combined = features
-        input_combined[:][:] = zip(features[:][:], iif[:][:])
-        outputs = self.models["depth"](input_combined)
+        #iif = self.models["ii_encoder_depth"](dept_iif)
+
+        #input_combined = features
+        #input_combined[:][:] = zip(features[:][:], iif[:][:])
+        #outputs = self.models["depth"](input_combined)
+        outputs = self.models["depth"](features)
 
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
@@ -443,8 +445,10 @@ class Trainer:
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                     outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear",align_corners=True)
+
+                outputs["mfh_"+str(scale)+"_"+str(frame_id)] = outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
                 
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
+                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
                 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
@@ -712,10 +716,10 @@ class Trainer:
 
                     wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["ch_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                 
-                    """f = outputs["mf_"+str(s)+"_"+str(frame_id)][j].data
+                    f = outputs["mf_"+str(s)+"_"+str(frame_id)][j].data
                     flow = self.flow2rgb(f,32)
                     flow = torch.from_numpy(flow)
-                    wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)"""
+                    wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)
                 wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
                                 
                     
