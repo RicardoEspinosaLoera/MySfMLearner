@@ -369,11 +369,10 @@ class Trainer:
     
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     outputs_mf = self.models["motion_flow"](motion_inputs[0])
-
-                    
                     input_combined = pose_inputs
                     input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
                     axisangle, translation = self.models["pose"](input_combined)
+                    #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
@@ -441,26 +440,24 @@ class Trainer:
                     depth, inputs[("inv_K", source_scale)])
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
+                #print(pix_coords.shape)
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
+                #outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
+                    #outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear",align_corners=True)
 
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords  
+                outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
+                #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
+                #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
 
-                """             
-                outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                    outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear",align_corners=True)
-
-                outputs["mfh_"+str(scale)+"_"+str(frame_id)] = outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
-                
+                #if frame_id < 0:
                 outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
+                #else:
+                #    outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] - outputs["mfh_"+str(scale)+"_"+str(frame_id)]
                 
+                               
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["cf_"+str(scale)+"_"+str(frame_id)],
-                    padding_mode="border",align_corners=True)
-                
-                """
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
-                    inputs[("color", frame_id, source_scale)],
-                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
@@ -482,7 +479,7 @@ class Trainer:
                             outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
 
                 outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
-                
+     
                 
         
         #Feature similairty and depth consistency loss
