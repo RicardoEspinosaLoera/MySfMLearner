@@ -294,7 +294,10 @@ class Trainer:
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color_aug", 0, 0])
         dept_iif = get_ilumination_invariant_features(inputs["color_aug", 0, 0])
+        print(len(dept_iif))
+        print(dept_iif.shape)
         iif = self.models["ii_encoder_depth"](dept_iif)
+
         input_combined = features
         input_combined[:][:] = zip(features[:][:], iif[:][:])
         outputs = self.models["depth"](input_combined)
