@@ -118,7 +118,7 @@ def evaluate(opt):
                 if opt.post_process:
                     # Post-processed results require each image to have two forward passes
                     input_color = torch.cat((input_color, torch.flip(input_color, [3])), 0)
-                a = F.interpolate(input_color, [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
+                a = F.interpolate(input_color, [256 + 2, 320 + 2], mode="bilinear", align_corners=True)
                 #features = en(inputs["color_aug", 0, 0])
                 dept_iif = get_ilumination_invariant_features(a)
 
