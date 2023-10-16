@@ -295,8 +295,6 @@ class Trainer:
         a = F.interpolate(inputs["color_aug", 0, 0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
         features = self.models["encoder"](inputs["color_aug", 0, 0])
         dept_iif = get_ilumination_invariant_features(a)
-        print(len(dept_iif))
-        print(dept_iif.shape)
         iif = self.models["ii_encoder_depth"](dept_iif)
 
         input_combined = features
