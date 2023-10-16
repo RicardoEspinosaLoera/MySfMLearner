@@ -292,16 +292,16 @@ class Trainer:
             inputs[key] = ipt.to(self.device)
         
         #DepthNet Prediction
-        a = F.interpolate(inputs["color_aug", 0, 0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
+        #a = F.interpolate(inputs["color_aug", 0, 0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
         features = self.models["encoder"](inputs["color_aug", 0, 0])
-        dept_iif = get_ilumination_invariant_features(a)
+        #dept_iif = get_ilumination_invariant_features(a)
 
-        iif = self.models["ii_encoder_depth"](dept_iif)
+        #iif = self.models["ii_encoder_depth"](dept_iif)
 
-        input_combined = features
-        input_combined[:][:] = zip(features[:][:], iif[:][:])
-        outputs = self.models["depth"](input_combined)
-        #outputs = self.models["depth"](features)
+        #input_combined = features
+        #input_combined[:][:] = zip(features[:][:], iif[:][:])
+        #outputs = self.models["depth"](input_combined)
+        outputs = self.models["depth"](features)
 
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
@@ -400,86 +400,7 @@ class Trainer:
                     
         return outputs
 
-    def generate_images_pred(self, inputs, outputs):
-        """Generate the warped (reprojected) color images for a minibatch.
-        Generated images are saved into the `outputs` dictionary.
-        """
-        for scale in self.opt.scales:
-            
-            disp = outputs["disp_"+str(scale)]
-            if self.opt.v1_multiscale:
-                source_scale = scale
-            else:
-                disp = F.interpolate(
-                    disp, [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-
-            _, depth = disp_to_depth(disp, self.opt.min_depth, self.opt.max_depth)
-
-            outputs["depth_"+str(scale)] = depth
-
-            source_scale = 0
-            for i, frame_id in enumerate(self.opt.frame_ids[1:]):
                 
-                if frame_id == "s":
-                    T = inputs["stereo_T"]
-                else:
-                    T = outputs["cam_T_cam_0_"+str(frame_id)]
-                #   from the authors of https://arxiv.org/abs/1712.00175
-                if self.opt.pose_model_type == "posecnn":
-
-                    axisangle = outputs["axisangle_0_"+str(f_i)]
-                    translation = outputs["translation_0_"+str(f_i)]
-
-                    inv_depth = 1 / depth
-                    mean_inv_depth = inv_depth.mean(3, True).mean(2, True)
-
-                    T = transformation_from_parameters(
-                        axisangle[:, 0], translation[:, 0] * mean_inv_depth[:, 0], frame_id < 0)
-
-                cam_points = self.backproject_depth[source_scale](
-                    depth, inputs[("inv_K", source_scale)])
-                pix_coords = self.project_3d[source_scale](
-                    cam_points, inputs[("K", source_scale)], T)
-                #print(pix_coords.shape)
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
-                #outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                    #outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear",align_corners=True)
-
-                outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
-                #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
-                #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
-
-                #if frame_id < 0:
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
-                #else:
-                #    outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] - outputs["mfh_"+str(scale)+"_"+str(frame_id)]
-                
-                               
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
-                    inputs[("color", frame_id, source_scale)],
-                    outputs["cf_"+str(scale)+"_"+str(frame_id)],
-                    padding_mode="border",align_corners=True)
-                    
-                #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
-                
-                #Motion flow
-
-                #outputs["mfh_"+str(scale)] = F.interpolate(
-                #    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-
-                #print(outputs["mfh_"+str(scale)].shape)
-
-                #outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["sample_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
-                
-                #Lighting compensation
-                
-                outputs["ch_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                            outputs["c_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                outputs["bh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
-                            outputs["b_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)                            
-
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(scale)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(scale)]  + outputs["bh_"+str(scale)+"_"+str(frame_id)]
-     
                 
         
         #Feature similairty and depth consistency loss

@@ -12,6 +12,7 @@ from utils import readlines
 from options import MonodepthOptions
 import datasets
 import networks
+from layers import *
 
 cv2.setNumThreads(0)  # This speeds up evaluation 5x on our unix systems (OpenCV 3.3.1)
 
@@ -76,6 +77,7 @@ def evaluate(opt):
 
         filenames = readlines(os.path.join(splits_dir, opt.eval_split, "test_files.txt"))
         encoder_path = os.path.join(opt.load_weights_folder, "encoder.pth")
+        encoder_path2 = os.path.join(opt.load_weights_folder, "ii_encoder_depth.pth")
         decoder_path = os.path.join(opt.load_weights_folder, "depth.pth")
 
         encoder_dict = torch.load(encoder_path)
@@ -95,6 +97,8 @@ def evaluate(opt):
 
         encoder.cuda()
         encoder.eval()
+        encoder2.cuda()
+        encoder2.eval()
         depth_decoder.cuda()
         depth_decoder.eval()
 
@@ -110,8 +114,16 @@ def evaluate(opt):
                 if opt.post_process:
                     # Post-processed results require each image to have two forward passes
                     input_color = torch.cat((input_color, torch.flip(input_color, [3])), 0)
+                a = F.interpolate(input_color, [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
+                #features = en(inputs["color_aug", 0, 0])
+                dept_iif = get_ilumination_invariant_features(a)
 
-                output = depth_decoder(encoder(input_color))
+                iif = encoder2(dept_iif)
+                b = encoder(input_color)
+                input_combined = b
+                input_combined[:][:] = zip(b[:][:], iif[:][:])
+                output = depth_decoder(input_combined)
+                
                 pred_disp, _ = disp_to_depth(output["disp_0"], opt.min_depth, opt.max_depth)
                 pred_disp = pred_disp.cpu()[:, 0].numpy()
 
