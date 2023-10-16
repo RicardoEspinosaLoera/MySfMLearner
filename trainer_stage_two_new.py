@@ -442,7 +442,9 @@ class Trainer:
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
 
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords               
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords  
+
+                """             
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                     outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear",align_corners=True)
 
@@ -459,7 +461,7 @@ class Trainer:
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
-                    padding_mode="border",align_corners=True)"""
+                    padding_mode="border",align_corners=True)
                     
                 #print(outputs["color_"+str(frame_id)+"_"+str(scale)].shape)
                 
