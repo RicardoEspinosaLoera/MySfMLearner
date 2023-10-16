@@ -226,6 +226,7 @@ class Trainer:
         self.models["lighting"].train()
         self.models["motion_flow"].train()
         self.models["ii_encoder"].train()
+        self.models["ii_encoder_depth"].train()
 
     def set_eval(self):
         """Convert all models to testing/evaluation mode
@@ -239,6 +240,7 @@ class Trainer:
         self.models["lighting"].eval()
         self.models["motion_flow"].eval()
         self.models["ii_encoder"].eval()
+        self.models["ii_encoder_depth"].eval()
 
     def train(self):
         """Run the entire training pipeline
