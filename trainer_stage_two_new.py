@@ -102,11 +102,7 @@ class Trainer:
                     num_input_features=1,
                     num_frames_to_predict_for=2)
 
-                self.models["pose_ii"] = networks.PoseDecoderIIL(
-                    self.models["pose_encoder"].num_ch_enc,
-                    num_input_features=1,
-                    num_frames_to_predict_for=2)
-
+                
             elif self.opt.pose_model_type == "shared":
                 self.models["pose"] = networks.PoseDecoder(
                     self.models["encoder"].num_ch_enc, self.num_pose_frames)
@@ -116,7 +112,6 @@ class Trainer:
                     self.num_input_frames if self.opt.pose_model_input == "all" else 2)
 
             self.models["pose"].to(self.device)
-            self.models["pose_ii"].to(self.device)
             self.parameters_to_train += list(self.models["pose"].parameters())
 
         if self.opt.predictive_mask:
@@ -227,7 +222,6 @@ class Trainer:
         self.models["lighting"].train()
         self.models["motion_flow"].train()
         self.models["ii_encoder"].train()
-        self.models["pose_ii"].train()
 
     def set_eval(self):
         """Convert all models to testing/evaluation mode
@@ -241,7 +235,6 @@ class Trainer:
         self.models["lighting"].eval()
         self.models["motion_flow"].eval()
         self.models["ii_encoder"].eval()
-        self.models["pose_ii"].eval()
 
     def train(self):
         """Run the entire training pipeline
@@ -294,8 +287,11 @@ class Trainer:
         
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color_aug", 0, 0])
-
-        outputs = self.models["depth"](features)
+        dept_iif = get_ilumination_invariant_features(inputs["color_aug", 0, 0])
+        iif = self.models["ii_encoder"](dept_iif)
+        input_combined = features
+        input_combined[:][:] = zip(features[:][:], iif[:][:])
+        outputs = self.models["depth"](input_combined)
 
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, outputs))
@@ -368,7 +364,6 @@ class Trainer:
                     input_combined = pose_inputs
                     input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
                     axisangle, translation = self.models["pose"](input_combined)
-                    #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
