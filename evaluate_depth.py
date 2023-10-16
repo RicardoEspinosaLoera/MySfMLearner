@@ -81,6 +81,7 @@ def evaluate(opt):
         decoder_path = os.path.join(opt.load_weights_folder, "depth.pth")
 
         encoder_dict = torch.load(encoder_path)
+        encoder_dict2 = torch.load(encoder_path2)
 
         dataset = datasets.SCAREDRAWDataset(opt.data_path, filenames,
                                            encoder_dict['height'], encoder_dict['width'],
@@ -91,8 +92,11 @@ def evaluate(opt):
         encoder = networks.ResnetEncoder(opt.num_layers, False)
         depth_decoder = networks.DepthDecoder(encoder.num_ch_enc, scales=range(4))
 
+        encoder2 = networks.ResnetEncoderIIL(opt.num_layers, False)
+
         model_dict = encoder.state_dict()
         encoder.load_state_dict({k: v for k, v in encoder_dict.items() if k in model_dict})
+        encoder2.load_state_dict({k: v for k, v in encoder2_dict.items() if k in model_dict})
         depth_decoder.load_state_dict(torch.load(decoder_path))
 
         encoder.cuda()
