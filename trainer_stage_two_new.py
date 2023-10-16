@@ -64,6 +64,10 @@ class Trainer:
             self.opt.num_layers, pretrained = False, num_input_images=2)  # 18
         self.models["ii_encoder"].to(self.device)
 
+         self.models["ii_encoder_deph"] = networks.ResnetEncoderIIL(
+            self.opt.num_layers, pretrained = False, num_input_images=1)  # 18
+        self.models["ii_encoder_depth"].to(self.device)
+
         self.models["position"] = networks.PositionDecoder(
             self.models["position_encoder"].num_ch_enc, self.opt.scales)
         self.models["position"].to(self.device)
@@ -288,7 +292,7 @@ class Trainer:
         #DepthNet Prediction
         features = self.models["encoder"](inputs["color_aug", 0, 0])
         dept_iif = get_ilumination_invariant_features(inputs["color_aug", 0, 0])
-        iif = self.models["ii_encoder"](dept_iif)
+        iif = self.models["ii_encoder_depth"](dept_iif)
         input_combined = features
         input_combined[:][:] = zip(features[:][:], iif[:][:])
         outputs = self.models["depth"](input_combined)
