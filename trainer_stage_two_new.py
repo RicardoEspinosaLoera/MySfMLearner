@@ -64,7 +64,7 @@ class Trainer:
             self.opt.num_layers, pretrained = False, num_input_images=2)  # 18
         self.models["ii_encoder"].to(self.device)
 
-        self.models["ii_encoder_deph"] = networks.ResnetEncoderIIL(
+        self.models["ii_encoder_depth"] = networks.ResnetEncoderIIL(
             self.opt.num_layers, pretrained = False, num_input_images=1)  # 18
         self.models["ii_encoder_depth"].to(self.device)
 
