@@ -362,7 +362,7 @@ class Trainer:
                     iif_all = [get_ilumination_invariant_features(a),get_ilumination_invariant_features(b)] 
     
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
-                    #outputs_mf = self.models["motion_flow"](motion_inputs[0])
+                    outputs_mf = self.models["motion_flow"](motion_inputs[0])
 
                     
                     input_combined = pose_inputs
@@ -387,7 +387,7 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #print(outputs["mf_"+str(scale)].shape)
 
@@ -441,7 +441,7 @@ class Trainer:
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)] = F.interpolate(
                     outputs["mf_"+str(scale)+"_"+str(frame_id)], [self.opt.height, self.opt.width], mode="bilinear",align_corners=True)
                 
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mf_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
+                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)].permute(0,2,3,1)
                 
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
