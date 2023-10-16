@@ -65,7 +65,7 @@ class Trainer:
         self.models["ii_encoder"].to(self.device)
 
         self.models["ii_encoder_depth"] = networks.ResnetEncoderIIL(
-            self.opt.num_layers, pretrained = False, num_input_images=1)  # 18
+            self.opt.num_layers, pretrained = False)  # 18
         self.models["ii_encoder_depth"].to(self.device)
 
         self.models["position"] = networks.PositionDecoder(
