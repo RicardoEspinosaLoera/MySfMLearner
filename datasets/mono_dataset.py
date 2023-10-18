@@ -175,6 +175,7 @@ class MonoDataset(data.Dataset):
             color_aug = transforms.ColorJitter(self.brightness, self.contrast, self.saturation, self.hue)
         else:
             color_aug = (lambda x: x)
+            
 
         self.preprocess(inputs, color_aug)
         for i in self.frame_idxs:
