@@ -358,9 +358,9 @@ class Trainer:
                     #outputs_2 = self.models["transform"](transform_inputs)
 
                     # Input motion flow
-                    """
+                    
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-                    a = F.interpolate(
+                    """a = F.interpolate(
                             pose_feats[f_i], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
 
                     b = F.interpolate(
