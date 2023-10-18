@@ -407,88 +407,88 @@ class Trainer:
         """Generate the warped (reprojected) color images for a minibatch.
         Generated images are saved into the `outputs` dictionary.
         """
-        for scale in self.opt.scales:
-            
-            disp = outputs["disp_"+str(scale)]
-            if self.opt.v1_multiscale:
-                source_scale = scale
-            else:
-                disp = F.interpolate(
-                    disp, [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-
-            _, depth = disp_to_depth(disp, self.opt.min_depth, self.opt.max_depth)
-
-            outputs["depth_"+str(scale)] = depth
-
-            source_scale = 0
-            for i, frame_id in enumerate(self.opt.frame_ids[1:]):
+            for scale in self.opt.scales:
                 
-                if frame_id == "s":
-                    T = inputs["stereo_T"]
+                disp = outputs["disp_"+str(scale)]
+                if self.opt.v1_multiscale:
+                    source_scale = scale
                 else:
-                    T = outputs["cam_T_cam_0_"+str(frame_id)]
-                #   from the authors of https://arxiv.org/abs/1712.00175
-                if self.opt.pose_model_type == "posecnn":
+                    disp = F.interpolate(
+                        disp, [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
 
-                    axisangle = outputs["axisangle_0_"+str(f_i)]
-                    translation = outputs["translation_0_"+str(f_i)]
+                _, depth = disp_to_depth(disp, self.opt.min_depth, self.opt.max_depth)
 
-                    inv_depth = 1 / depth
-                    mean_inv_depth = inv_depth.mean(3, True).mean(2, True)
+                outputs["depth_"+str(scale)] = depth
 
-                    T = transformation_from_parameters(
-                        axisangle[:, 0], translation[:, 0] * mean_inv_depth[:, 0], frame_id < 0)
+                source_scale = 0
+                for i, frame_id in enumerate(self.opt.frame_ids[1:]):
+                    
+                    if frame_id == "s":
+                        T = inputs["stereo_T"]
+                    else:
+                        T = outputs["cam_T_cam_0_"+str(frame_id)]
+                    #   from the authors of https://arxiv.org/abs/1712.00175
+                    if self.opt.pose_model_type == "posecnn":
 
-                cam_points = self.backproject_depth[source_scale](
-                    depth, inputs[("inv_K", source_scale)])
-                pix_coords = self.project_3d[source_scale](
-                    cam_points, inputs[("K", source_scale)], T)
+                        axisangle = outputs["axisangle_0_"+str(f_i)]
+                        translation = outputs["translation_0_"+str(f_i)]
 
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-    
-                outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
-                #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
-                #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
+                        inv_depth = 1 / depth
+                        mean_inv_depth = inv_depth.mean(3, True).mean(2, True)
 
-                #if frame_id < 0:
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
-                #else:
-                #    outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] - outputs["mfh_"+str(scale)+"_"+str(frame_id)]
-                
-                               
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
-                    inputs[("color", frame_id, source_scale)],
-                    outputs["cf_"+str(scale)+"_"+str(frame_id)],
-                    padding_mode="border",align_corners=True)
-                """
-                outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
-                    inputs[("color", frame_id, source_scale)],
-                    outputs["sample_"+str(frame_id)+"_"+str(scale)],
-                    padding_mode="border",align_corners=True)"""
-                
-                #Motion flow
-                """
-                outputs["mfh_"+str(scale)] = F.interpolate(
-                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                        T = transformation_from_parameters(
+                            axisangle[:, 0], translation[:, 0] * mean_inv_depth[:, 0], frame_id < 0)
 
-                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
-                """
-                #Lighting compensation
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(0)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(0)]  + outputs["bh_"+str(0)+"_"+str(frame_id)]
-                
-                
+                    cam_points = self.backproject_depth[source_scale](
+                        depth, inputs[("inv_K", source_scale)])
+                    pix_coords = self.project_3d[source_scale](
+                        cam_points, inputs[("K", source_scale)], T)
+
+                    outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
         
-        #Feature similairty and depth consistency loss
-        """
-        self.models["encoder"].eval()
-        self.models["depth"].eval()
-        features = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)].detach())
-        #outputs["f2"] = features[0][:,r,:, :].detach()
-        predicted_disp = self.models["depth"](features)
-        _, predicted_depth = disp_to_depth(predicted_disp["disp_"+str(0)].detach(), self.opt.min_depth, self.opt.max_depth)
-        outputs["pdepth_"+str(0)] = predicted_depth
-        self.models["encoder"].train()
-        self.models["depth"].train()"""
+                    outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
+                    #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
+                    #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
+
+                    #if frame_id < 0:
+                    outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
+                    #else:
+                    #    outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] - outputs["mfh_"+str(scale)+"_"+str(frame_id)]
+                    
+                                
+                    outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
+                        inputs[("color", frame_id, source_scale)],
+                        outputs["cf_"+str(scale)+"_"+str(frame_id)],
+                        padding_mode="border",align_corners=True)
+                    """
+                    outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
+                        inputs[("color", frame_id, source_scale)],
+                        outputs["sample_"+str(frame_id)+"_"+str(scale)],
+                        padding_mode="border",align_corners=True)"""
+                    
+                    #Motion flow
+                    """
+                    outputs["mfh_"+str(scale)] = F.interpolate(
+                        outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+
+                    outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
+                    """
+                    #Lighting compensation
+                    outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["ch_"+str(0)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(0)]  + outputs["bh_"+str(0)+"_"+str(frame_id)]
+                    
+                    
+            
+            #Feature similairty and depth consistency loss
+            """
+            self.models["encoder"].eval()
+            self.models["depth"].eval()
+            features = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)].detach())
+            #outputs["f2"] = features[0][:,r,:, :].detach()
+            predicted_disp = self.models["depth"](features)
+            _, predicted_depth = disp_to_depth(predicted_disp["disp_"+str(0)].detach(), self.opt.min_depth, self.opt.max_depth)
+            outputs["pdepth_"+str(0)] = predicted_depth
+            self.models["encoder"].train()
+            self.models["depth"].train()"""
                 
     def compute_reprojection_loss(self, pred, target):
 
