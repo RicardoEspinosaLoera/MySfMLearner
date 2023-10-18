@@ -404,9 +404,9 @@ class Trainer:
                 
         
         def generate_images_pred(self, inputs, outputs,r):
-        """Generate the warped (reprojected) color images for a minibatch.
-        Generated images are saved into the `outputs` dictionary.
-        """
+            """Generate the warped (reprojected) color images for a minibatch.
+            Generated images are saved into the `outputs` dictionary.
+            """
             for scale in self.opt.scales:
                 
                 disp = outputs["disp_"+str(scale)]
