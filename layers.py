@@ -262,6 +262,8 @@ def get_ilumination_invariant_features(img):
         img_gray = transforms.functional.rgb_to_grayscale(img,1)
     else: 
         img_gray = img
+    #same padding
+    img_gray = F.pad(img_gray, (0, 0, 1, 2))
     #print(img_gray.shape)
     #kernel = torch.tensor([[1, 2, 1],[0, 0, 0],[-1, -2, -1]]).to(device=img_gray.device)
     K1 = torch.Tensor([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]]).to(device=img_gray.device)
