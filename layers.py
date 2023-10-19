@@ -263,7 +263,7 @@ def get_ilumination_invariant_features(img):
     else: 
         img_gray = img
     #same padding
-    img_gray = F.pad(img_gray, (0, 0, 1, 2))
+    
     #print(img_gray.shape)
     #kernel = torch.tensor([[1, 2, 1],[0, 0, 0],[-1, -2, -1]]).to(device=img_gray.device)
     K1 = torch.Tensor([[-1, 0, 1],[-2, 0, 2], [-1, 0, 1]]).to(device=img_gray.device)
@@ -275,14 +275,15 @@ def get_ilumination_invariant_features(img):
     K7 = torch.Tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]]).to(device=img_gray.device)
     K8 = torch.Tensor([[-2, -1, 0], [-1, 0, 1], [0, 1, 2]]).to(device=img_gray.device)
 
-    M1 = F.conv2d(img_gray, K1.view(1, 1, 3, 3), padding=0)
-    M2 = F.conv2d(img_gray, K2.view(1, 1, 3, 3), padding=0)
-    M3 = F.conv2d(img_gray, K3.view(1, 1, 3, 3), padding=0)
-    M4 = F.conv2d(img_gray, K4.view(1, 1, 3, 3), padding=0)
-    M5 = F.conv2d(img_gray, K5.view(1, 1, 3, 3), padding=0)
-    M6 = F.conv2d(img_gray, K6.view(1, 1, 3, 3), padding=0)
-    M7 = F.conv2d(img_gray, K7.view(1, 1, 3, 3), padding=0)
-    M8 = F.conv2d(img_gray, K8.view(1, 1, 3, 3), padding=0)
+    img_gray = F.pad(img_gray, (0, 0, 1, 2))
+    M1 = F.conv2d(img_gray, K1.view(1, 1, 3, 3))
+    M2 = F.conv2d(img_gray, K2.view(1, 1, 3, 3))
+    M3 = F.conv2d(img_gray, K3.view(1, 1, 3, 3))
+    M4 = F.conv2d(img_gray, K4.view(1, 1, 3, 3))
+    M5 = F.conv2d(img_gray, K5.view(1, 1, 3, 3))
+    M6 = F.conv2d(img_gray, K6.view(1, 1, 3, 3))
+    M7 = F.conv2d(img_gray, K7.view(1, 1, 3, 3))
+    M8 = F.conv2d(img_gray, K8.view(1, 1, 3, 3))
 
     nor = (M1 ** 2).sum() + (M2 ** 2).sum() + (M3 ** 2).sum() +(M4 ** 2).sum() + (M5 ** 2).sum() + (M6 ** 2).sum() + (M7 ** 2).sum() + + (M8 ** 2).sum()
     nor = torch.sqrt(nor) + 1e-09
