@@ -372,13 +372,11 @@ class Trainer:
                     #concatenated_output = torch.cat((pose_inputs,motion_inputs), dim=1)
                     concatenated_list = []
                     # Iterate over the corresponding tensors in list1 and list2 and concatenate them
-                    for tensor1, tensor2 in zip(pose_inputs, motion_inputs):
-                        print(tensor1[0].shape)
-                        print(tensor2[0].shape)
-                        #concatenated_tensor = torch.cat([tensor1, tensor2], dim=1)
-                        #concatenated_list.append(concatenated_tensor)
+                    for tensor1, tensor2 in zip(pose_inputs[0], motion_inputs[0]):
+                        concatenated_tensor = torch.cat([tensor1, tensor2], dim=1)
+                        concatenated_list.append(concatenated_tensor)
 
-                    #print(concatenated_list[0][0].shape)
+                    print(concatenated_list[0].shape)
                     axisangle, translation = self.models["pose"](concatenated_list)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
