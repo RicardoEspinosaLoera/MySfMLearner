@@ -369,7 +369,7 @@ class Trainer:
                     print(pose_inputs[0][0].shape)
                     print(motion_inputs[0][0].shape)
                     #input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
-                    concatenated_output = torch.cat((pose_inputs[:][:], motion_inputs[:][:]), dim=1)
+                    concatenated_output = torch.cat((pose_inputs,motion_inputs), dim=1)
                     print(concatenated_output[0][0].shape)
                     axisangle, translation = self.models["pose"](pose_inputs)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
