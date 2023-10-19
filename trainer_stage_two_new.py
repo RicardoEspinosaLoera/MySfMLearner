@@ -377,6 +377,7 @@ class Trainer:
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])
+                            
 
                     
 
@@ -475,7 +476,9 @@ class Trainer:
                 outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
                 """
                 #Lighting compensation
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = outputs["c_"+str(0)+"_"+str(frame_id)] * outputs["color_"+str(frame_id)+"_"+str(0)]  + outputs["b_"+str(0)+"_"+str(frame_id)]
+                b = outputs["b_"+str(0)+"_"+str(frame_id)]
+                c = outputs["c_"+str(0)+"_"+str(frame_id)]
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = c * outputs["color_"+str(frame_id)+"_"+str(0)] + b
                 
                     
             
