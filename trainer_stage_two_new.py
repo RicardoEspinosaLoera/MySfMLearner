@@ -806,8 +806,8 @@ class Trainer:
         return rgb_map.clip(0,1)
 
     def colormap(inputs, normalize=True, torch_transpose=True):
-        if isinstance(inputs, torch.Tensor):
-            inputs = inputs.detach().cpu().numpy()
+        #if isinstance(inputs, torch.Tensor):
+        inputs = inputs.detach().cpu().numpy()
 
         vis = inputs
         #if normalize:
