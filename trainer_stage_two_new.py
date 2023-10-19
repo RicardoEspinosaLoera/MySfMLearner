@@ -358,11 +358,9 @@ class Trainer:
                     #outputs_2 = self.models["transform"](transform_inputs)
 
                     # Input motion flow
-                    
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
                     iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features( pose_feats[0])] 
                     
-                      
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     outputs_mf = self.models["motion_flow"](motion_inputs[0])
                     input_combined = pose_inputs
@@ -389,15 +387,12 @@ class Trainer:
                     print(pose_inputs[0][2].shape)
                     print(pose_inputs[0][3].shape)
                     print(pose_inputs[0][4].shape)
-                    
+                
                     axisangle, translation = self.models["pose"](pose_inputs)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
-                    outputs_lighting = self.models["lighting"](pose_inputs[0])
-                            
-
-                    
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])                   
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
