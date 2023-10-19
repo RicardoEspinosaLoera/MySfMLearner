@@ -376,7 +376,7 @@ class Trainer:
                         concatenated_tensor = torch.cat([tensor1, tensor2], dim=1)
                         concatenated_list.append(concatenated_tensor)
 
-                    #print(concatenated_output[0][0].shape)
+                    print(concatenated_list[0][0].shape)
                     axisangle, translation = self.models["pose"](concatenated_list)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
