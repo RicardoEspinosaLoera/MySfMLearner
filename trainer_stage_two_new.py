@@ -7,6 +7,7 @@ import networks
 import numpy as np
 import torch.optim as optim
 import torch.nn as nn
+import matplotlib.pyplot as plt
 # generate random integer values
  
 _DEPTH_COLORMAP = plt.get_cmap('plasma', 256)  # for plotting
