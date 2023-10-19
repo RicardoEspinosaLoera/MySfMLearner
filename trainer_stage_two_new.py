@@ -366,8 +366,8 @@ class Trainer:
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     outputs_mf = self.models["motion_flow"](motion_inputs[0])
                     input_combined = pose_inputs
-                    #print(pose_inputs[0][0].shape)
-                    #print(motion_inputs[0][0].shape)
+                    print(pose_inputs[0][0].shape)
+                    print(motion_inputs[0][0].shape)
                     #input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
                     #concatenated_output = torch.cat((pose_inputs,motion_inputs), dim=1)
                     concatenated_list = []
