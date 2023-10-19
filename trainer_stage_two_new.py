@@ -390,7 +390,7 @@ class Trainer:
                     print(pose_inputs[0][3].shape)
                     print(pose_inputs[0][4].shape)
                     
-                    axisangle, translation = self.models["pose"](concatenated_list)
+                    axisangle, translation = self.models["pose"](pose_inputs)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
