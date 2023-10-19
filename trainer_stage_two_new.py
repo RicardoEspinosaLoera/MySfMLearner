@@ -105,7 +105,7 @@ class Trainer:
                     self.models["pose_encoder"].num_ch_enc,
                     num_input_features=1,
                     num_frames_to_predict_for=2)
-                print(self.models["pose_encoder"].num_ch_enc)
+                #print(self.models["pose_encoder"].num_ch_enc)
                 
             elif self.opt.pose_model_type == "shared":
                 self.models["pose"] = networks.PoseDecoder(
@@ -388,7 +388,7 @@ class Trainer:
                     print(pose_inputs[0][3].shape)
                     print(pose_inputs[0][4].shape)
                 
-                    axisangle, translation = self.models["pose"](pose_inputs)
+                    axisangle, translation = self.models["pose"](concatenated_list)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
