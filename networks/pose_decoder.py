@@ -11,7 +11,7 @@ class PoseDecoder(nn.Module):
 
         #self.num_ch_enc = num_ch_enc
         self.num_input_features = num_input_features
-        self.num_ch_enc = [128, 256]
+        self.num_ch_enc = [128]
 
         if num_frames_to_predict_for is None:
             num_frames_to_predict_for = num_input_features - 1
