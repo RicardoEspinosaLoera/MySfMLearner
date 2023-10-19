@@ -109,7 +109,7 @@ class Trainer:
                 
             elif self.opt.pose_model_type == "shared":
                 self.models["pose"] = networks.PoseDecoder(
-                    self.models["encoder"].num_ch_enc, self.num_pose_frames)
+                    self.models["ii_encoder"].num_ch_enc, self.num_pose_frames)
 
             elif self.opt.pose_model_type == "cnn":
                 self.models["pose"] = networks.PoseCNN(
@@ -366,8 +366,8 @@ class Trainer:
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     outputs_mf = self.models["motion_flow"](motion_inputs[0])
                     input_combined = pose_inputs
-                    print(pose_inputs[0][0].shape)
-                    print(motion_inputs[0][0].shape)
+                    #print(pose_inputs[0][0].shape)
+                    #print(motion_inputs[0][0].shape)
                     #input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
                     #concatenated_output = torch.cat((pose_inputs,motion_inputs), dim=1)
                     concatenated_list = []
@@ -376,7 +376,7 @@ class Trainer:
                         concatenated_tensor = torch.cat([tensor1, tensor2], dim=1)
                         concatenated_list.append(concatenated_tensor)
 
-                    print(concatenated_list[0].shape)
+                    #print(concatenated_list[0].shape)
                     axisangle, translation = self.models["pose"](concatenated_list)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
