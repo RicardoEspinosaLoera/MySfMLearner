@@ -372,7 +372,7 @@ class Trainer:
                     #outputs_mf = self.models["motion_flow"](motion_inputs[0])
                     input_combined = pose_inputs
                     input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
-                    axisangle, translation = self.models["pose_ii"](input_combined)
+                    axisangle, translation = self.models["pose"](input_combined)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
