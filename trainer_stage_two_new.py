@@ -9,6 +9,8 @@ import torch.optim as optim
 import torch.nn as nn
 # generate random integer values
  
+_DEPTH_COLORMAP = plt.get_cmap('plasma', 256)  # for plotting
+
 from utils import *
 from layers import *
 from torch.utils.data import DataLoader
@@ -717,7 +719,9 @@ class Trainer:
                     flow = self.flow2rgb(f,32)
                     flow = torch.from_numpy(flow)
                     wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)
-                wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(normalize_image(outputs["disp_"+str(s)][j]))},step=self.step)
+                
+                disp = colormap(outputs["disp_"+str(s)][j])
+                wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(disp.transpose(1, 2, 0))},step=self.step)
                                 
                     
 
@@ -799,3 +803,33 @@ class Trainer:
         rgb_map[1] -= 0.5*(normalized_flow_map[0] + normalized_flow_map[1])
         rgb_map[2] += normalized_flow_map[1]
         return rgb_map.clip(0,1)
+
+    def colormap(inputs, normalize=True, torch_transpose=True):
+        if isinstance(inputs, torch.Tensor):
+            inputs = inputs.detach().cpu().numpy()
+
+        vis = inputs
+        if normalize:
+            ma = float(vis.max())
+            mi = float(vis.min())
+            d = ma - mi if ma != mi else 1e5
+            vis = (vis - mi) / d
+
+        if vis.ndim == 4:
+            vis = vis.transpose([0, 2, 3, 1])
+            vis = _DEPTH_COLORMAP(vis)
+            vis = vis[:, :, :, 0, :3]
+            if torch_transpose:
+                vis = vis.transpose(0, 3, 1, 2)
+        elif vis.ndim == 3:
+            vis = _DEPTH_COLORMAP(vis)
+            vis = vis[:, :, :, :3]
+            if torch_transpose:
+                vis = vis.transpose(0, 3, 1, 2)
+        elif vis.ndim == 2:
+            vis = _DEPTH_COLORMAP(vis)
+            vis = vis[..., :3]
+            if torch_transpose:
+                vis = vis.transpose(2, 0, 1)
+
+    return vis
