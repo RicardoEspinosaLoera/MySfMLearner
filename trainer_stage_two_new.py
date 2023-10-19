@@ -384,11 +384,11 @@ class Trainer:
                     print(concatenated_list[4].shape)
 
                     print(len(pose_inputs))
-                    print(pose_inputs[0].shape)
-                    print(pose_inputs[1].shape)
-                    print(pose_inputs[2].shape)
-                    print(pose_inputs[3].shape)
-                    print(pose_inputs[4].shape)
+                    print(pose_inputs[0][0].shape)
+                    print(pose_inputs[0][1].shape)
+                    print(pose_inputs[0][2].shape)
+                    print(pose_inputs[0][3].shape)
+                    print(pose_inputs[0][4].shape)
                     
                     axisangle, translation = self.models["pose"](concatenated_list)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
