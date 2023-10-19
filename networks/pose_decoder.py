@@ -9,7 +9,7 @@ class PoseDecoder(nn.Module):
     def __init__(self, num_ch_enc, num_input_features, num_frames_to_predict_for=None, stride=1):
         super(PoseDecoder, self).__init__()
 
-        self.num_ch_enc = []
+        self.num_ch_enc = num_ch_enc
         self.num_input_features = num_input_features
 
         if num_frames_to_predict_for is None:
