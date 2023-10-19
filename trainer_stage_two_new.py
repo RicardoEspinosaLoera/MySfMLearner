@@ -366,7 +366,7 @@ class Trainer:
                     b = F.interpolate(
                             pose_feats[0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
                     """
-                    iif_all = [get_ilumination_invariant_features(a),get_ilumination_invariant_features(b)] 
+                    iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features( pose_feats[0])] 
                     
                       
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
