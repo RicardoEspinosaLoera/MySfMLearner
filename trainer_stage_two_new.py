@@ -369,6 +369,7 @@ class Trainer:
                     print(pose_inputs[0][0].shape)
                     print(motion_inputs[0][0].shape)
                     input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
+                    print(input_combined[0][0].shape)
                     axisangle, translation = self.models["pose"](pose_inputs)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
 
