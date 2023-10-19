@@ -378,6 +378,10 @@ class Trainer:
 
                     print(len(concatenated_list))
                     print(concatenated_list[0].shape)
+                    print(concatenated_list[1].shape)
+                    print(concatenated_list[2].shape)
+                    print(concatenated_list[3].shape)
+                    print(concatenated_list[4].shape)
                     
                     axisangle, translation = self.models["pose"](concatenated_list)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
