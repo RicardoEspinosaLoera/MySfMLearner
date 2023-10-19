@@ -368,7 +368,7 @@ class Trainer:
 
                     iif_all = [get_ilumination_invariant_features(a),get_ilumination_invariant_features(b)] 
                     
-                    #motion_inputs = [self.models["encoder"](torch.cat(pose_inputs, 1))]
+                    motion_inputs = [self.models["encoder"](torch.cat(iif_all, 1))]
                     #outputs_mf = self.models["motion_flow"](motion_inputs[0])
                     input_combined = pose_inputs
                     input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
