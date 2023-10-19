@@ -360,12 +360,12 @@ class Trainer:
                     # Input motion flow
                     
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-                    a = F.interpolate(
+                    """a = F.interpolate(
                             pose_feats[f_i], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
 
                     b = F.interpolate(
                             pose_feats[0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
-
+                    """
                     iif_all = [get_ilumination_invariant_features(a),get_ilumination_invariant_features(b)] 
                     
                       
@@ -572,7 +572,7 @@ class Trainer:
             for frame_id in self.opt.frame_ids[1:]:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
-                occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
+                #occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
                 
                             
                 loss_reprojection += (
