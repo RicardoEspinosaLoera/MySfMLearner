@@ -373,8 +373,8 @@ class Trainer:
                     concatenated_list = []
                     # Iterate over the corresponding tensors in list1 and list2 and concatenate them
                     for tensor1, tensor2 in zip(pose_inputs, motion_inputs):
-                        print(tensor1.shape)
-                        print(tensor2.shape)
+                        print(tensor1[0].shape)
+                        print(tensor2[0].shape)
                         #concatenated_tensor = torch.cat([tensor1, tensor2], dim=1)
                         #concatenated_list.append(concatenated_tensor)
 
