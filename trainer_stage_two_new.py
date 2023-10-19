@@ -832,4 +832,4 @@ class Trainer:
             if torch_transpose:
                 vis = vis.transpose(2, 0, 1)
 
-    return vis
+        return vis
