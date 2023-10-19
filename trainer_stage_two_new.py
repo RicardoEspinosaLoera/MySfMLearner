@@ -7,7 +7,6 @@ import networks
 import numpy as np
 import torch.optim as optim
 import torch.nn as nn
-import matplotlib.pyplot as plt
 # generate random integer values
  
 _DEPTH_COLORMAP = plt.get_cmap('plasma', 256)  # for plotting
@@ -721,7 +720,7 @@ class Trainer:
                     flow = torch.from_numpy(flow)
                     wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)
                 
-                disp = self.colormap(outputs["disp_"+str(s)][j])
+                disp = self.colormap(normalize_image(outputs["disp_"+str(s)][j]))
                 wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(disp.transpose(1, 2, 0))},step=self.step)
                                 
                     
@@ -806,15 +805,10 @@ class Trainer:
         return rgb_map.clip(0,1)
 
     def colormap(inputs, normalize=True, torch_transpose=True):
-        #if isinstance(inputs, torch.Tensor):
-        inputs = inputs.detach().cpu().numpy()
+        if isinstance(inputs, torch.Tensor):
+            inputs = inputs.detach().cpu().numpy()
 
         vis = inputs
-        #if normalize:
-        ma = float(vis.max())
-        mi = float(vis.min())
-        d = ma - mi if ma != mi else 1e5
-        vis = (vis - mi) / d
 
         if vis.ndim == 4:
             vis = vis.transpose([0, 2, 3, 1])
@@ -833,4 +827,4 @@ class Trainer:
             if torch_transpose:
                 vis = vis.transpose(2, 0, 1)
 
-        return vis
+    return vis
