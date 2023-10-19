@@ -22,7 +22,7 @@ class PoseDecoder(nn.Module):
         #self.squeeze = nn.Conv2d(int(self.num_ch_enc[-1]), 256, 1)
         self.squeeze = nn.Conv2d(int(128), 256, 1)
         #self.convs["pose_0"] = nn.Conv2d(int(num_input_features * 256), 256, 3, stride, 1)
-        self.pose_0 = nn.Conv2d(int(128 * 256), 256, 3, stride, 1)
+        self.pose_0 = nn.Conv2d(int(num_input_features * 256), 256, 3, stride, 1)
         #self.convs["pose_1"] = nn.Conv2d(256, 256, 3, stride, 1)
         self.pose_1 = nn.Conv2d(256, 256, 3, stride, 1)
         #self.convs["pose_2"] = nn.Conv2d(256, 6 * num_frames_to_predict_for, 1)
