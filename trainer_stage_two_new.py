@@ -381,6 +381,8 @@ class Trainer:
                     print(concatenated_list[3].shape)
                     print(concatenated_list[4].shape)
 
+                    last_features = [f[-1] for f in concatenated_list]
+
                     print(len(pose_inputs))
                     print(pose_inputs[0][0].shape)
                     print(pose_inputs[0][1].shape)
