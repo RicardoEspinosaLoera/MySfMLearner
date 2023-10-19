@@ -109,7 +109,7 @@ class Trainer:
                 
             elif self.opt.pose_model_type == "shared":
                 self.models["pose"] = networks.PoseDecoder(
-                    self.models["encoder"].num_ch_enc, self.num_pose_frames)
+                    128, self.num_pose_frames)
 
             elif self.opt.pose_model_type == "cnn":
                 self.models["pose"] = networks.PoseCNN(
