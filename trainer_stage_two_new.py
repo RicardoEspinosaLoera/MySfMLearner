@@ -721,7 +721,7 @@ class Trainer:
                     flow = torch.from_numpy(flow)
                     wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)
                 
-                disp = self.colormap(outputs["disp_"+str(s)][j])
+                disp = self.colormap(outputs["disp_"+str(s)][j, 0])
                 wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(disp.transpose(1, 2, 0))},step=self.step)
                                 
                     
