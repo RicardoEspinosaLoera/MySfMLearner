@@ -360,18 +360,14 @@ class Trainer:
                     # Input motion flow
                     
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-                    """a = F.interpolate(
-                            pose_feats[f_i], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
-
-                    b = F.interpolate(
-                            pose_feats[0], [self.opt.height + 2, self.opt.width + 2], mode="bilinear", align_corners=True)
-                    """
                     iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features( pose_feats[0])] 
                     
                       
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     outputs_mf = self.models["motion_flow"](motion_inputs[0])
                     input_combined = pose_inputs
+                    print(pose_inputs[0][0].shape)
+                    print(motion_inputs[0][0].shape)
                     input_combined[:][:] = zip(pose_inputs[:][:], motion_inputs[:][:])
                     axisangle, translation = self.models["pose"](pose_inputs)
                     #axisangle, translation = self.models["pose_ii"](pose_inputs)
