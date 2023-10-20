@@ -365,6 +365,7 @@ class Trainer:
 
                     # Input motion flow
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+                    """
                     iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features( pose_feats[0])] 
                     
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
@@ -379,9 +380,9 @@ class Trainer:
                     for tensor1, tensor2 in zip(pose_inputs[0], motion_inputs[0]):
                         concatenated_tensor = torch.cat([tensor1, tensor2], dim=1)
                         concatenated_list.append(concatenated_tensor)
-                
-                    axisangle, translation = self.models["pose"]([concatenated_list])
-                    #axisangle, translation = self.models["pose_ii"](pose_inputs)
+                    
+                    axisangle, translation = self.models["pose"]([concatenated_list])"""
+                    axisangle, translation = self.models["pose_ii"](pose_inputs)
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])                   
@@ -398,7 +399,7 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #print(outputs["mf_"+str(scale)].shape)
 
