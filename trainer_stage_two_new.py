@@ -18,7 +18,8 @@ from torch.utils.data import DataLoader
 import wandb
 
 wandb.init(project="MySfMLearner", entity="respinosa")
-
+# Clear GPU memory
+torch.cuda.empty_cache()
 #from tensorboardX import SummaryWriter
 
 
