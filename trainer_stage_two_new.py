@@ -593,7 +593,7 @@ class Trainer:
             #loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            #loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
+            loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
