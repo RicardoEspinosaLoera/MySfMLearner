@@ -396,15 +396,13 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #Lighting compensation
                         b = outputs["b_"+str(0)+"_"+str(f_i)]
                         c = outputs["c_"+str(0)+"_"+str(f_i)]
                         outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
-                        print(outputs["refinedCB_"+str(f_i)+"_"+str(scale)].shape)
-                        print(outputs_mf[("flow", scale)].shape)
-                        outputs["refinedOF_"+str(f_i)+"_"+str(scale)] = outputs["refinedCB_"+str(f_i)+"_"+str(0)] + outputs["mf_"+str(0)+"_"+str(f_i)]
+                        
                     
                    
                     
@@ -455,17 +453,11 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-                """
-                outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
-                #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
-                #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
-
-                #if frame_id < 0:
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
-                #else:
-                #    outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] - outputs["mfh_"+str(scale)+"_"+str(frame_id)]
                 
-                            
+                outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
+
+                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
+        
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["cf_"+str(scale)+"_"+str(frame_id)],
@@ -475,7 +467,7 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
-                
+                """
                 #Motion flow
                 """
                 outputs["mfh_"+str(scale)] = F.interpolate(
