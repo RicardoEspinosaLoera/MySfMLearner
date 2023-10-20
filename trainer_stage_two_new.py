@@ -365,7 +365,7 @@ class Trainer:
 
                     # Input motion flow
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-                    
+                    """
                     iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features( pose_feats[0])] 
                     
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
@@ -378,7 +378,8 @@ class Trainer:
                         concatenated_list.append(concatenated_tensor)
                     
                     axisangle, translation = self.models["pose"]([concatenated_list])
-                    #axisangle, translation = self.models["pose"](pose_inputs)
+                    """
+                    axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])                   
@@ -397,8 +398,10 @@ class Trainer:
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
-                        #print(outputs["mf_"+str(scale)].shape)
-
+                        #Lighting compensation
+                        b = outputs["b_"+str(0)+"_"+str(frame_id)]
+                        c = outputs["c_"+str(0)+"_"+str(frame_id)]
+                        outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
                     
                    
                     
@@ -477,10 +480,7 @@ class Trainer:
                 
                 outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
                 """
-                #Lighting compensation
-                b = outputs["b_"+str(0)+"_"+str(frame_id)]
-                c = outputs["c_"+str(0)+"_"+str(frame_id)]
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = c * outputs["color_"+str(frame_id)+"_"+str(0)] + b
+                
                 
                     
             
@@ -575,9 +575,11 @@ class Trainer:
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
                 
-                            
+                """            
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
+                loss_reprojection += (
+                    self.compute_reprojection_loss(outputs[("color", frame_id, scale)], outputs[("refinedCB_", frame_id, scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 """loss_ilumination_invariant += (
                     self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
                 loss_motion_flow += (
