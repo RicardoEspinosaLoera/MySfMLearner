@@ -449,7 +449,7 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-                
+                """
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
                 #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 0] /= self.opt.width - 1
                 #outputs["mfh_"+str(scale)+"_"+str(frame_id)][..., 1] /= self.opt.height - 1
@@ -469,7 +469,7 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
-                """
+                
                 #Motion flow
                 """
                 outputs["mfh_"+str(scale)] = F.interpolate(
@@ -516,13 +516,13 @@ class Trainer:
     def get_ilumination_invariant_loss(self, pred, target):
         features_p = get_ilumination_invariant_features(pred)
         features_t = get_ilumination_invariant_features(target)
-        #abs_diff = torch.abs(features_t - features_p)
-        #l1_loss = abs_diff.mean(1, True)
+        abs_diff = torch.abs(features_t - features_p)
+        l1_loss = abs_diff.mean(1, True)
 
         ssim_loss = self.ssim(features_p, features_t).mean(1, True)
-        #ii_loss = 0.85 * ssim_loss + 0.15 * l1_loss
+        ii_loss = 0.85 * ssim_loss + 0.15 * l1_loss
         #print(ii_loss.shape)
-        return ssim_loss
+        return ii_loss
     
     #def get_motion_flow_loss(self, flow):
     def get_motion_flow_loss(self,motion_map):
@@ -573,16 +573,16 @@ class Trainer:
             for frame_id in self.opt.frame_ids[1:]:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
-                #occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
+                occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
                 
                             
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                """loss_ilumination_invariant += (
-                    self.get_ilumination_invariant_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
-                loss_motion_flow += (
+                loss_ilumination_invariant += (
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
+                """loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
-                )
+                )"""
             
 
             mean_disp = disp.mean(2, True).mean(3, True)
@@ -590,10 +590,10 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            #loss += 0.20 * loss_ilumination_invariant / 2.0
+            loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
+            #loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
