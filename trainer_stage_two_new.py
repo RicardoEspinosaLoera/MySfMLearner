@@ -399,9 +399,9 @@ class Trainer:
                         #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #Lighting compensation
-                        b = outputs["b_"+str(0)+"_"+str(frame_id)]
-                        c = outputs["c_"+str(0)+"_"+str(frame_id)]
-                        outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
+                        b = outputs["b_"+str(0)+"_"+str(f_i)]
+                        c = outputs["c_"+str(0)+"_"+str(f_i)]
+                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
                     
                    
                     
