@@ -382,7 +382,7 @@ class Trainer:
                         concatenated_list.append(concatenated_tensor)
                     
                     axisangle, translation = self.models["pose"]([concatenated_list])"""
-                    axisangle, translation = self.models["pose_ii"](pose_inputs)
+                    axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])                   
