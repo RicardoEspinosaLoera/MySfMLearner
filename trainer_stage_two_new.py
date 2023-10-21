@@ -370,7 +370,7 @@ class Trainer:
                     
                     motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     outputs_mf = self.models["motion_flow"](motion_inputs[0])
-                    """input_combined = pose_inputs
+                    #input_combined = pose_inputs
                     concatenated_list = []
                     # Iterate over the corresponding tensors in list1 and list2 and concatenate them
                     for tensor1, tensor2 in zip(pose_inputs[0], motion_inputs[0]):
@@ -378,8 +378,8 @@ class Trainer:
                         concatenated_list.append(concatenated_tensor)
                     
                     axisangle, translation = self.models["pose"]([concatenated_list])
-                    """
-                    axisangle, translation = self.models["pose"](pose_inputs)
+                    
+                    #axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])                   
@@ -388,10 +388,7 @@ class Trainer:
                     outputs["translation_0_"+str(f_i)] = translation
                     outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
                         axisangle[:, 0], translation[:, 0])
-                    #outputs["constrast_0_"+str(f_1)] = contrast
-                    #outputs["constrast_0_"+str(f_1)] = brightness
-                    
-                    #if f_i < 0:
+
                     
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
