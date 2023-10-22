@@ -803,7 +803,7 @@ class Trainer:
         rgb_map[2] += normalized_flow_map[1]
         return rgb_map.clip(0,1)
 
-    def colormap(self, inputs, normalize=True, torch_transpose=True):
+    def colormap(self, inputs, normalize=True, torch_transpose=False):
         inputs = inputs.detach().cpu().numpy()
 
         vis = inputs
