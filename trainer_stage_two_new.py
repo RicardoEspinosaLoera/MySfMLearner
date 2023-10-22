@@ -372,7 +372,7 @@ class Trainer:
                     #iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features( pose_feats[0])] 
                     
                     #motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
-                    outputs_mf = self.models["motion_flow"](pose_inputs[0])
+                    #outputs_mf = self.models["motion_flow"](pose_inputs[0])
                     #input_combined = pose_inputs
                     """
                     concatenated_list = []
@@ -397,7 +397,7 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["mf_"+str(0)+"_"+str(f_i)])
                         #outputs["r_"+str(scale)+"_"+str(f_i)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["ph_"+str(scale)+"_"+str(f_i)])
@@ -468,6 +468,15 @@ class Trainer:
                     outputs["cf_"+str(scale)+"_"+str(frame_id)],
                     padding_mode="border",align_corners=True)
 
+                
+                outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
+
+                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
+                
+                outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
+                    inputs[("color", frame_id, source_scale)],
+                    outputs["cf_"+str(scale)+"_"+str(frame_id)],
+                    padding_mode="border",align_corners=True)
                 
                 """
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
@@ -653,11 +662,11 @@ class Trainer:
             loss = 0
             registration_losses = []
 
-            target = inputs[("color", 0, 0)]
+            target = outputs["refinedCB_target"+str(frame_id)+"_"+str(scale)]
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["refinedCB_target"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
