@@ -365,6 +365,7 @@ class Trainer:
 
                     # Input motion flow
                     pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+                    
                     """
                     iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features( pose_feats[0])] 
                     
@@ -380,9 +381,10 @@ class Trainer:
                     axisangle, translation = self.models["pose"]([concatenated_list])
                     """
                     axisangle, translation = self.models["pose"](pose_inputs)
-
+                    
                     # Input for Lighting
                     outputs_lighting = self.models["lighting"](pose_inputs[0])                   
+                    outputs_mf = self.models["motion_flow"](motion_inputs[0])
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
                     outputs["translation_0_"+str(f_i)] = translation
@@ -396,7 +398,7 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #Lighting compensation
                         b = outputs["b_"+str(0)+"_"+str(f_i)]
@@ -473,6 +475,7 @@ class Trainer:
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                 
+                outputs["color_ref"+str(scale)+"_"+str(frame_id)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["mf_"+str(0)+"_"+str(frame_id)])
                 #Motion flow
                 """
                 outputs["mfh_"+str(scale)] = F.interpolate(
@@ -579,12 +582,12 @@ class Trainer:
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["color_ref"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 """loss_ilumination_invariant += (
-                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
                 loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
-                )"""
+                )
             
 
             mean_disp = disp.mean(2, True).mean(3, True)
@@ -595,7 +598,7 @@ class Trainer:
             #loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            #loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
+            loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
@@ -675,7 +678,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["color_ref"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
@@ -711,18 +714,16 @@ class Trainer:
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
                     #if frame_id < 0:
-                    wandb.log({mode+"_Output_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
-                    wandb.log({mode+"_Refined_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_Output_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_OutputMF_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color_ref"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_RefinedCB_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
                     
-                    wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["b_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
-
-                    wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["c_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
-                    """
+                    
                     f = outputs["mf_"+str(s)+"_"+str(frame_id)][j].data
                     flow = self.flow2rgb(f,32)
                     flow = torch.from_numpy(flow)
                     wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)
-                    """
+                    
                 disp = normalize_image(outputs["disp_"+str(s)][j])
                 wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(disp)},step=self.step)
                                 
