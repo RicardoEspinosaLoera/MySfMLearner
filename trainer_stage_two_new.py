@@ -399,7 +399,7 @@ class Trainer:
                         #Lighting compensation
                         b = outputs["b_"+str(0)+"_"+str(f_i)]
                         c = outputs["c_"+str(0)+"_"+str(f_i)]
-                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * inputs[("color", f_i, 0)] + b
+                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
                         
                         
                     
