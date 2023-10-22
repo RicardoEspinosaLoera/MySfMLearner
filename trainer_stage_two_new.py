@@ -395,11 +395,11 @@ class Trainer:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
-                        outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", 0, 0)], outputs["mf_"+str(0)+"_"+str(f_i)])
+                        outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["mf_"+str(0)+"_"+str(f_i)])
                         #Lighting compensation
                         b = outputs["b_"+str(0)+"_"+str(f_i)]
                         c = outputs["c_"+str(0)+"_"+str(f_i)]
-                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * outputs["refinedMF_"+str(f_i)+"_"+str(scale)] + b
+                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * inputs[("color", f_i, 0)] + b
                         
                         
                     
@@ -464,7 +464,7 @@ class Trainer:
 
                 """
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
-                    inputs[("color", frame_id, source_scale)],
+                    outputs["refinedMF_"+str(f_i)+"_"+str(scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                 
