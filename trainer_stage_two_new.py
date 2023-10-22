@@ -404,7 +404,7 @@ class Trainer:
                         #Lighting compensation
                         b = outputs["b_"+str(0)+"_"+str(f_i)]
                         c = outputs["c_"+str(0)+"_"+str(f_i)]
-                        outputs["refinedCB_target"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)].detach() + b
+                        outputs["refinedCB_target"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
                         #outputs[("refined", scale, f_i)] = (outputs[("transform", "high", scale, f_i)] * outputs[("occu_mask_backward", 0, f_i)].detach()  + inputs[("color", 0, 0)])
                         
                         
@@ -458,7 +458,7 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
                 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-                
+                """
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
 
                 outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
@@ -473,7 +473,7 @@ class Trainer:
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
-                    padding_mode="border",align_corners=True)"""
+                    padding_mode="border",align_corners=True)
                 
 
                 
@@ -555,7 +555,7 @@ class Trainer:
             for frame_id in self.opt.frame_ids[1:]:
                 
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
-                occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
+                #occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
                 
                 """            
                 loss_reprojection += (
