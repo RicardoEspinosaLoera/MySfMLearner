@@ -718,7 +718,7 @@ class Trainer:
                     flow = torch.from_numpy(flow)
                     wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)
                     
-                disp = normalize_image(outputs["disp_"+str(s)][j].data)
+                disp = normalize_image(outputs["disp_"+str(s)][j])
                 vis = self.colormap(disp)
                 wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(vis)},step=self.step)
                                 
@@ -803,7 +803,7 @@ class Trainer:
         rgb_map[2] += normalized_flow_map[1]
         return rgb_map.clip(0,1)
 
-    def colormap(inputs, normalize=True, torch_transpose=True):
+    def colormap(self, inputs, normalize=True, torch_transpose=True):
         inputs = inputs.detach().cpu().numpy()
 
         vis = inputs
