@@ -576,9 +576,9 @@ class Trainer:
                     self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_target"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 """loss_ilumination_invariant += (
                     self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
-                """loss_motion_flow += (
+                loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
-                )"""
+                )
             
 
             mean_disp = disp.mean(2, True).mean(3, True)
@@ -589,7 +589,7 @@ class Trainer:
             #loss += 0.10 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            #loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
+            loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
