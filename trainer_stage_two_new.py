@@ -335,11 +335,94 @@ class Trainer:
                 if f_i != "s":
                     inputs_all = [pose_feats[f_i], pose_feats[0]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
-                    """if f_i < 0:
-                        inputs_all = [pose_feats[f_i], pose_feats[0]]
-                    else:
-                        inputs_all = [pose_feats[0], pose_feats[f_i]]
-                    """  
+                    
+                                      
+
+                    # OF Prediction normal and reversed
+                    position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
+                    position_inputs_reverse = self.models["position_encoder"](torch.cat(inputs_all_reverse, 1))
+                    outputs_0 = self.models["position"](position_inputs)
+                    outputs_1 = self.models["position"](position_inputs_reverse)
+
+                    for scale in self.opt.scales:
+                        outputs["p_"+str(scale)+"_"+str(f_i)] = outputs_0["position_"+str(scale)]
+                        outputs["ph_"+str(scale)+"_"+str(f_i)] = F.interpolate(
+                            outputs["p_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                        #outputs["r_"+str(scale)+"_"+str(f_i)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["ph_"+str(scale)+"_"+str(f_i)])
+                        outputs["pr_"+str(scale)+"_"+str(f_i)] = outputs_1["position_"+str(scale)]
+                        outputs["prh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
+                            outputs["pr_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                        
+                        outputs["omaskb_"+str(scale)+"_"+str(f_i)],  outputs["omapb_"+str(scale)+"_"+str(f_i)]= self.get_occu_mask_backward(outputs["prh_"+str(scale)+"_"+str(f_i)])
+                        outputs["omapbi_"+str(scale)+"_"+str(f_i)] = self.get_occu_mask_bidirection(outputs["ph_"+str(scale)+"_"+str(f_i)],
+                                                                                                          outputs["prh_"+str(scale)+"_"+str(f_i)])
+
+                    # Input for the AFNet
+                    #transform_input = [outputs["r_0"+"_"+str(f_i)], inputs[("color", 0, 0)]]
+                    # Output from AFNet
+                    #transform_inputs = self.models["transform_encoder"](torch.cat(transform_input, 1))
+                    #outputs_2 = self.models["transform"](transform_inputs)
+
+                    # Input motion flow
+                    pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+                    
+                    #motion_inputs = [self.models["encoder"](torch.cat(inputs_all, 1))]
+                    #outputs_mf = self.models["motion_flow"](motion_inputs[0])
+                    """input_combined = pose_inputs
+                    concatenated_list = []
+                    # Iterate over the corresponding tensors in list1 and list2 and concatenate them
+                    for tensor1, tensor2 in zip(pose_inputs[0], motion_inputs[0]):
+                        concatenated_tensor = torch.cat([tensor1, tensor2], dim=1)
+                        concatenated_list.append(concatenated_tensor)
+                    
+                    axisangle, translation = self.models["pose"]([concatenated_list])
+                    """
+                    axisangle, translation = self.models["pose"](pose_inputs)
+
+                    # Input for Lighting
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])                   
+
+                    outputs["axisangle_0_"+str(f_i)] = axisangle
+                    outputs["translation_0_"+str(f_i)] = translation
+                    outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
+                        axisangle[:, 0], translation[:, 0])
+                    #outputs["constrast_0_"+str(f_1)] = contrast
+                    #outputs["constrast_0_"+str(f_1)] = brightness
+                    
+                    #if f_i < 0:
+                    
+                    for scale in self.opt.scales:
+                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
+                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        
+                        #Lighting compensation
+                        b = outputs["b_"+str(0)+"_"+str(f_i)]
+                        c = outputs["c_"+str(0)+"_"+str(f_i)]
+                        outputs["refinedCB_target"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
+                        
+                    
+                   
+                    
+        return outputs
+"""
+    def predict_poses(self, inputs, features, disps):
+
+        outputs = {}
+        if self.num_pose_frames == 2:
+            if self.opt.pose_model_type == "shared":
+                pose_feats = {f_i: features[f_i] for f_i in self.opt.frame_ids}
+            else:
+                #pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
+                pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
+
+            
+            for f_i in self.opt.frame_ids[1:]:
+                #print("Entro"+str(f_i))
+                if f_i != "s":
+                    inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
+
 
                     # OF Prediction normal and reversed
                     position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
@@ -374,7 +457,7 @@ class Trainer:
                     #motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
                     #outputs_mf = self.models["motion_flow"](pose_inputs[0])
                     #input_combined = pose_inputs
-                    """
+                    
                     concatenated_list = []
                     # Iterate over the corresponding tensors in list1 and list2 and concatenate them
                     for tensor1, tensor2 in zip(pose_inputs[0], motion_inputs[0]):
@@ -382,7 +465,7 @@ class Trainer:
                         concatenated_list.append(concatenated_tensor)
                     
                     axisangle, translation = self.models["pose"]([concatenated_list])
-                    """
+                    
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
@@ -415,10 +498,10 @@ class Trainer:
                    
                     
         return outputs
+"""
+                
+                
 
-                
-                
-        
     def generate_images_pred(self, inputs, outputs):
         """Generate the warped (reprojected) color images for a minibatch.
         Generated images are saved into the `outputs` dictionary.
@@ -488,7 +571,7 @@ class Trainer:
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                 
-                outputs["colort_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["mf_"+str(0)+"_"+str(frame_id)])
+                #outputs["colort_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["mf_"+str(0)+"_"+str(frame_id)])
                 
     def compute_reprojection_loss(self, pred, target):
 
@@ -574,12 +657,12 @@ class Trainer:
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["colort_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_target"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss( outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 """loss_ilumination_invariant += (
                     self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
-                loss_motion_flow += (
+                """loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
-                )
+                )"""
             
 
             mean_disp = disp.mean(2, True).mean(3, True)
@@ -590,7 +673,7 @@ class Trainer:
             #loss += 0.10 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
+            #loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
@@ -671,7 +754,7 @@ class Trainer:
             for frame_id in self.opt.frame_ids[1:]:
                 
                 registration_losses.append(
-                    ncc_loss(outputs["colort_"+str(frame_id)+"_"+str(scale)].mean(1, True), outputs["refinedCB_target"+str(frame_id)+"_"+str(scale)].mean(1, True)))
+                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].mean(1, True), outputs["refinedCB_target"+str(frame_id)+"_"+str(scale)].mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
@@ -707,7 +790,7 @@ class Trainer:
             for s in self.opt.scales:
                 for frame_id in self.opt.frame_ids[1:]:
                     #if frame_id < 0:
-                    wandb.log({mode+"_Output_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["colort_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_Output_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
                     wandb.log({mode+"_Refined_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_target"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
                     
                     wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["b_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
