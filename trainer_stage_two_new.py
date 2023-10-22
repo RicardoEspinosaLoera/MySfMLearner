@@ -475,7 +475,7 @@ class Trainer:
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                 
-                outputs["color_ref"+str(scale)+"_"+str(frame_id)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["mf_"+str(0)+"_"+str(frame_id)])
+                outputs["color_ref"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["mf_"+str(0)+"_"+str(frame_id)])
                 #Motion flow
                 """
                 outputs["mfh_"+str(scale)] = F.interpolate(
