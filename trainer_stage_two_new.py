@@ -464,7 +464,9 @@ class Trainer:
                 
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)] = outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
 
-                outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
+                cords_original = outputs["sample_"+str(frame_id)+"_"+str(scale)].detach()
+
+                outputs["cf_"+str(scale)+"_"+str(frame_id)] = cords_original + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
         
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
