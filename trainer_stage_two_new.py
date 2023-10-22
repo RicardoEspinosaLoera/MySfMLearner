@@ -92,7 +92,7 @@ class Trainer:
         self.models["lighting"].to(self.device)
         self.parameters_to_train += list(self.models["lighting"].parameters())
 
-        self.models["motion_flow"] = networks.ResidualFLowDecoder(self.models["ii_encoder"].num_ch_enc, self.opt.scales)
+        self.models["motion_flow"] = networks.ResidualFLowDecoder(self.models["encoder"].num_ch_enc, self.opt.scales)
         self.models["motion_flow"].to(self.device)
         self.parameters_to_train += list(self.models["motion_flow"].parameters())
 
@@ -369,7 +369,7 @@ class Trainer:
                     #iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features( pose_feats[0])] 
                     
                     #motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
-                    #outputs_mf = self.models["motion_flow"](motion_inputs[0])
+                    outputs_mf = self.models["motion_flow"](pose_inputs[0])
                     #input_combined = pose_inputs
                     """
                     concatenated_list = []
@@ -394,13 +394,13 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #Lighting compensation
                         b = outputs["b_"+str(0)+"_"+str(f_i)]
                         c = outputs["c_"+str(0)+"_"+str(f_i)]
                         outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
-                        #outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(outputs["refinedCB_"+str(f_i)+"_"+str(0)], outputs["mf_"+str(0)+"_"+str(f_i)])
+                        outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(outputs["refinedCB_"+str(f_i)+"_"+str(0)], outputs["mf_"+str(0)+"_"+str(f_i)])
                         
                     
                    
@@ -461,34 +461,14 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["cf_"+str(scale)+"_"+str(frame_id)],
                     padding_mode="border",align_corners=True)
+
                 """
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                 
-                #Motion flow
-                """
-                outputs["mfh_"+str(scale)] = F.interpolate(
-                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                
-                outputs["colorR_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mfh_"+str(scale)])
-                """
-                
-                
-                    
-            
-            #Feature similairty and depth consistency loss
-            """
-            self.models["encoder"].eval()
-            self.models["depth"].eval()
-            features = self.models["encoder"](outputs["color_"+str(-1)+"_"+str(0)].detach())
-            #outputs["f2"] = features[0][:,r,:, :].detach()
-            predicted_disp = self.models["depth"](features)
-            _, predicted_depth = disp_to_depth(predicted_disp["disp_"+str(0)].detach(), self.opt.min_depth, self.opt.max_depth)
-            outputs["pdepth_"+str(0)] = predicted_depth
-            self.models["encoder"].train()
-            self.models["depth"].train()"""
+
                 
     def compute_reprojection_loss(self, pred, target):
 
@@ -574,8 +554,8 @@ class Trainer:
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
                 loss_reprojection += (
                     self.compute_reprojection_loss( outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
-                loss_ilumination_invariant += (
-                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()
+                """loss_ilumination_invariant += (
+                    self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
                 """loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
                 )"""
@@ -586,10 +566,10 @@ class Trainer:
             smooth_loss = get_smooth_loss(norm_disp, color)
 
             loss += loss_reprojection / 2.0
-            loss += 0.10 * loss_ilumination_invariant / 2.0
+            #loss += 0.10 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            #loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
+            loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
