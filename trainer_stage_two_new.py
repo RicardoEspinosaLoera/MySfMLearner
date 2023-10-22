@@ -333,13 +333,13 @@ class Trainer:
             for f_i in self.opt.frame_ids[1:]:
                 #print("Entro"+str(f_i))
                 if f_i != "s":
-                    #inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    inputs_all = [pose_feats[f_i], pose_feats[0]]
                     inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
-                    if f_i < 0:
+                    """if f_i < 0:
                         inputs_all = [pose_feats[f_i], pose_feats[0]]
                     else:
                         inputs_all = [pose_feats[0], pose_feats[f_i]]
-                                      
+                    """  
 
                     # OF Prediction normal and reversed
                     position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
