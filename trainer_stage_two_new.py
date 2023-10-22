@@ -405,6 +405,7 @@ class Trainer:
                    
                     
         return outputs
+        
 """
     def predict_poses(self, inputs, features, disps):
 
@@ -498,7 +499,7 @@ class Trainer:
                    
                     
         return outputs
-"""
+    """
                 
                 
 
