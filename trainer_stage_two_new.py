@@ -401,9 +401,6 @@ class Trainer:
                         c = outputs["c_"+str(0)+"_"+str(f_i)]
                         outputs["refinedCB_target"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
                         
-                    
-                   
-                    
         return outputs               
                 
 
