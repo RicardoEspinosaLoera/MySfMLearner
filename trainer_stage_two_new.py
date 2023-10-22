@@ -396,8 +396,6 @@ class Trainer:
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
-                        """outputs["mfh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
-                             outputs["mf_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)"""
                         outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["mf_"+str(0)+"_"+str(f_i)])
                         #outputs["r_"+str(scale)+"_"+str(f_i)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["ph_"+str(scale)+"_"+str(f_i)])
                         #Lighting compensation
@@ -454,7 +452,7 @@ class Trainer:
                     depth, inputs[("inv_K", source_scale)])
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
-
+                """
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
                 
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
@@ -469,9 +467,9 @@ class Trainer:
                 
                 """
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
-                    outputs["refinedMF_"+str(frame_id)+"_"+str(source_scale)],
+                    inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
-                    padding_mode="border",align_corners=True)"""
+                    padding_mode="border",align_corners=True)
                 
 
                 
