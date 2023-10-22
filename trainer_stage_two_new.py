@@ -452,9 +452,9 @@ class Trainer:
                     depth, inputs[("inv_K", source_scale)])
                 pix_coords = self.project_3d[source_scale](
                     cam_points, inputs[("K", source_scale)], T)
-                """
-                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
                 
+                outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
+                """
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
 
                 outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
@@ -466,6 +466,7 @@ class Trainer:
 
                 
                 """
+
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
