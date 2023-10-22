@@ -396,7 +396,7 @@ class Trainer:
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
-                        outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["mf_"+str(0)+"_"+str(f_i)])
+                        outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", 0, 0)], outputs["mf_"+str(0)+"_"+str(f_i)])
                         #outputs["r_"+str(scale)+"_"+str(f_i)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["ph_"+str(scale)+"_"+str(f_i)])
                         #Lighting compensation
                         b = outputs["b_"+str(0)+"_"+str(f_i)]
