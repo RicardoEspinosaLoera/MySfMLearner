@@ -404,7 +404,7 @@ class Trainer:
                         #Lighting compensation
                         b = outputs["b_"+str(0)+"_"+str(f_i)]
                         c = outputs["c_"+str(0)+"_"+str(f_i)]
-                        outputs["refinedCB_target"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
+                        outputs["refinedCB_target"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)].detach() + b
                         #outputs[("refined", scale, f_i)] = (outputs[("transform", "high", scale, f_i)] * outputs[("occu_mask_backward", 0, f_i)].detach()  + inputs[("color", 0, 0)])
                         
                         
@@ -470,7 +470,6 @@ class Trainer:
 
                 
                 """
-
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
