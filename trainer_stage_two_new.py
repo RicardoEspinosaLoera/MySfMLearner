@@ -92,7 +92,7 @@ class Trainer:
         self.models["lighting"].to(self.device)
         self.parameters_to_train += list(self.models["lighting"].parameters())
 
-        self.models["motion_flow"] = networks.ResidualFLowDecoder(self.models["encoder"].num_ch_enc, self.opt.scales)
+        self.models["motion_flow"] = networks.ResidualFLowDecoder(self.models["ii_encoder"].num_ch_enc, self.opt.scales)
         self.models["motion_flow"].to(self.device)
         self.parameters_to_train += list(self.models["motion_flow"].parameters())
 
@@ -318,93 +318,98 @@ class Trainer:
 
         return outputs, losses
 
-def predict_poses(self, inputs, features, disps):
-    """Predict poses between input frames for monocular sequences.
-    """
-    outputs = {}
-    if self.num_pose_frames == 2:
-        if self.opt.pose_model_type == "shared":
-            pose_feats = {f_i: features[f_i] for f_i in self.opt.frame_ids}
-        else:
-            #pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
-            pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
+    def predict_poses(self, inputs, features, disps):
+        """Predict poses between input frames for monocular sequences.
+        """
+        outputs = {}
+        if self.num_pose_frames == 2:
+            if self.opt.pose_model_type == "shared":
+                pose_feats = {f_i: features[f_i] for f_i in self.opt.frame_ids}
+            else:
+                #pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
+                pose_feats = {f_i: inputs["color_aug", f_i, 0] for f_i in self.opt.frame_ids}
 
+            
+            for f_i in self.opt.frame_ids[1:]:
+                #print("Entro"+str(f_i))
+                if f_i != "s":
+                    inputs_all = [pose_feats[f_i], pose_feats[0]]
+                    inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
+                    
+                                      
+
+                    # OF Prediction normal and reversed
+                    position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
+                    position_inputs_reverse = self.models["position_encoder"](torch.cat(inputs_all_reverse, 1))
+                    outputs_0 = self.models["position"](position_inputs)
+                    outputs_1 = self.models["position"](position_inputs_reverse)
+
+                    for scale in self.opt.scales:
+                        outputs["p_"+str(scale)+"_"+str(f_i)] = outputs_0["position_"+str(scale)]
+                        outputs["ph_"+str(scale)+"_"+str(f_i)] = F.interpolate(
+                            outputs["p_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                        #outputs["r_"+str(scale)+"_"+str(f_i)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["ph_"+str(scale)+"_"+str(f_i)])
+                        outputs["pr_"+str(scale)+"_"+str(f_i)] = outputs_1["position_"+str(scale)]
+                        outputs["prh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
+                            outputs["pr_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                        
+                        outputs["omaskb_"+str(scale)+"_"+str(f_i)],  outputs["omapb_"+str(scale)+"_"+str(f_i)]= self.get_occu_mask_backward(outputs["prh_"+str(scale)+"_"+str(f_i)])
+                        outputs["omapbi_"+str(scale)+"_"+str(f_i)] = self.get_occu_mask_bidirection(outputs["ph_"+str(scale)+"_"+str(f_i)],
+                                                                                                          outputs["prh_"+str(scale)+"_"+str(f_i)])
+
+                    # Input for the AFNet
+                    #transform_input = [outputs["r_0"+"_"+str(f_i)], inputs[("color", 0, 0)]]
+                    # Output from AFNet
+                    #transform_inputs = self.models["transform_encoder"](torch.cat(transform_input, 1))
+                    #outputs_2 = self.models["transform"](transform_inputs)
+
+                    # Input motion flow
+                    pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
+                    """
+                    iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features( pose_feats[0])] 
+                    
+                    motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
+                    outputs_mf = self.models["motion_flow"](motion_inputs[0])
+                    input_combined = pose_inputs
+                    concatenated_list = []
+                    # Iterate over the corresponding tensors in list1 and list2 and concatenate them
+                    for tensor1, tensor2 in zip(pose_inputs[0], motion_inputs[0]):
+                        concatenated_tensor = torch.cat([tensor1, tensor2], dim=1)
+                        concatenated_list.append(concatenated_tensor)
+                    
+                    axisangle, translation = self.models["pose"]([concatenated_list])
+                    """
+                    axisangle, translation = self.models["pose"](pose_inputs)
+
+                    # Input for Lighting
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])                   
+
+                    outputs["axisangle_0_"+str(f_i)] = axisangle
+                    outputs["translation_0_"+str(f_i)] = translation
+                    outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
+                        axisangle[:, 0], translation[:, 0])
+                    #outputs["constrast_0_"+str(f_1)] = contrast
+                    #outputs["constrast_0_"+str(f_1)] = brightness
+                    
+                    #if f_i < 0:
+                    
+                    for scale in self.opt.scales:
+                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
+                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        
+                        #Lighting compensation
+                        b = outputs["b_"+str(0)+"_"+str(frame_id)]
+                        c = outputs["c_"+str(0)+"_"+str(frame_id)]
+                        outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
+                    
+                   
+                    
+        return outputs
+
+                
+                
         
-        for f_i in self.opt.frame_ids[1:]:
-            #print("Entro"+str(f_i))
-            if f_i != "s":
-                inputs_all = [pose_feats[f_i], pose_feats[0]]
-                inputs_all_reverse = [pose_feats[0], pose_feats[f_i]]
-                
-                                    
-
-                # OF Prediction normal and reversed
-                position_inputs = self.models["position_encoder"](torch.cat(inputs_all, 1))
-                position_inputs_reverse = self.models["position_encoder"](torch.cat(inputs_all_reverse, 1))
-                outputs_0 = self.models["position"](position_inputs)
-                outputs_1 = self.models["position"](position_inputs_reverse)
-
-                for scale in self.opt.scales:
-                    outputs["p_"+str(scale)+"_"+str(f_i)] = outputs_0["position_"+str(scale)]
-                    outputs["ph_"+str(scale)+"_"+str(f_i)] = F.interpolate(
-                        outputs["p_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                    #outputs["r_"+str(scale)+"_"+str(f_i)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["ph_"+str(scale)+"_"+str(f_i)])
-                    outputs["pr_"+str(scale)+"_"+str(f_i)] = outputs_1["position_"+str(scale)]
-                    outputs["prh_"+str(scale)+"_"+str(f_i)] = F.interpolate(
-                        outputs["pr_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                    
-                    outputs["omaskb_"+str(scale)+"_"+str(f_i)],  outputs["omapb_"+str(scale)+"_"+str(f_i)]= self.get_occu_mask_backward(outputs["prh_"+str(scale)+"_"+str(f_i)])
-                    outputs["omapbi_"+str(scale)+"_"+str(f_i)] = self.get_occu_mask_bidirection(outputs["ph_"+str(scale)+"_"+str(f_i)],
-                                                                                                        outputs["prh_"+str(scale)+"_"+str(f_i)])
-
-                # Input for the AFNet
-                #transform_input = [outputs["r_0"+"_"+str(f_i)], inputs[("color", 0, 0)]]
-                # Output from AFNet
-                #transform_inputs = self.models["transform_encoder"](torch.cat(transform_input, 1))
-                #outputs_2 = self.models["transform"](transform_inputs)
-
-                # Input motion flow
-                pose_inputs = [self.models["pose_encoder"](torch.cat(inputs_all, 1))]
-                """
-                iif_all = [get_ilumination_invariant_features(pose_feats[f_i]),get_ilumination_invariant_features( pose_feats[0])] 
-                
-                motion_inputs = [self.models["ii_encoder"](torch.cat(iif_all, 1))]
-                outputs_mf = self.models["motion_flow"](motion_inputs[0])
-                input_combined = pose_inputs
-                concatenated_list = []
-                # Iterate over the corresponding tensors in list1 and list2 and concatenate them
-                for tensor1, tensor2 in zip(pose_inputs[0], motion_inputs[0]):
-                    concatenated_tensor = torch.cat([tensor1, tensor2], dim=1)
-                    concatenated_list.append(concatenated_tensor)
-                
-                axisangle, translation = self.models["pose"]([concatenated_list])
-                """
-                axisangle, translation = self.models["pose"](pose_inputs)
-
-                # Input for Lighting
-                outputs_lighting = self.models["lighting"](pose_inputs[0])                   
-
-                outputs["axisangle_0_"+str(f_i)] = axisangle
-                outputs["translation_0_"+str(f_i)] = translation
-                outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
-                    axisangle[:, 0], translation[:, 0])
-                #outputs["constrast_0_"+str(f_1)] = contrast
-                #outputs["constrast_0_"+str(f_1)] = brightness
-                
-                #if f_i < 0:
-                
-                for scale in self.opt.scales:
-                    outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
-                    outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                    #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
-                    
-                    #Lighting compensation
-                    b = outputs["b_"+str(0)+"_"+str(frame_id)]
-                    c = outputs["c_"+str(0)+"_"+str(frame_id)]
-                    outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
-                            
-        return outputs                
-
     def generate_images_pred(self, inputs, outputs):
         """Generate the warped (reprojected) color images for a minibatch.
         Generated images are saved into the `outputs` dictionary.
@@ -683,7 +688,6 @@ def predict_poses(self, inputs, features, disps):
         losses["loss"] = -1 * total_loss
 
         return losses
-
     def log_time(self, batch_idx, duration, loss):
         """Print a logging statement to the terminal
         """
@@ -717,8 +721,8 @@ def predict_poses(self, inputs, features, disps):
                     f = outputs["mf_"+str(s)+"_"+str(frame_id)][j].data
                     flow = self.flow2rgb(f,32)
                     flow = torch.from_numpy(flow)
-                    wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)"""
-                    
+                    wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)
+                    """
                 disp = normalize_image(outputs["disp_"+str(s)][j])
                 wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(disp)},step=self.step)
                                 
@@ -803,8 +807,9 @@ def predict_poses(self, inputs, features, disps):
         rgb_map[2] += normalized_flow_map[1]
         return rgb_map.clip(0,1)
 
-    def colormap(self, inputs, normalize=True, torch_transpose=False):
-        inputs = inputs.detach().cpu().numpy()
+    def colormap(inputs, normalize=True, torch_transpose=True):
+        if isinstance(inputs, torch.Tensor):
+            inputs = inputs.detach().cpu().numpy()
 
         vis = inputs
 
