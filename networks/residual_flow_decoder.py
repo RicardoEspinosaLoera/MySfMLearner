@@ -62,7 +62,7 @@ class ResidualFLowDecoder(nn.Module):
 
         return self.outputs
 
-
+"""
 from __future__ import absolute_import, division, print_function
 
 import numpy as np
@@ -72,7 +72,7 @@ import torch.nn as nn
 from torch.distributions.normal import Normal
 from collections import OrderedDict
 from layers import *
-"""
+
 
 class ResidualFLowDecoder(nn.Module):
     def __init__(self, num_ch_enc, scales = range(4) , num_output_channels=2, use_skips=True):
