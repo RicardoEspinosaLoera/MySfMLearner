@@ -386,18 +386,13 @@ class Trainer:
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
-                    outputs_lighting = self.models["lighting"](pose_inputs[0])                   
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])  
+                    outputs_mf = self.models["motion_flow"](pose_inputs[0])   
 
-                    outputs["axisangle_0_"+str(f_i)] = axisangle
-                    outputs["translation_0_"+str(f_i)] = translation
-                    outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
-                        axisangle[:, 0], translation[:, 0])
-
-                    
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["mf_"+str(0)+"_"+str(f_i)])
                         #outputs["r_"+str(scale)+"_"+str(f_i)] = self.spatial_transform(inputs[("color", f_i, 0)], outputs["ph_"+str(scale)+"_"+str(f_i)])
@@ -405,7 +400,15 @@ class Trainer:
                         b = outputs["b_"+str(0)+"_"+str(f_i)]
                         c = outputs["c_"+str(0)+"_"+str(f_i)]
                         outputs["refinedCB_target"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
-                        #outputs[("refined", scale, f_i)] = (outputs[("transform", "high", scale, f_i)] * outputs[("occu_mask_backward", 0, f_i)].detach()  + inputs[("color", 0, 0)])
+                        #outputs[("refined", scale, f_i)] = (outputs[("transform", "high", scale, f_i)] * outputs[("occu_mask_backward", 0, f_i)].detach()  + inputs[("color", 0, 0)])              
+
+                    outputs["axisangle_0_"+str(f_i)] = axisangle
+                    outputs["translation_0_"+str(f_i)] = translation
+                    outputs["cam_T_cam_0_"+str(f_i)] = transformation_from_parameters(
+                        axisangle[:, 0], translation[:, 0])
+
+                    
+                    
                         
                         
                     
@@ -458,8 +461,8 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
                 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-                """
-                outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
+                
+                outputs["mfh_"+str(scale)+"_"+str(frame_id)] = outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
 
                 outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
         
@@ -468,7 +471,7 @@ class Trainer:
                     outputs["cf_"+str(scale)+"_"+str(frame_id)],
                     padding_mode="border",align_corners=True)
 
-                
+                """
                 outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
 
                 outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
@@ -478,11 +481,11 @@ class Trainer:
                     outputs["cf_"+str(scale)+"_"+str(frame_id)],
                     padding_mode="border",align_corners=True)
                 
-                """
+                
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
-                    padding_mode="border",align_corners=True)
+                    padding_mode="border",align_corners=True)"""
                 
 
                 
