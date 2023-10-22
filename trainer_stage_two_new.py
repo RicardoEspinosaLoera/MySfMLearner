@@ -464,7 +464,7 @@ class Trainer:
 
                 """
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
-                    outputs["refinedMF_"+str(f_i)+"_"+str(scale)],
+                    outputs["refinedMF_"+str(frame_id)+"_"+str(source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
                 
