@@ -395,11 +395,11 @@ class Trainer:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
-                        #outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", 0, 0)], outputs["mf_"+str(0)+"_"+str(f_i)])
+                        outputs["refinedMF_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", 0, 0)], outputs["mf_"+str(0)+"_"+str(f_i)])
                         #Lighting compensation
                         b = outputs["b_"+str(0)+"_"+str(f_i)]
                         c = outputs["c_"+str(0)+"_"+str(f_i)]
-                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
+                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * outputs["refinedMF_"+str(f_i)+"_"+str(scale)] + b
                         
                         
                     
@@ -452,9 +452,9 @@ class Trainer:
                     cam_points, inputs[("K", source_scale)], T)
 
                 outputs["sample_"+str(frame_id)+"_"+str(scale)] = pix_coords
-                
-                outputs["mfh_"+str(scale)+"_"+str(frame_id)] = outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
-                
+                """
+                outputs["mfh_"+str(scale)+"_"+str(frame_id)]=outputs["mf_"+str(0)+"_"+str(frame_id)].permute(0,2,3,1)
+
                 outputs["cf_"+str(scale)+"_"+str(frame_id)] = outputs["sample_"+str(frame_id)+"_"+str(scale)] + outputs["mfh_"+str(scale)+"_"+str(frame_id)]
         
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
@@ -467,7 +467,7 @@ class Trainer:
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
-                """
+                
 
                 
     def compute_reprojection_loss(self, pred, target):
