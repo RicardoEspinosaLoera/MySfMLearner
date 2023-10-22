@@ -662,7 +662,7 @@ class Trainer:
             loss = 0
             registration_losses = []
 
-            target = outputs["refinedCB_target"+str(frame_id)+"_"+str(scale)]
+            target = outputs["refinedCB_target"+str(0)+"_"+str(0)]
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
