@@ -720,7 +720,6 @@ def predict_poses(self, inputs, features, disps):
                     wandb.log({mode+"_Motion_Flow_{}_{}_{}".format(frame_id,s,j): wandb.Image(flow)},step=self.step)"""
                     
                 disp = normalize_image(outputs["disp_"+str(s)][j])
-                #vis = self.colormap(disp)
                 wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(disp)},step=self.step)
                                 
                     
