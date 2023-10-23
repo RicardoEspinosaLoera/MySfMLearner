@@ -482,7 +482,7 @@ class Trainer:
                 """
                 outputs["color_motion_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mf_"+str(0)+"_"+str(frame_id)])
 
-                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] =  outputs["c_"+str(scale)+"_"+str(f_i)] * outputs["color_motion_"+str(frame_id)+"_"+str(scale)] + outputs["b_"+str(scale)+"_"+str(f_i)]
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] =  outputs["c_"+str(0)+"_"+str(frame_id)] * outputs["color_motion_"+str(frame_id)+"_"+str(scale)] + outputs["b_"+str(0)+"_"+str(frame_id)]
                 
                     
             
