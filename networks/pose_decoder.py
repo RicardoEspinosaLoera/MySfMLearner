@@ -9,9 +9,7 @@ class PoseDecoder(nn.Module):
     def __init__(self, num_ch_enc, num_input_features, num_frames_to_predict_for=None, stride=1):
         super(PoseDecoder, self).__init__()
 
-        #self.num_ch_enc = [128,128,256,512,1024]
         self.num_ch_enc = num_ch_enc
-
         self.num_input_features = num_input_features
 
         if num_frames_to_predict_for is None:
@@ -21,7 +19,6 @@ class PoseDecoder(nn.Module):
         #self.convs = OrderedDict()
         self.convs : Dict[string] = {} 
         #self.convs["squeeze"] = nn.Conv2d(int(self.num_ch_enc[-1]), 256, 1)
-        #print(self.num_ch_enc[-1])
         self.squeeze = nn.Conv2d(int(self.num_ch_enc[-1]), 256, 1)
         #self.convs["pose_0"] = nn.Conv2d(int(num_input_features * 256), 256, 3, stride, 1)
         self.pose_0 = nn.Conv2d(int(num_input_features * 256), 256, 3, stride, 1)
@@ -35,8 +32,8 @@ class PoseDecoder(nn.Module):
         self.net = nn.ModuleList(list(self.convs.values()))
 
     def forward(self, input_features):
-        #print(self.num_ch_enc)
         last_features = [f[-1] for f in input_features]
+
         cat_features = [self.relu(self.squeeze(f)) for f in last_features]
         cat_features = torch.cat(cat_features, 1)
 
