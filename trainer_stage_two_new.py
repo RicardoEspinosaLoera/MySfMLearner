@@ -397,8 +397,14 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
-                        
+                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        outputs[("bh",scale, f_i)] = F.interpolate(
+                            outputs[("b",scale,f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                        outputs[("ch",scale, f_i)] = F.interpolate(
+                            outputs[("c",scale,f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                    
+                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = outputs[("ch",scale, f_i)] * inputs[("color", 0, 0)] + outputs[("bh",scale, f_i)]
+            """   
             for f_i in self.opt.frame_ids[1:]:
                 for scale in self.opt.scales:
                     #Motion Flow
@@ -406,7 +412,7 @@ class Trainer:
                     #Lighting compensation
                     b = outputs["b_"+str(0)+"_"+str(f_i)]
                     c = outputs["c_"+str(0)+"_"+str(f_i)]
-                    outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * outputs["color_motion_"+str(f_i)+"_"+str(scale)] + b
+                    outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * outputs["color_motion_"+str(f_i)+"_"+str(scale)] + b"""
 
                    
                     
@@ -588,9 +594,9 @@ class Trainer:
                     self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 """loss_ilumination_invariant += (
                     self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
-                loss_motion_flow += (
+                """loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
-                )
+                )"""
             
 
             mean_disp = disp.mean(2, True).mean(3, True)
@@ -601,7 +607,7 @@ class Trainer:
             #loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            loss += 0.001 * loss_motion_flow / (2 ** scale)
+            #loss += 0.001 * loss_motion_flow / (2 ** scale)
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
