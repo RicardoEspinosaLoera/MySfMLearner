@@ -541,7 +541,8 @@ class Trainer:
         # We used L0.5 norm here because it's more sparsity encouraging than L1.
         # The coefficients are designed in a way that the norm asymptotes to L1 in
         # the small value limit.
-        return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
+        #return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
+        return torch.sqrt(1 + (tensor_abs / mean))
 
     
 
@@ -595,7 +596,7 @@ class Trainer:
             #loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            loss += 0.001 * (loss_motion_flow / 2.0) / (2 ** scale)
+            loss += 0.001 * loss_motion_flow / (2 ** scale)
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
