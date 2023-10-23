@@ -400,9 +400,9 @@ class Trainer:
                         outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         
                         #Lighting compensation
-                        b = outputs["b_"+str(0)+"_"+str(f_i)]
-                        c = outputs["c_"+str(0)+"_"+str(f_i)]
-                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
+                        #b = outputs["b_"+str(0)+"_"+str(f_i)]
+                        #c = outputs["c_"+str(0)+"_"+str(f_i)]
+                        #outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * inputs[("color", 0, 0)] + b
                     
                    
                     
@@ -469,6 +469,7 @@ class Trainer:
                     outputs["cf_"+str(scale)+"_"+str(frame_id)],
                     padding_mode="border",align_corners=True)
                 """
+
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
@@ -480,7 +481,9 @@ class Trainer:
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 """
                 outputs["color_motion_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mf_"+str(0)+"_"+str(frame_id)])
-                
+                b = outputs["b_"+str(0)+"_"+str(f_i)]
+                c = outputs["c_"+str(0)+"_"+str(f_i)]
+                outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * outputs["color_motion_"+str(frame_id)+"_"+str(scale)] + b
                 
                     
             
@@ -577,11 +580,11 @@ class Trainer:
                 occu_mask_backward = outputs["omaskb_"+str(0)+"_"+str(frame_id)].detach()
                 occu_mask_backward_ = get_feature_oclution_mask(occu_mask_backward)
                 
-                """            
+          
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
-                loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["color_motion_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                """loss_reprojection += (
+                    self.compute_reprojection_loss(outputs["color_motion_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
                 """loss_ilumination_invariant += (
                     self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
                 loss_motion_flow += (
