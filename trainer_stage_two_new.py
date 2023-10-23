@@ -542,7 +542,7 @@ class Trainer:
         # The coefficients are designed in a way that the norm asymptotes to L1 in
         # the small value limit.
         #return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
-        return mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1)
+        return torch.mean(mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
         #return torch.sqrt(tensor_abs / mean + 1))
 
     
