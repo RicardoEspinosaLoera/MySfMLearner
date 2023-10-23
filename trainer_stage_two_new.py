@@ -542,7 +542,7 @@ class Trainer:
         # The coefficients are designed in a way that the norm asymptotes to L1 in
         # the small value limit.
         #return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
-        return mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1)
+        return torch.mean(mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
         #return torch.sqrt(tensor_abs / mean + 1))
 
     
@@ -585,7 +585,7 @@ class Trainer:
                 """loss_ilumination_invariant += (
                     self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
                 loss_motion_flow += (
-                    self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
+                    self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)]) / (2 ** scale)
                 )
             
 
@@ -597,7 +597,7 @@ class Trainer:
             #loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            loss += 0.001 * loss_motion_flow / (2 ** scale)
+            loss += 0.001 * loss_motion_flow 
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
