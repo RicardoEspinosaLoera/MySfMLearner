@@ -481,9 +481,9 @@ class Trainer:
                     outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 """
                 outputs["color_motion_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mf_"+str(0)+"_"+str(frame_id)])
-                b = outputs["b_"+str(0)+"_"+str(f_i)]
-                c = outputs["c_"+str(0)+"_"+str(f_i)]
-                outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = c * outputs["color_motion_"+str(frame_id)+"_"+str(scale)] + b
+                b = outputs["b_"+str(0)+"_"+str(frame_id)]
+                c = outputs["c_"+str(0)+"_"+str(frame_id)]
+                outputs["refinedCB_"+str(frame_id)+"_"+str(scale)] = c * outputs["color_motion_"+str(frame_id)+"_"+str(scale)] + b
                 
                     
             
