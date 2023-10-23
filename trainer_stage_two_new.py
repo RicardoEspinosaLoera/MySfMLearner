@@ -401,7 +401,7 @@ class Trainer:
                         
             for f_i in self.opt.frame_ids[1:]:
                 for scale in self.opt.scales:
-                    outputs["color_motion_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", 0, 0)],outputs["mf_"+str(scale)+"_"+str(f_i)])
+                    outputs["color_motion_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", 0, 0)],outputs["mf_"+str(0)+"_"+str(f_i)])
                     #Lighting compensation
                     b = outputs["b_"+str(scale)+"_"+str(f_i)]
                     c = outputs["c_"+str(scale)+"_"+str(f_i)]
