@@ -401,6 +401,7 @@ class Trainer:
                         
             for f_i in self.opt.frame_ids[1:]:
                 for scale in self.opt.scales:
+                    #Motion Flow
                     outputs["color_motion_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", 0, 0)],outputs["mf_"+str(0)+"_"+str(f_i)])
                     #Lighting compensation
                     b = outputs["b_"+str(0)+"_"+str(f_i)]
@@ -545,7 +546,7 @@ class Trainer:
         # The coefficients are designed in a way that the norm asymptotes to L1 in
         # the small value limit.
         #return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
-        return torch.mean(mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
+        return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
         #return torch.sqrt(tensor_abs / mean + 1))
 
     
