@@ -399,9 +399,9 @@ class Trainer:
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
                         #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         outputs[("bh",scale, f_i)] = F.interpolate(
-                            outputs[("b",scale,f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                            outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                         outputs[("ch",scale, f_i)] = F.interpolate(
-                            outputs[("c",scale,f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                            outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                     
                         outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = outputs[("ch",scale, f_i)] * inputs[("color", 0, 0)] + outputs[("bh",scale, f_i)]
             """   
