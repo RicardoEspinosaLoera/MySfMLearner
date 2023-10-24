@@ -397,7 +397,7 @@ class Trainer:
                     for scale in self.opt.scales:
                         outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
                         outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        #outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                         outputs[("bh",scale, f_i)] = F.interpolate(
                             outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                         outputs[("ch",scale, f_i)] = F.interpolate(
@@ -479,19 +479,14 @@ class Trainer:
                     outputs["cf_"+str(scale)+"_"+str(frame_id)],
                     padding_mode="border",align_corners=True)
                 """
+
                 outputs["color_"+str(frame_id)+"_"+str(scale)] = F.grid_sample(
                     inputs[("color", frame_id, source_scale)],
                     outputs["sample_"+str(frame_id)+"_"+str(scale)],
                     padding_mode="border",align_corners=True)
+
                 
-                #Motion flow
-                """
-                outputs["mfh_"+str(scale)] = F.interpolate(
-                    outputs["mf_"+str(scale)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                """
-                
-                
-                
+                outputs["color_motion_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mf_"+str(0)+"_"+str(frame_id)])
                     
             
             #Feature similairty and depth consistency loss
@@ -591,7 +586,7 @@ class Trainer:
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["color_motion_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 """loss_ilumination_invariant += (
                     self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
                 """loss_motion_flow += (
@@ -687,7 +682,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["color_motion_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
@@ -724,18 +719,18 @@ class Trainer:
                 for frame_id in self.opt.frame_ids[1:]:
                     #if frame_id < 0:
                     wandb.log({mode+"_Output_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
-                    #wandb.log({mode+"_Output_Motion_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color_motion_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
+                    wandb.log({mode+"_Output_Motion_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["color_motion_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
                     wandb.log({mode+"_Refined_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["refinedCB_"+str(frame_id)+"_"+str(s)][j].data)},step=self.step)
                     """
                     wandb.log({mode+"_Brightness_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["b_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
 
                     wandb.log({mode+"_Contrast_{}_{}_{}".format(frame_id, s, j): wandb.Image(outputs["c_"+str(s)+"_"+str(frame_id)][j].data)},step=self.step)
                     """
-                """
+                
                 f = outputs["mf_"+str(s)+"_"+str(frame_id)][j].data
                 flow = self.flow2rgb(f,32)
                 flow = torch.from_numpy(flow)
-                wandb.log({mode+"_Motion_Flow_{}_{}".format(s,j): wandb.Image(flow)},step=self.step)"""
+                wandb.log({mode+"_Motion_Flow_{}_{}".format(s,j): wandb.Image(flow)},step=self.step)
                     
                 disp = normalize_image(outputs["disp_"+str(s)][j])
                 wandb.log({mode+"_Disp_{}_{}".format(s, j): wandb.Image(disp)},step=self.step)
