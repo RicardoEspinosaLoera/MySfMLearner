@@ -382,7 +382,8 @@ class Trainer:
                     axisangle, translation = self.models["pose"](pose_inputs)
 
                     # Input for Lighting
-                    outputs_lighting = self.models["lighting"](pose_inputs[0])                   
+                    outputs_lighting = self.models["lighting"](pose_inputs[0])   
+                    
                     outputs_mf = self.models["motion_flow"](pose_inputs[0])
 
                     outputs["axisangle_0_"+str(f_i)] = axisangle
@@ -393,17 +394,18 @@ class Trainer:
                     #outputs["constrast_0_"+str(f_1)] = brightness
                     
                     #if f_i < 0:
-                    
-                    for scale in self.opt.scales:
-                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
-                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
-                        outputs[("bh",scale, f_i)] = F.interpolate(
-                            outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                        outputs[("ch",scale, f_i)] = F.interpolate(
-                            outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                    
-                        outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = outputs[("ch",scale, f_i)] * inputs[("color", 0, 0)] + outputs[("bh",scale, f_i)]
+            for f_i in self.opt.frame_ids[1:]:
+                for scale in self.opt.scales:
+                    outputs["color_motion_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(inputs[("color", 0, 0)],outputs["mf_"+str(0)+"_"+str(frame_id)])
+                    outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+                    outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
+                    outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                    outputs[("bh",scale, f_i)] = F.interpolate(
+                        outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                    outputs[("ch",scale, f_i)] = F.interpolate(
+                        outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                
+                    outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = outputs[("ch",scale, f_i)] * outputs["color_motion_"+str(frame_id)+"_"+str(scale)] + outputs[("bh",scale, f_i)]
             """   
             for f_i in self.opt.frame_ids[1:]:
                 for scale in self.opt.scales:
@@ -486,7 +488,7 @@ class Trainer:
                     padding_mode="border",align_corners=True)
 
                 
-                outputs["color_motion_"+str(frame_id)+"_"+str(scale)] = self.spatial_transform(outputs["color_"+str(frame_id)+"_"+str(scale)],outputs["mf_"+str(0)+"_"+str(frame_id)])
+                
                     
             
             #Feature similairty and depth consistency loss
@@ -547,7 +549,7 @@ class Trainer:
         # The coefficients are designed in a way that the norm asymptotes to L1 in
         # the small value limit.
         #return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
-        return torch.mean(2 * mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
+        return torch.mean(mean * torch.sqrt(tensor_abs / (mean + 1e-24) + 1))
         #return torch.sqrt(tensor_abs / mean + 1))
 
     
@@ -586,12 +588,12 @@ class Trainer:
                 loss_reprojection += (
                     self.compute_reprojection_loss(outputs["refinedCB_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward).sum() / occu_mask_backward.sum()"""
                 loss_reprojection += (
-                    self.compute_reprojection_loss(outputs["color_motion_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
+                    self.compute_reprojection_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], outputs["refinedCB_"+str(frame_id)+"_"+str(scale)]) * occu_mask_backward).sum() / occu_mask_backward.sum()
                 """loss_ilumination_invariant += (
                     self.get_ilumination_invariant_loss(outputs["color_"+str(frame_id)+"_"+str(scale)], inputs[("color",0,0)]) * occu_mask_backward_).sum() / occu_mask_backward_.sum()"""
-                """loss_motion_flow += (
+                loss_motion_flow += (
                     self.get_motion_flow_loss(outputs["mf_"+str(scale)+"_"+str(frame_id)])
-                )"""
+                )
             
 
             mean_disp = disp.mean(2, True).mean(3, True)
@@ -602,7 +604,7 @@ class Trainer:
             #loss += 0.20 * loss_ilumination_invariant / 2.0
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
-            #loss += 0.001 * loss_motion_flow / (2 ** scale)
+            loss += 0.001 * loss_motion_flow / (2 ** scale)
             
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
@@ -682,7 +684,7 @@ class Trainer:
 
             for frame_id in self.opt.frame_ids[1:]:
                 registration_losses.append(
-                    ncc_loss(outputs["color_motion_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
+                    ncc_loss(outputs["color_"+str(frame_id)+"_"+str(scale)].mean(1, True), target.mean(1, True)))
 
             registration_losses = torch.cat(registration_losses, 1)
             registration_losses, idxs_registration = torch.min(registration_losses, dim=1)
