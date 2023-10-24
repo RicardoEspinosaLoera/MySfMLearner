@@ -392,10 +392,11 @@ class Trainer:
                         axisangle[:, 0], translation[:, 0])
                     #outputs["constrast_0_"+str(f_1)] = contrast
                     #outputs["constrast_0_"+str(f_1)] = brightness
-                    outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
-                    outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                    outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
-                    
+                    for scale in self.opt.scales:
+                        outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+                        outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
+                        outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+
                     #if f_i < 0:
             for f_i in self.opt.frame_ids[1:]:
                 for scale in self.opt.scales:
