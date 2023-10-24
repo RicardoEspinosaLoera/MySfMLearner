@@ -407,7 +407,7 @@ class Trainer:
                     outputs[("ch",scale, f_i)] = F.interpolate(
                         outputs["c_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                 
-                    outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = outputs[("ch",scale, f_i)] * outputs["color_motion_"+str(frame_id)+"_"+str(scale)] + outputs[("bh",scale, f_i)]
+                    outputs["refinedCB_"+str(f_i)+"_"+str(scale)] = outputs[("ch",scale, f_i)] * outputs["color_motion_"+str(f_i)+"_"+str(scale)] + outputs[("bh",scale, f_i)]
             """   
             for f_i in self.opt.frame_ids[1:]:
                 for scale in self.opt.scales:
