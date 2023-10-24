@@ -392,14 +392,15 @@ class Trainer:
                         axisangle[:, 0], translation[:, 0])
                     #outputs["constrast_0_"+str(f_1)] = contrast
                     #outputs["constrast_0_"+str(f_1)] = brightness
+                    outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
+                    outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
+                    outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
                     
                     #if f_i < 0:
             for f_i in self.opt.frame_ids[1:]:
                 for scale in self.opt.scales:
                     outputs["color_motion_"+str(f_i)+"_"+str(scale)] = self.spatial_transform(inputs[("color", 0, 0)],outputs["mf_"+str(0)+"_"+str(f_i)])
-                    outputs["b_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,0,None,:, :]
-                    outputs["c_"+str(scale)+"_"+str(f_i)] = outputs_lighting[("lighting", scale)][:,1,None,:, :]
-                    outputs["mf_"+str(scale)+"_"+str(f_i)] = outputs_mf[("flow", scale)]
+                    
                     outputs[("bh",scale, f_i)] = F.interpolate(
                         outputs["b_"+str(scale)+"_"+str(f_i)], [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
                     outputs[("ch",scale, f_i)] = F.interpolate(
